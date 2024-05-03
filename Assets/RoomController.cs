@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,9 +13,9 @@ public class RoomController : NetworkBehaviour
     [Tooltip("0: Up, 1: Right, 2: Down, 3: Left, clockwise from top basically")]
     [SerializeField] private RoomDoorController[] doors = new RoomDoorController[4];
 
-    private static int _nextId = 0;
-    public int Id;
-    private static List<RoomController> _allRooms = new List<RoomController>();
+    private static uint _nextId = 0;
+    public uint Id;
+    private static Dictionary<uint,RoomController> _allRooms = new();
     public void Initialize()
     {
         enemySpawner?.BeginSpawningEnemies();
@@ -33,60 +34,57 @@ public class RoomController : NetworkBehaviour
         this.enabled = false;
     }
 
-    public void onDoorEntered(int targetRoomID,int targetDoorDirection)
+    public void onDoorEntered(uint targetRoomID,uint targetDoorDirection)
     {
         //if(IsServer||!IsOwner) return;
-        enemySpawner?.StopSpawningEnemies();
+        //enemySpawner?.StopSpawningEnemies();
         RequestRoomChangeServerRpc(targetRoomID,targetDoorDirection);
     }
     
     [ServerRpc(RequireOwnership = false)]
-    private void RequestRoomChangeServerRpc(int targetRoomID,int targetDoorDirection, ServerRpcParams serverRpcParams = default)
+    private void RequestRoomChangeServerRpc(uint targetRoomID,uint targetDoorDirection, ServerRpcParams serverRpcParams = default)
     {
-        // Prepare the ClientRpcParams to target the specific client.
-        var clientRpcParams = new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }
-            }
-        };
-    
-        RoomChangeClientRpc(targetRoomID, targetDoorDirection, clientRpcParams); // Correctly targets the client.
-        //RoomChangeClientRpc(targetRoomID);
-    }
-
-    [ClientRpc]
-    private void RoomChangeClientRpc(int targetRoomID,int targetDoorDirection, ClientRpcParams rpcParams = default)
-    {
-        //if(!IsOwner) return;
-        print("received room change order from server"+NetworkManager.LocalClientId);
-        ChangeRoom(targetRoomID,targetDoorDirection);
-    }
-
-    private void ChangeRoom(int targetRoomID,int targetDoorDirection)
-    {
-        //if(!IsOwner) return;
-        
-        RoomController targetRoom = getRoomById(targetRoomID);
+        RoomController targetRoom = tryGetRoomById(targetRoomID);
         if(targetRoom==null) return;
         
         
         targetRoom.enabled = true;
         targetRoom.Initialize();
         
-        Vector2 spawnPoint = targetRoom.getDoorSpawnPoint(targetDoorDirection);
+        Vector2 spawnPoint = targetRoom.tryGetDoorSpawnPoint(targetDoorDirection);
         if(spawnPoint==Vector2.zero) return;
+        
+        print("initialized room "+targetRoomID);
+
+        // Prepare the ClientRpcParams to target the specific client.
+        var clientRpcParams = new ClientRpcParams {
+            Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }}};
+    
+        RoomChangeClientRpc(targetRoomID, spawnPoint, clientRpcParams); // Correctly targets the client.
+        //RoomChangeClientRpc(targetRoomID);
+    }
+
+    [ClientRpc]
+    private void RoomChangeClientRpc(uint targetRoomID,Vector2 spawnPoint, ClientRpcParams rpcParams = default)
+    {
+        //if(!IsOwner) return;
+        print("received room change order from server P"+NetworkManager.LocalClientId);
+        //ChangeRoom(targetRoomID,targetDoorDirection);
+        
+        RoomController targetRoom = tryGetRoomById(targetRoomID);
+        if(targetRoom==null) return;
         
         CameraController.Instance.changeCameraPos(targetRoom.cameraTargetPos.position);
         NetworkManager.LocalClient.PlayerObject.transform.position = spawnPoint;
         
-        
-        print("initialized room "+targetRoomID);
-        
     }
-
-    private Vector2 getDoorSpawnPoint(int targetDirection)
+/*
+    private void ChangeRoom(uint targetRoomID,Vector2 spawnPoint)
+    {
+        //if(!IsOwner) return;
+    }
+*/
+    private Vector2 tryGetDoorSpawnPoint(uint targetDirection)
     {
         Vector2 spawnPoint = Vector2.zero;
         if(doors[targetDirection].transform.GetChild(0)!=null)
@@ -94,20 +92,14 @@ public class RoomController : NetworkBehaviour
         
         return spawnPoint;
     }
-    private RoomController getRoomById(int id)
+    private RoomController tryGetRoomById(uint id)
     {
-        foreach (var room in _allRooms)
-        {
-            if(room.Id==id)
-                return room;
-        }
-        UnityException e = new UnityException("Room with id "+id+" not found");
-        return null;
+        return _allRooms.TryGetValue(id, out var room) ? room : null;
     }
 
-    public static void registerNewRoom(RoomController toAdd)
+    private static void registerNewRoom(RoomController toAdd)
     {
-        if(!_allRooms.Contains(toAdd))
-            _allRooms.Add(toAdd);
+        _allRooms.Add(toAdd.Id,toAdd);
     }
 }
+

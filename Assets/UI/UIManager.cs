@@ -9,6 +9,7 @@ public class UIManager : SingletonLocal<UIManager>
     [SerializeField] private TextMeshProUGUI HPText;
     public void updateDisplayedHP(int newHP)
     {
+        print("UIManager received new HP: "+newHP+"!");
         HPText.text = "HP: " + newHP;
     }
 }

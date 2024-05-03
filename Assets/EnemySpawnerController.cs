@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
-using Unity.Multiplayer.Samples.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -10,6 +8,7 @@ using Random = UnityEngine.Random;
 public class EnemySpawnerController : NetworkBehaviour
 {
     [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private List<EnemyWaveData> Waves;
     [SerializeField] private float spawnInterval;
     
     [SerializeField] private CircleCollider2D spawnArea;
@@ -19,25 +18,29 @@ public class EnemySpawnerController : NetworkBehaviour
     public void BeginSpawningEnemies()
     {
         if(!IsServer) return;
-        if(enemySpawnCoroutineRef!=null) return;
+        if(enemySpawnCoroutineRef!=null) return; //already spawning enemies
+        
         enemySpawnCoroutineRef = StartCoroutine(spawnEnemyCoroutine());
     }
-    public void StopSpawningEnemies()
+    /*public void StopSpawningEnemies()
     {
         if(enemySpawnCoroutineRef==null) return;
         StopCoroutine(enemySpawnCoroutineRef);
         enemySpawnCoroutineRef = null;
-    }
+    }*/
 
     private IEnumerator spawnEnemyCoroutine()
     {
-        while (true)
+        foreach(var wave in Waves)
         {
-            yield return new WaitForSeconds(spawnInterval);
-            Vector2 randomPos = getRandomSpawnPos();
-            SpawnEnemy(randomPos);
+            yield return new WaitForSeconds(wave.waveInitDelay);
+            for (int i = 0; i < wave.enemyCount; i++)
+            {
+                Vector2 randomPos = getRandomSpawnPos();
+                SpawnEnemy(randomPos);
+                yield return new WaitForSeconds(spawnInterval);
+            }
         }
-        //RequestEnemySpawnServerRpc(randomPos);
     }
     private void SpawnEnemy(Vector2 pos)
     {
@@ -54,4 +57,11 @@ public class EnemySpawnerController : NetworkBehaviour
         print("i am being destroyed!");
         //base.OnDestroy();
     }
+}
+[Serializable]
+public class EnemyWaveData
+{
+    public GameObject enemyPrefab;
+    public uint enemyCount;
+    public uint waveInitDelay;
 }

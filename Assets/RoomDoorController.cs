@@ -11,9 +11,9 @@ public class RoomDoorController : NetworkBehaviour
     [Tooltip("0: Up, 1: Right, 2: Down, 3: Left, clockwise from top basically")]
     [SerializeField] private int doorDirection;
     [Header("Target")]
-    [SerializeField] private int targetRoomId;
+    [SerializeField] private uint targetRoomId;
     [Tooltip("0: Up, 1: Right, 2: Down, 3: Left, clockwise from top basically")]
-    [SerializeField] private int targetDoorDirection;
+    [SerializeField] private uint targetDoorDirection;
     private void Start()
     {
         owningRoom = GetComponentInParent<RoomController>();

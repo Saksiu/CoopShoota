@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyController : NetworkBehaviour
 {
@@ -14,9 +15,18 @@ public class EnemyController : NetworkBehaviour
     
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Collider2D col;
+    
+    [SerializeField] private EnemyHealthComponent healthComponent;
+    //[SerializeField] private HealthBarController healthBar;
 
     private Vector2 targetPos=Vector2.zero;
     //public override void OnNetworkSpawn() { }
+
+
+    public override void OnNetworkSpawn()
+    {
+        //healthBar.init(healthComponent.maxHP);
+    }
 
     private void FixedUpdate()
     {
@@ -40,7 +50,7 @@ public class EnemyController : NetworkBehaviour
         targetPos = closestPlayerPos;
         Vector2 direction= (targetPos - (Vector2)transform.position).normalized;
         rb.velocity = direction*speed;
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+        //transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
 
     }
 
@@ -48,20 +58,33 @@ public class EnemyController : NetworkBehaviour
     {
         //print(other.gameObject.layer);
         if(!IsServer) return;
-        if(other.gameObject.layer==actualValueOfLayerMask(enemyLayer)||other.gameObject.layer==actualValueOfLayerMask(wallLayer)) return;
+        
+        //if(other.gameObject.layer==actualValueOfLayerMask(enemyLayer)||other.gameObject.layer==actualValueOfLayerMask(wallLayer)) return;
 
+        if (other.gameObject.GetComponent<BulletController>())
+        {
+            //deduct hp
+            print("enemy hit by bullet "+NetworkManager.LocalClientId);
+            if(IsSpawned)
+                healthComponent.DeductHPServerRpc(1);
+        }
         //print("collided enemy"+gameObject.layer+" with "+other.gameObject.layer+" ???: "+(other.gameObject.layer==enemyLayer));
         
-        //if(!IsOwner) return;
-        col.enabled = false;
-        //if(!IsOwner) return;
+        //col.enabled = false;
+        
         PlayerController player = other.gameObject.GetComponent<PlayerController>();
         if(player!=null)
         {
-            player.DeductHPServerRpc(1);
+            player.healthComponent.DeductHPServerRpc(1);
         }
-        
+        //healthComponent.HP.Value--;
         //if(!IsServer) return;
+        /*if(NetworkObject.IsSpawned)
+            NetworkObject.Despawn();*/
+    }
+
+    public void onDeath()
+    {
         if(NetworkObject.IsSpawned)
             NetworkObject.Despawn();
     }

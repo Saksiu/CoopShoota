@@ -1,26 +1,72 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
 public class GunController : NetworkBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private float ShootCooldown;
     [SerializeField] private Transform gunNozzle;
     
     private PlayerController owningPlayer;
+    
+    private bool ShootInput => Input.GetMouseButton(0);
+    private bool canShoot = true;
+    private Coroutine shootCoroutineHandle;
+    
     private void FixedUpdate()
     {
         if(!IsOwner) return;
 
         Vector2 dir = getDirTowardsMouse();
         rotateGunTowards(dir);
-        
-        if (Input.GetMouseButton(0))
+
+
+        if (ShootInput&&canShoot)
         {
-            RequestFireServerRpc(dir);
-            FireBullet(dir);
-        }
+            canShoot = false;
+            Invoke(nameof(enableShootingAfterCooldown),ShootCooldown);
             
+            dir = getDirTowardsMouse();
+            Vector2 gunNozzlePos = gunNozzle.position;
+            
+            RequestFireServerRpc(getDirTowardsMouse(),gunNozzlePos);
+            FireBullet(getDirTowardsMouse(), gunNozzlePos);
+        }
+        
+        /*if (ShootInput&&shootCoroutineHandle==null)
+        {
+            shootCoroutineHandle = StartCoroutine(ShootCoroutine());
+        }
+        else if (!ShootInput&&shootCoroutineHandle!=null)
+        {
+            StopCoroutine(shootCoroutineHandle);
+            Invoke(nameof(enableShootingAfterCooldown),ShootCooldown);
+            shootCoroutineHandle = null;
+        }*/
     }
+    
+    private IEnumerator ShootCoroutine()
+    {
+        Vector2 dir;
+        Vector2 gunNozzlePos;
+        while (true)
+        {
+            if (ShootInput)
+            {
+                canShoot = false;
+                dir = getDirTowardsMouse();
+                gunNozzlePos = gunNozzle.position;
+                
+                RequestFireServerRpc(getDirTowardsMouse(),gunNozzlePos);
+                FireBullet(getDirTowardsMouse(), gunNozzlePos);
+                yield return new WaitForSeconds(ShootCooldown);
+                canShoot = true;
+            }
+            yield return null;
+        }
+    } 
+    private void enableShootingAfterCooldown()=>canShoot = true;
 
     private void Start()
     {
@@ -34,22 +80,23 @@ public class GunController : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void RequestFireServerRpc(Vector2 dir)
+    private void RequestFireServerRpc(Vector2 dir,Vector2 initPos)
     {
-        FireBulletClientRpc(dir);
+        FireBullet(dir,initPos);
+        FireBulletClientRpc(dir,initPos);
     }
 
     [ClientRpc]
-    private void FireBulletClientRpc(Vector2 dir)
+    private void FireBulletClientRpc(Vector2 dir,Vector2 initPos)
     {
-        if(!IsOwner) FireBullet(dir);
+        if(!IsOwner) FireBullet(dir,initPos);
     }
 
-    private void FireBullet(Vector2 dir)
+    private void FireBullet(Vector2 dir,Vector2 initPos)
     { 
         //print(bulletPrefab==null);
         //Quaternion bulletDir = Quaternion.LookRotation(Vector3.forward, dir);
-        Instantiate(bulletPrefab, gunNozzle.position, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
+        Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
     }
     
     private Vector2 getDirTowardsMouse()

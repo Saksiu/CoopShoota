@@ -1,18 +1,15 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : NetworkBehaviour
 {
-    public string playerName{private set; get;}
-    public static int maxHP = 10;
-    public NetworkVariable<int> HP = new(maxHP);
+    public NetworkVariable<FixedString64Bytes> playerName=new(
+        "",NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+
+    public PlayerHealthComponent healthComponent;
 
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float speed;
@@ -22,38 +19,34 @@ public class PlayerController : NetworkBehaviour
     
     public override void OnNetworkSpawn()
     {
-        if(!IsOwner) return;
-        RequestClientNamesUpdateServerRpc(NetworkObjectId, NetworkManager.LocalClientId);
-        //print("network spawn called on player"+NetworkManager.LocalClientId);
-        HP.OnValueChanged+=onHpChanged;
-        SetHPServerRpc(maxHP);
-        
-        if(!IsOwner) enabled = false;
-    }
-
-    [ServerRpc]
-    private void RequestClientNamesUpdateServerRpc(ulong playerObjectId,  ulong playerId)
-    {
-        
-        ClientNameUpdateClientRpc(playerObjectId, playerId);
-    }
-    [ClientRpc]
-    private void ClientNameUpdateClientRpc(ulong playerObjectId, ulong playerId)
-    {
-        //if(!IsOwner) return;
-        var player = NetworkManager.SpawnManager.SpawnedObjects[playerObjectId].GetComponent<PlayerController>();
-        if(player==null)
+        print("network spawn called on player"+NetworkManager.LocalClientId);
+        playerName.OnValueChanged+=setName;
+        //HP.OnValueChanged+=onHpChanged;
+        if(!IsOwner)
         {
-            print("player not found");
+            enabled = false;
             return;
         }
-        player.playerName = "Player " + playerId;
-        player.GetComponentInChildren<TextMeshPro>().text=playerId.ToString();
+        //healthComponent
+        //SetHPServerRpc(maxHP);
+        
+        //if(!IsOwner) enabled = false;
+        base.OnNetworkSpawn();
+    }
+    //public override onne
+    public void setName(FixedString64Bytes prevName, FixedString64Bytes newName)
+    {
+        print("setting name to "+newName+" for player P"+NetworkManager.LocalClientId+"!");
+        playerName.Value = newName;
+        TextMeshPro playerNameText = GetComponentInChildren<TextMeshPro>();
+        playerNameText.enabled = true;
+        playerNameText.text=newName.ToString();
     }
 
     public override void OnNetworkDespawn()
     {
-        HP.OnValueChanged-=onHpChanged;
+        playerName.OnValueChanged-=setName;
+       // HP.OnValueChanged-=onHpChanged;
     }
 
     private void FixedUpdate()
@@ -86,7 +79,7 @@ public class PlayerController : NetworkBehaviour
         Invoke(nameof(enableMovement),duration);
     }
     private void enableMovement()=>MovementEnabled = true;
-    private void onHpChanged(int prev, int curr)
+    /*private void onHpChanged(int prev, int curr)
     {
         if(!IsOwner) return;
         //print("HP changed from "+prev+" to "+curr);
@@ -97,17 +90,23 @@ public class PlayerController : NetworkBehaviour
     public void DeductHPServerRpc(int amount)
     {
         if(HP.Value<=0) return;
+        print("deducting HP from "+playerName.Value+" by "+amount+" points");
         HP.Value -= amount;
         if(HP.Value<=0)
         {
             GameMaster.Instance.onPlayerDeath(this);
         }
     }
+
+    public void onPlayerDeath()
+    {
+        GameMaster.Instance.onPlayerDeath(this);
+    }
     [ServerRpc]
-    public void SetHPServerRpc(int newHP)
+    private void SetHPServerRpc(int newHP)
     {
         HP.Value = newHP;
-    }
+    }*/
     /*public struct PlayerHealthData: INetworkSerializable
     {
         public int HP;
