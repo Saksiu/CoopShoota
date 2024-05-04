@@ -10,7 +10,14 @@ public class GameMaster : SingletonNetwork<GameMaster>
 {
     public LinkedList<PlayerController> _players = new();
     [SerializeField] private RoomController _currentRoomController;
-    
+    [SerializeField] private List<Transform> spawnPoints;
+
+    public override void Awake()
+    {
+        base.Awake();
+        //Cursor.lockState = CursorLockMode.Locked;
+    }
+
     public void onPlayerJoined(ulong playerId)
     {
         print("onPlayerJoined "+playerId+" ");
@@ -20,7 +27,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
             return;
         _players.AddLast(player);
         
-        
+        player.transform.position=spawnPoints[_players.Count-1].position;
         
         //player.setName("", "P"+player.OwnerClientId.ToString());
         if (NetworkManager.ConnectedClientsIds.Count >= 2)

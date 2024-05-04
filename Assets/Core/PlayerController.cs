@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -9,10 +10,16 @@ public class PlayerController : NetworkBehaviour
     public NetworkVariable<FixedString64Bytes> playerName=new(
         "",NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
+    [SerializeField] private Camera playerCamera;
+    
     public PlayerHealthComponent healthComponent;
 
-    [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private float speed;
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private float walkSpeed=5;
+    [SerializeField] private float cameraSensitivity=10;
+    
+    [Tooltip("More=more rotation freedom")]
+    [SerializeField] private float verticalCameraClamp = 40;
     
     private bool MovementEnabled = true;
     
@@ -46,31 +53,49 @@ public class PlayerController : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         playerName.OnValueChanged-=setName;
-       // HP.OnValueChanged-=onHpChanged;
+    }
+
+
+    private float verticalAngle=0.0f;
+
+    private void Update()
+    {
+        // Player rotation on the Y axis (horizontal)
+        float lookH = Input.GetAxis("Mouse X") * cameraSensitivity;
+        transform.Rotate(Vector3.up, lookH);
+
+        // Camera rotation on the X axis (vertical)
+        verticalAngle -= Input.GetAxis("Mouse Y") * cameraSensitivity; // Subtract to invert the vertical input
+        verticalAngle = Mathf.Clamp(verticalAngle, -verticalCameraClamp, verticalCameraClamp); // Clamp the vertical angle within the limits
+
+        // Apply rotation to the camera using Quaternion to avoid gimbal lock issues
+        playerCamera.transform.localRotation = Quaternion.Euler(verticalAngle, 0, 0);
     }
 
     private void FixedUpdate()
     {
+        
         //print("update!");
         //if(!IsOwner) return;
-        float finalSpeedHorizontal=0;
-        float finalSpeedVertical=0;
+
+        if(!MovementEnabled) return;
+            
+        Vector2 moveDir=Vector2.zero;
 
         if(Input.GetKey(KeyCode.D))
-            finalSpeedHorizontal+=speed;
+            moveDir.x+=walkSpeed;
         if(Input.GetKey(KeyCode.A))
-            finalSpeedHorizontal-=speed;
+            moveDir.x-=walkSpeed;
         if(Input.GetKey(KeyCode.W))
-            finalSpeedVertical+=speed;
+            moveDir.y+=walkSpeed;
         if(Input.GetKey(KeyCode.S))
-            finalSpeedVertical-=speed;
+            moveDir.y-=walkSpeed;
         
-        if(!MovementEnabled) return;
-        //not sure if I want to keep this, but it fixes some issues when NetworkRigidbody2D is attached to Player Prefab
-        if(finalSpeedHorizontal!=0)
-            rb.velocity = new Vector2(finalSpeedHorizontal, rb.velocity.y);
-        if(finalSpeedVertical!=0)
-            rb.velocity = new Vector2(rb.velocity.x, finalSpeedVertical);
+        Vector3 movementDirection = transform.right * moveDir.x + transform.forward * moveDir.y;
+        rb.velocity = new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z);
+
+        //rb.velocity = ;
+
     }
 
     public void onDash(float duration)
@@ -79,34 +104,7 @@ public class PlayerController : NetworkBehaviour
         Invoke(nameof(enableMovement),duration);
     }
     private void enableMovement()=>MovementEnabled = true;
-    /*private void onHpChanged(int prev, int curr)
-    {
-        if(!IsOwner) return;
-        //print("HP changed from "+prev+" to "+curr);
-        UIManager.Instance.updateDisplayedHP(curr);
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    public void DeductHPServerRpc(int amount)
-    {
-        if(HP.Value<=0) return;
-        print("deducting HP from "+playerName.Value+" by "+amount+" points");
-        HP.Value -= amount;
-        if(HP.Value<=0)
-        {
-            GameMaster.Instance.onPlayerDeath(this);
-        }
-    }
-
-    public void onPlayerDeath()
-    {
-        GameMaster.Instance.onPlayerDeath(this);
-    }
-    [ServerRpc]
-    private void SetHPServerRpc(int newHP)
-    {
-        HP.Value = newHP;
-    }*/
+    
     /*public struct PlayerHealthData: INetworkSerializable
     {
         public int HP;

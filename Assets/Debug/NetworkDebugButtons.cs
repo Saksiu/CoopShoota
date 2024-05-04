@@ -12,9 +12,24 @@ public class NetworkDebugButtons : MonoBehaviour
         GUILayout.BeginArea((new Rect(10,10,300,300)));
         if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
         {
-            if(!ClonesManager.IsClone()) if(GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
-            if(!ClonesManager.IsClone()) if(GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
-            if(GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
+            if (!ClonesManager.IsClone())
+            {
+                if(GUILayout.Button("Host")) 
+                {
+                    NetworkManager.Singleton.StartHost();
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+                if(GUILayout.Button("Server"))
+                {
+                    NetworkManager.Singleton.StartServer();
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+            }
+            if(GUILayout.Button("Client"))
+            {
+                NetworkManager.Singleton.StartClient();
+                Cursor.lockState = CursorLockMode.Locked;
+            }
         }
         
         GUILayout.EndArea();
