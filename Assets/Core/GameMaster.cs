@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class GameMaster : SingletonNetwork<GameMaster>
 {
-    public LinkedList<PlayerController> _players = new();
+    public List<PlayerController> _players = new();
     [SerializeField] private RoomController _currentRoomController;
     [SerializeField] private List<Transform> spawnPoints;
 
@@ -23,13 +23,13 @@ public class GameMaster : SingletonNetwork<GameMaster>
         print("onPlayerJoined "+playerId+" ");
         if(!IsServer) return;
         var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
+        
         if(player==null||_players.Contains(player))
             return;
-        _players.AddLast(player);
+        _players.Add(player);
         
-        player.transform.position=spawnPoints[_players.Count-1].position;
         
-        //player.setName("", "P"+player.OwnerClientId.ToString());
+        setPlayerPositionClientRpc(playerId,spawnPoints[_players.Count-1].position);
         if (NetworkManager.ConnectedClientsIds.Count >= 2)
             InitGame();
     }
@@ -44,6 +44,19 @@ public class GameMaster : SingletonNetwork<GameMaster>
         if(NetworkObject.IsSpawned)
             NetworkObject.Despawn();
 
+    }
+
+    [ClientRpc]
+    public void setPlayerPositionClientRpc(ulong playerID,Vector3 pos,ClientRpcParams clientRpcParams=default)
+    {
+        print("received position update for player " + playerID + " on client " + NetworkManager.LocalClientId+"is owner "+IsOwner);
+        
+        //if(!IsOwner) return;
+        if(NetworkManager.LocalClientId!=playerID) return;
+        
+        
+        NetworkManager.LocalClient.PlayerObject.transform.position = pos;
+        //transform.position = pos;
     }
 
     private void InitGame()
@@ -61,11 +74,13 @@ public class GameMaster : SingletonNetwork<GameMaster>
             player.setName("","P"+player.OwnerClientId.ToString());
         }*/
         //replicatePlayerNamesClientRpc();
-        _currentRoomController.Initialize();
+        _currentRoomController?.Initialize();
     }
 
     public override void OnNetworkSpawn()
     {
+        NetworkManager.OnClientConnectedCallback += onPlayerJoined;
+        NetworkManager.OnClientDisconnectCallback += onPlayerLeft;
         /*if (!IsServer)
         {
             
@@ -81,16 +96,20 @@ public class GameMaster : SingletonNetwork<GameMaster>
             return;
         }*/
         //NetworkManager.OnClientStarted += onPlayerJoined;
-        NetworkManager.OnClientConnectedCallback += onPlayerJoined;
-        NetworkManager.OnClientDisconnectCallback += onPlayerLeft;
         
+        
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        NetworkManager.OnClientConnectedCallback -= onPlayerJoined;
+        NetworkManager.OnClientDisconnectCallback -= onPlayerLeft;
     }
 
     public override void OnDestroy()
     {
         //NetworkManager.OnClientStarted -= onPlayerJoined;
-        NetworkManager.OnClientConnectedCallback -= onPlayerJoined;
-        NetworkManager.OnClientDisconnectCallback -= onPlayerLeft;
+        
         base.OnDestroy();
     }
     public void onPlayerDeath(PlayerController deadPlayer)

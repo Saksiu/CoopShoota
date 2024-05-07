@@ -14,14 +14,15 @@ public class DashingComponent : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(Input.GetKey(KeyCode.LeftShift)) Dash(GetComponent<Rigidbody2D>().velocity);
+        if(Input.GetKey(KeyCode.LeftShift)) 
+            Dash(PlayerController.localPlayer.playerCamera.transform.forward);
     }
 
-    public void Dash(Vector2 direction)
+    public void Dash(Vector3 direction)
     {
         if(!candash) return;
-        GetComponent<PlayerController>().onDash(dashDuration);
-        GetComponent<Rigidbody2D>().AddForce(direction.normalized*dashForce,ForceMode2D.Impulse);
+        PlayerController.localPlayer.onDash(dashDuration);
+        PlayerController.localPlayer.rb.AddForce(direction.normalized*dashForce,ForceMode.Impulse);
         StartCoroutine(dashCooldownCoroutine());
     }
 

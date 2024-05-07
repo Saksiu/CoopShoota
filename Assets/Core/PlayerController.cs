@@ -10,17 +10,15 @@ public class PlayerController : NetworkBehaviour
     public NetworkVariable<FixedString64Bytes> playerName=new(
         "",NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
-    [SerializeField] private Camera playerCamera;
+    public CameraController playerCamera;
+
+    public static PlayerController localPlayer;
     
     public PlayerHealthComponent healthComponent;
 
-    [SerializeField] private Rigidbody rb;
+    public Rigidbody rb;
     [SerializeField] private float walkSpeed=5;
-    [SerializeField] private float cameraSensitivity=10;
-    
-    [Tooltip("More=more rotation freedom")]
-    [SerializeField] private float verticalCameraClamp = 40;
-    
+
     private bool MovementEnabled = true;
     
     
@@ -29,15 +27,16 @@ public class PlayerController : NetworkBehaviour
         print("network spawn called on player"+NetworkManager.LocalClientId);
         playerName.OnValueChanged+=setName;
         //HP.OnValueChanged+=onHpChanged;
+        playerCamera.Init(IsOwner);
+        
         if(!IsOwner)
         {
+            GetComponentInChildren<PlayerJumpingComponent>().enabled = false;
             enabled = false;
             return;
         }
-        //healthComponent
-        //SetHPServerRpc(maxHP);
-        
-        //if(!IsOwner) enabled = false;
+        localPlayer = this;
+
         base.OnNetworkSpawn();
     }
     //public override onne
@@ -61,15 +60,11 @@ public class PlayerController : NetworkBehaviour
     private void Update()
     {
         // Player rotation on the Y axis (horizontal)
-        float lookH = Input.GetAxis("Mouse X") * cameraSensitivity;
-        transform.Rotate(Vector3.up, lookH);
-
-        // Camera rotation on the X axis (vertical)
-        verticalAngle -= Input.GetAxis("Mouse Y") * cameraSensitivity; // Subtract to invert the vertical input
-        verticalAngle = Mathf.Clamp(verticalAngle, -verticalCameraClamp, verticalCameraClamp); // Clamp the vertical angle within the limits
-
-        // Apply rotation to the camera using Quaternion to avoid gimbal lock issues
-        playerCamera.transform.localRotation = Quaternion.Euler(verticalAngle, 0, 0);
+        float lookH = Input.GetAxis("Mouse X") * playerCamera.cameraSensitivity;
+        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + lookH, 0);
+        //transform.Rotate(Vector3.up, lookH);
+        
+        if(playerCamera==null||(!playerCamera.isActiveAndEnabled)) return;
     }
 
     private void FixedUpdate()
@@ -92,6 +87,8 @@ public class PlayerController : NetworkBehaviour
             moveDir.y-=walkSpeed;
         
         Vector3 movementDirection = transform.right * moveDir.x + transform.forward * moveDir.y;
+        //rb.AddForce(new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z),ForceMode.Force);
+        //transform.Translate(new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z));
         rb.velocity = new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z);
 
         //rb.velocity = ;

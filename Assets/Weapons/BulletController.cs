@@ -7,9 +7,10 @@ public class BulletController : MonoBehaviour
 {
     [SerializeField] private float speed;
 
-    public void Launch(Vector2 dir)
+    public void Launch(Vector3 dir)
     {
-        GetComponent<Rigidbody2D>().AddForce(dir*speed,ForceMode2D.Impulse);
+        //GetComponent<Rigidbody2D>().AddForce(dir*speed,ForceMode2D.Impulse);
+        GetComponent<Rigidbody>().AddForce(dir*speed,ForceMode.Impulse);
         Invoke(nameof(DestroySelf), 5f);
     }
 

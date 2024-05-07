@@ -8,18 +8,26 @@ public class GunController : NetworkBehaviour
     [SerializeField] private float ShootCooldown;
     [SerializeField] private Transform gunNozzle;
     
+    [SerializeField] private Animator gunAnimator;
+
+    [SerializeField] private ParticleSystem shootEffect;
+    
     private PlayerController owningPlayer;
     
     private bool ShootInput => Input.GetMouseButton(0);
     private bool canShoot = true;
     private Coroutine shootCoroutineHandle;
     
+    private static readonly int Shoot = Animator.StringToHash("Shoot");
+    private static readonly int ShootTrigger= Animator.StringToHash("ShootTrigger");
+    
+
     private void FixedUpdate()
     {
         if(!IsOwner) return;
 
-        Vector2 dir = getDirTowardsMouse();
-        rotateGunTowards(dir);
+        //Vector2 dir = getDirTowardsMouse();
+        //rotateGunTowards(dir);
 
 
         if (ShootInput&&canShoot)
@@ -27,13 +35,13 @@ public class GunController : NetworkBehaviour
             canShoot = false;
             Invoke(nameof(enableShootingAfterCooldown),ShootCooldown);
             
-            dir = getDirTowardsMouse();
-            Vector2 gunNozzlePos = gunNozzle.position;
+            //dir = getDirTowardsMouse();
+            Vector3 gunNozzlePos = gunNozzle.position;
             
-            RequestFireServerRpc(getDirTowardsMouse(),gunNozzlePos);
-            FireBullet(getDirTowardsMouse(), gunNozzlePos);
+            RequestFireServerRpc(gunNozzle.up,gunNozzlePos);
+            FireBullet(gunNozzle.up, gunNozzlePos);
         }
-        
+
         /*if (ShootInput&&shootCoroutineHandle==null)
         {
             shootCoroutineHandle = StartCoroutine(ShootCoroutine());
@@ -48,60 +56,65 @@ public class GunController : NetworkBehaviour
     
     private IEnumerator ShootCoroutine()
     {
-        Vector2 dir;
-        Vector2 gunNozzlePos;
+        //Vector2 dir;
+        Vector3 gunNozzlePos;
         while (true)
         {
             if (ShootInput)
             {
                 canShoot = false;
-                dir = getDirTowardsMouse();
+                //dir = getDirTowardsMouse();
                 gunNozzlePos = gunNozzle.position;
                 
-                RequestFireServerRpc(getDirTowardsMouse(),gunNozzlePos);
-                FireBullet(getDirTowardsMouse(), gunNozzlePos);
+                RequestFireServerRpc(gunNozzle.up,gunNozzlePos);
+                FireBullet(gunNozzle.up, gunNozzlePos);
                 yield return new WaitForSeconds(ShootCooldown);
                 canShoot = true;
             }
             yield return null;
         }
     } 
-    private void enableShootingAfterCooldown()=>canShoot = true;
+    private void enableShootingAfterCooldown(){
+        canShoot = true;
+    }
 
     private void Start()
     {
         owningPlayer = GetComponentInParent<PlayerController>();
     }
 
-    private void rotateGunTowards(Vector2 dir)
+    private void rotateGunTowards(Vector3 dir)
     {
         transform.rotation = Quaternion.LookRotation(Vector3.forward, dir);
         //transform.Rotate(0, 0, 90);
     }
 
     [ServerRpc]
-    private void RequestFireServerRpc(Vector2 dir,Vector2 initPos)
+    private void RequestFireServerRpc(Vector3 dir,Vector3 initPos)
     {
         FireBullet(dir,initPos);
         FireBulletClientRpc(dir,initPos);
     }
 
     [ClientRpc]
-    private void FireBulletClientRpc(Vector2 dir,Vector2 initPos)
+    private void FireBulletClientRpc(Vector3 dir,Vector3 initPos)
     {
         if(!IsOwner) FireBullet(dir,initPos);
     }
 
-    private void FireBullet(Vector2 dir,Vector2 initPos)
+    private void FireBullet(Vector3 dir,Vector3 initPos)
     { 
         //print(bulletPrefab==null);
         //Quaternion bulletDir = Quaternion.LookRotation(Vector3.forward, dir);
         Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
+        shootEffect.Play();
+        gunAnimator.SetTrigger(ShootTrigger);
     }
     
-    private Vector2 getDirTowardsMouse()
+    /*private Vector2 getDirTowardsMouse()
     {
-        Vector2 mousePos = CameraController.Instance.Camera.ScreenToWorldPoint(Input.mousePosition);
-        return (mousePos - (Vector2)transform.position).normalized;
-    }
+        //Vector2 mousePos = CameraController.Instance.Camera.ScreenToWorldPoint(Input.mousePosition);
+        //return (mousePos - (Vector2)transform.position).normalized;
+        return Vector2.zero;
+    }*/
 }

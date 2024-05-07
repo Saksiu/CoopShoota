@@ -13,6 +13,7 @@ public class EnemyHealthComponent : NetworkBehaviour
     public int maxHP = 10;
     public NetworkVariable<int> HP = new();
 
+    [SerializeField] private Canvas enemyCanvas;
     [SerializeField] private Slider healthBar;
     
     
@@ -33,7 +34,12 @@ public class EnemyHealthComponent : NetworkBehaviour
         HP.OnValueChanged -= onHpChanged;
         base.OnNetworkDespawn();
     }
-    
+
+    private void Update()
+    {
+        enemyCanvas.transform.LookAt(PlayerController.localPlayer.transform);
+    }
+
     private void onHpChanged(int prev, int curr)
     {
        // print("HP changed from "+prev+" to "+curr);

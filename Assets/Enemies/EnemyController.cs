@@ -8,18 +8,14 @@ using UnityEngine.UI;
 public class EnemyController : NetworkBehaviour
 {
     [SerializeField] private float speed;
-    
-    [SerializeField] private LayerMask playerLayer;
-    [SerializeField] private LayerMask wallLayer;
-    [SerializeField] private LayerMask enemyLayer;
-    
-    [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Collider2D col;
+
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private Collider col;
     
     [SerializeField] private EnemyHealthComponent healthComponent;
     //[SerializeField] private HealthBarController healthBar;
 
-    private Vector2 targetPos=Vector2.zero;
+    private Vector3 targetPos=Vector3.zero;
     //public override void OnNetworkSpawn() { }
 
 
@@ -32,13 +28,14 @@ public class EnemyController : NetworkBehaviour
     {
         if (!IsServer) return;
         //get closer of the players
-        Vector2 closestPlayerPos = Vector2.zero;
+        Vector3 closestPlayerPos = Vector3.zero;
         float closestDistance = float.MaxValue;
         float nextPlayerDistance;
+        
         foreach (var player in GameMaster.Instance._players)
         {
             if(player==null) break;
-            nextPlayerDistance = Vector2.Distance(player.transform.position, transform.position);
+            nextPlayerDistance = Vector3.Distance(player.transform.position, transform.position);
             if (nextPlayerDistance < closestDistance)
             {
                 closestDistance = nextPlayerDistance;
@@ -48,13 +45,13 @@ public class EnemyController : NetworkBehaviour
         if(closestDistance<1f) targetPos = transform.position;
         
         targetPos = closestPlayerPos;
-        Vector2 direction= (targetPos - (Vector2)transform.position).normalized;
+        Vector3 direction= (targetPos - transform.position).normalized;
         rb.velocity = direction*speed;
         //transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
 
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    private void OnCollisionEnter(Collision other)
     {
         //print(other.gameObject.layer);
         if(!IsServer) return;
@@ -71,12 +68,9 @@ public class EnemyController : NetworkBehaviour
         //print("collided enemy"+gameObject.layer+" with "+other.gameObject.layer+" ???: "+(other.gameObject.layer==enemyLayer));
         
         //col.enabled = false;
-        
-        PlayerController player = other.gameObject.GetComponent<PlayerController>();
-        if(player!=null)
-        {
-            player.healthComponent.DeductHPServerRpc(1);
-        }
+
+        other.gameObject.GetComponent<PlayerController>()?.healthComponent.DeductHPServerRpc(1);
+
         //healthComponent.HP.Value--;
         //if(!IsServer) return;
         /*if(NetworkObject.IsSpawned)

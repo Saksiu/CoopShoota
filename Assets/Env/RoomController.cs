@@ -9,9 +9,8 @@ using UnityEngine;
 public class RoomController : NetworkBehaviour
 {
     [SerializeField] private EnemySpawnerController enemySpawner;
-    [SerializeField] private Transform cameraTargetPos;
-    [Tooltip("0: Up, 1: Right, 2: Down, 3: Left, clockwise from top basically")]
-    [SerializeField] private RoomDoorController[] doors = new RoomDoorController[4];
+    //[Tooltip("0: Up, 1: Right, 2: Down, 3: Left, clockwise from top basically")]
+    //[SerializeField] private RoomDoorController[] doors = new RoomDoorController[4];
 
     private static uint _nextId = 0;
     public uint Id;
@@ -74,7 +73,7 @@ public class RoomController : NetworkBehaviour
         RoomController targetRoom = tryGetRoomById(targetRoomID);
         if(targetRoom==null) return;
         
-        CameraController.Instance.changeCameraPos(targetRoom.cameraTargetPos.position);
+        //CameraController.Instance.changeCameraPos(targetRoom.cameraTargetPos.position);
         NetworkManager.LocalClient.PlayerObject.transform.position = spawnPoint;
         
     }
@@ -86,11 +85,11 @@ public class RoomController : NetworkBehaviour
 */
     private Vector2 tryGetDoorSpawnPoint(uint targetDirection)
     {
-        Vector2 spawnPoint = Vector2.zero;
+        /*Vector2 spawnPoint = Vector2.zero;
         if(doors[targetDirection].transform.GetChild(0)!=null)
             spawnPoint=doors[targetDirection].transform.GetChild(0).position;
-        
-        return spawnPoint;
+        return spawnPoint;*/
+        return Vector2.zero;
     }
     private RoomController tryGetRoomById(uint id)
     {

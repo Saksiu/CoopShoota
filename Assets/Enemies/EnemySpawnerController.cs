@@ -7,11 +7,11 @@ using Random = UnityEngine.Random;
 
 public class EnemySpawnerController : NetworkBehaviour
 {
-    [SerializeField] private GameObject enemyPrefab;
+    //[SerializeField] private GameObject enemyPrefab;
     [SerializeField] private List<EnemyWaveData> Waves;
     [SerializeField] private float spawnInterval;
     
-    [SerializeField] private CircleCollider2D spawnArea;
+    [SerializeField] private BoxCollider spawnArea;
     
     private Coroutine enemySpawnCoroutineRef;
 
@@ -37,19 +37,25 @@ public class EnemySpawnerController : NetworkBehaviour
             for (int i = 0; i < wave.enemyCount; i++)
             {
                 Vector2 randomPos = getRandomSpawnPos();
-                SpawnEnemy(randomPos);
+                SpawnEnemy(wave.enemyPrefab,randomPos);
                 yield return new WaitForSeconds(spawnInterval);
             }
         }
     }
-    private void SpawnEnemy(Vector2 pos)
+    private void SpawnEnemy(GameObject enemyPrefab, Vector2 pos)
     {
         Instantiate(enemyPrefab, pos, Quaternion.identity,null).GetComponent<NetworkObject>().Spawn();
     }
     
-    private Vector2 getRandomSpawnPos()
+    private Vector3 getRandomSpawnPos()
     {
-        return (Random.insideUnitCircle * spawnArea.radius)+(Vector2)spawnArea.transform.position;
+        Vector3 min = spawnArea.bounds.min;
+        Vector3 max = spawnArea.bounds.max;
+        //get a random point inside the spawn area
+        
+        return new Vector3(Random.Range(min.x,max.x),Random.Range(min.y,max.y),Random.Range(min.z,max.z));
+        
+        //return (Random.insideUnitCircle * spawnArea.radius)+(Vector2)spawnArea.transform.position;
     }
 
     public void OnDestroy()
