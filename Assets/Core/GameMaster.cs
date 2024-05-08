@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class GameMaster : SingletonNetwork<GameMaster>
 {
+    [SerializeField] private int minPlayers = 1;
+    
     public List<PlayerController> _players = new();
     [SerializeField] private RoomController _currentRoomController;
     [SerializeField] private List<Transform> spawnPoints;
@@ -30,7 +32,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         
         
         setPlayerPositionClientRpc(playerId,spawnPoints[_players.Count-1].position);
-        if (NetworkManager.ConnectedClientsIds.Count >= 2)
+        if (NetworkManager.ConnectedClientsIds.Count >= minPlayers)
             InitGame();
     }
     public void onPlayerLeft(ulong playerId)

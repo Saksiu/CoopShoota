@@ -8,9 +8,11 @@ public class DashingComponent : MonoBehaviour
 
     [SerializeField] private float dashForce;
     [SerializeField] private float dashCooldown;
+    
+    //[SerializeField] private float dashMaxDistance;
     [SerializeField] private float dashDuration;
     
-    private bool candash = true;
+    private bool canDash = true;
 
     private void FixedUpdate()
     {
@@ -20,7 +22,8 @@ public class DashingComponent : MonoBehaviour
 
     public void Dash(Vector3 direction)
     {
-        if(!candash) return;
+        if(!canDash) return;
+        
         PlayerController.localPlayer.onDash(dashDuration);
         PlayerController.localPlayer.rb.AddForce(direction.normalized*dashForce,ForceMode.Impulse);
         StartCoroutine(dashCooldownCoroutine());
@@ -28,8 +31,8 @@ public class DashingComponent : MonoBehaviour
 
     private IEnumerator dashCooldownCoroutine()
     {
-        candash = false;
+        canDash = false;
         yield return new WaitForSeconds(dashCooldown);
-        candash = true;
+        canDash = true;
     }
 }

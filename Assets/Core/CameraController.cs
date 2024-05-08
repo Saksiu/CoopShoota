@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private Camera Camera;
+    [SerializeField] private CinemachineVirtualCamera POVCamera;
     [SerializeField] private AudioListener AudioListener;
     
     public float cameraSensitivity=10;
@@ -17,7 +18,7 @@ public class CameraController : MonoBehaviour
     {
         if(isOwner) return;
         
-        Camera.enabled = false;
+        POVCamera.enabled = false;
         AudioListener.enabled = false;
         enabled = false;
     }
@@ -31,6 +32,6 @@ public class CameraController : MonoBehaviour
         verticalAngle = Mathf.Clamp(verticalAngle, -verticalCameraClamp, verticalCameraClamp); // Clamp the vertical angle within the limits
 
         // Apply rotation to the camera using Quaternion to avoid gimbal lock issues
-        Camera.transform.localRotation = Quaternion.Euler(verticalAngle, 0, 0);
+        transform.localRotation = Quaternion.Euler(verticalAngle, 0, 0);
     }
 }

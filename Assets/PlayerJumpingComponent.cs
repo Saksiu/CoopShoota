@@ -18,9 +18,9 @@ public class PlayerJumpingComponent : MonoBehaviour
 
     private void Jump()
     {
-        print("isgrounded: "+isGrounded());
+        //print("isgrounded: "+isGrounded());
         if(!isGrounded()) return;
-        print("can jump, jumping!");
+        //print("can jump, jumping!");
         PlayerController.localPlayer.rb.AddForce(transform.up*jumpForce,ForceMode.Impulse);
     }
 
@@ -28,8 +28,8 @@ public class PlayerJumpingComponent : MonoBehaviour
     {
         RaycastHit hit;
         Physics.Raycast(transform.position, Vector3.down, out hit, checkGroundDistance);
-        if(hit.collider)
-            print("isgrounded check "+hit.collider+" "+hit.transform.gameObject.layer+" "+hit.transform.gameObject.name+" "+hit.transform.gameObject.tag);
+        //if(hit.collider)
+        //    print("isgrounded check "+hit.collider+" "+hit.transform.gameObject.layer+" "+hit.transform.gameObject.name+" "+hit.transform.gameObject.tag);
         return hit.collider && hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground");
     }
     

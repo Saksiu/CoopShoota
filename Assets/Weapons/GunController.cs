@@ -40,6 +40,7 @@ public class GunController : NetworkBehaviour
             
             RequestFireServerRpc(gunNozzle.up,gunNozzlePos);
             FireBullet(gunNozzle.up, gunNozzlePos);
+            gunAnimator.SetTrigger(ShootTrigger);
         }
 
         /*if (ShootInput&&shootCoroutineHandle==null)
@@ -108,7 +109,6 @@ public class GunController : NetworkBehaviour
         //Quaternion bulletDir = Quaternion.LookRotation(Vector3.forward, dir);
         Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
         shootEffect.Play();
-        gunAnimator.SetTrigger(ShootTrigger);
     }
     
     /*private Vector2 getDirTowardsMouse()

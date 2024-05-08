@@ -36,24 +36,26 @@ public class EnemySpawnerController : NetworkBehaviour
             yield return new WaitForSeconds(wave.waveInitDelay);
             for (int i = 0; i < wave.enemyCount; i++)
             {
-                Vector2 randomPos = getRandomSpawnPos();
+                Vector3 randomPos = getRandomSpawnPos();
                 SpawnEnemy(wave.enemyPrefab,randomPos);
                 yield return new WaitForSeconds(spawnInterval);
             }
         }
     }
-    private void SpawnEnemy(GameObject enemyPrefab, Vector2 pos)
+    private void SpawnEnemy(GameObject enemyPrefab, Vector3 pos)
     {
         Instantiate(enemyPrefab, pos, Quaternion.identity,null).GetComponent<NetworkObject>().Spawn();
     }
     
     private Vector3 getRandomSpawnPos()
     {
+        Vector3 offset = spawnArea.center;
+        
         Vector3 min = spawnArea.bounds.min;
         Vector3 max = spawnArea.bounds.max;
         //get a random point inside the spawn area
         
-        return new Vector3(Random.Range(min.x,max.x),Random.Range(min.y,max.y),Random.Range(min.z,max.z));
+        return new Vector3(Random.Range(min.x,max.x),Random.Range(min.y,max.y),Random.Range(min.z,max.z))+offset;
         
         //return (Random.insideUnitCircle * spawnArea.radius)+(Vector2)spawnArea.transform.position;
     }
