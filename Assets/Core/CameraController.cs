@@ -10,6 +10,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private AudioListener AudioListener;
     
     public float cameraSensitivity=10;
+    public float cameraLerpSpeed=50;
 
     [Tooltip("More=more rotation freedom")]
     [SerializeField] private float verticalCameraClamp = 40;
@@ -24,12 +25,16 @@ public class CameraController : MonoBehaviour
     }
 
     private float verticalAngle=0.0f;
-
-    private void Update()
+    private float targetVerticalAngle=0.0f;
+    
+    public void moveCamera(float vertical)
     {
-        // Camera rotation on the X axis (vertical)
-        verticalAngle -= Input.GetAxis("Mouse Y") * cameraSensitivity; // Subtract to invert the vertical input
-        verticalAngle = Mathf.Clamp(verticalAngle, -verticalCameraClamp, verticalCameraClamp); // Clamp the vertical angle within the limits
+        targetVerticalAngle-= vertical * cameraSensitivity;
+        targetVerticalAngle= Mathf.Clamp(targetVerticalAngle, -verticalCameraClamp, verticalCameraClamp); // Clamp the vertical angle within the limits
+        
+        verticalAngle=Mathf.Lerp(verticalAngle,targetVerticalAngle,Time.deltaTime*cameraLerpSpeed);
+        //verticalAngle -= vertical * cameraSensitivity; // Subtract to invert the vertical input
+        //verticalAngle = Mathf.Clamp(verticalAngle, -verticalCameraClamp, verticalCameraClamp); // Clamp the vertical angle within the limits
 
         // Apply rotation to the camera using Quaternion to avoid gimbal lock issues
         transform.localRotation = Quaternion.Euler(verticalAngle, 0, 0);

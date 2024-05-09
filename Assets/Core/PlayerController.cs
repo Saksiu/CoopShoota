@@ -1,90 +1,77 @@
 using System;
+using System.Numerics;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
-public class PlayerController : NetworkBehaviour
+public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerActions
 {
+    public static PlayerController localPlayer;
     public NetworkVariable<FixedString64Bytes> playerName=new(
         "",NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
+    private PlayerInputGenerated input;
     public CameraController playerCamera;
-
-    public static PlayerController localPlayer;
-    
     public PlayerHealthComponent healthComponent;
-
+    
     public Rigidbody rb;
+    
+    [SerializeField] private DashingComponent dashComponent;
+    [SerializeField] private PlayerJumpingComponent jumpComponent;
+    
+    [SerializeField] private float checkGroundDistance=1.2f;
     [SerializeField] private float walkSpeed=5;
-
     private bool MovementEnabled = true;
-    
-    
+    private float verticalAngle=0.0f;
+
     public override void OnNetworkSpawn()
     {
         print("network spawn called on player"+NetworkManager.LocalClientId);
         playerName.OnValueChanged+=setName;
-        //HP.OnValueChanged+=onHpChanged;
-        playerCamera.Init(IsOwner);
         
+        playerCamera.Init(IsOwner);
+
+        TextMeshPro playerNameText = GetComponentInChildren<TextMeshPro>();
+        playerNameText.text=playerName.Value.ToString();
         if(!IsOwner)
         {
-            GetComponentInChildren<PlayerJumpingComponent>().enabled = false;
+            //GetComponentInChildren<PlayerJumpingComponent>().enabled = false;
+            //GetComponent<PlayerInput>().enabled = false;
+            //PlayerInteractor.Instance.enabled = false;
             enabled = false;
             return;
         }
-        localPlayer = this;
 
+        input = new PlayerInputGenerated();
+        input.Player.SetCallbacks(this);
+        input.Enable();
+        setNameServerRpc("P"+NetworkManager.LocalClientId);
+        localPlayer = this;
+        
         base.OnNetworkSpawn();
     }
-    //public override onne
-    public void setName(FixedString64Bytes prevName, FixedString64Bytes newName)
-    {
-        print("setting name to "+newName+" for player P"+NetworkManager.LocalClientId+"!");
-        playerName.Value = newName;
-        TextMeshPro playerNameText = GetComponentInChildren<TextMeshPro>();
-        playerNameText.enabled = true;
-        playerNameText.text=newName.ToString();
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        playerName.OnValueChanged-=setName;
-    }
-
-
-    private float verticalAngle=0.0f;
 
     private void Update()
     {
-        // Player rotation on the Y axis (horizontal)
-        float lookH = Input.GetAxis("Mouse X") * playerCamera.cameraSensitivity;
-        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + lookH, 0);
-        //transform.Rotate(Vector3.up, lookH);
-        
-        if(playerCamera==null||(!playerCamera.isActiveAndEnabled)) return;
-    }
 
+        //looking around
+        Vector2 lookInput = input.Player.Look.ReadValue<Vector2>();
+        
+        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + (lookInput.x*playerCamera.cameraSensitivity), 0);
+        playerCamera.moveCamera(lookInput.y);
+    }
     private void FixedUpdate()
     {
         
-        //print("update!");
-        //if(!IsOwner) return;
-
-        if(!MovementEnabled) return;
+        if((!isGrounded())||(!MovementEnabled)) return;
             
-        Vector2 moveDir=Vector2.zero;
-
-        if(Input.GetKey(KeyCode.D))
-            moveDir.x+=walkSpeed;
-        if(Input.GetKey(KeyCode.A))
-            moveDir.x-=walkSpeed;
-        if(Input.GetKey(KeyCode.W))
-            moveDir.y+=walkSpeed;
-        if(Input.GetKey(KeyCode.S))
-            moveDir.y-=walkSpeed;
+        Vector2 moveDir=input.Player.Move.ReadValue<Vector2>()*walkSpeed;
         
         Vector3 movementDirection = transform.right * moveDir.x + transform.forward * moveDir.y;
         //rb.AddForce(new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z),ForceMode.Force);
@@ -95,22 +82,103 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-    public void onDash(float duration)
+    #region input
+    
+    //empty as we need to read their values on update functions anyway
+    public void OnMove(InputAction.CallbackContext context) {}
+    public void OnLook(InputAction.CallbackContext context) {}
+
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        print("fire!");
+    }
+
+    public void OnDash(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+            dashComponent.Dash();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+            jumpComponent.Jump();
+    }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        PlayerInteractor.Instance.PerformInteraction();
+    }
+
+    #endregion
+    public void onDashFromComponent(float duration)
     {
         MovementEnabled = false;
         Invoke(nameof(enableMovement),duration);
     }
     private void enableMovement()=>MovementEnabled = true;
     
-    /*public struct PlayerHealthData: INetworkSerializable
+    
+    private bool wasGrounded = false;
+    public bool isGrounded()
     {
-        public int HP;
-        public int MaxHP;
-        
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        RaycastHit hit;
+        Physics.Raycast(transform.position, Vector3.down, out hit, checkGroundDistance);
+        //if(hit.collider)
+        //    print("isgrounded check "+hit.collider+" "+hit.transform.gameObject.layer+" "+hit.transform.gameObject.name+" "+hit.transform.gameObject.tag);
+        bool grounded=hit.collider && hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground");
+
+        if (grounded&&(!wasGrounded))
         {
-            serializer.SerializeValue(ref HP);
-            serializer.SerializeValue(ref MaxHP);
+            onTouchGround();
+            wasGrounded = true;
+            return grounded;
         }
-    }*/
+        if((!grounded)&&wasGrounded)
+        {
+            onLeaveGround();
+            wasGrounded = false;
+            return grounded;
+        }
+        return grounded;
+    }
+
+    private void onTouchGround()
+    {
+        print("on touch ground!");
+        //rb.velocity = Vector3.zero;
+    }
+    private void onLeaveGround()
+    {
+        print("on leave ground!");
+    }
+
+    private void setName(FixedString64Bytes prevName, FixedString64Bytes newName)
+    {
+        print("setting name to "+newName+" for player P"+NetworkManager.LocalClientId+"!");
+        playerName.Value = newName;
+        TextMeshPro playerNameText = GetComponentInChildren<TextMeshPro>();
+        playerNameText.enabled = true;
+        playerNameText.text=newName.ToString();
+    }
+    
+    [ServerRpc]
+    private void setNameServerRpc(FixedString64Bytes newName)=> playerName.Value = newName;
+
+    
+    private void OnDrawGizmos()
+    {
+        //grounded check
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * checkGroundDistance);
+    }
+    
+    public override void OnNetworkDespawn()
+    {
+        playerName.OnValueChanged-=setName;
+        if(!IsOwner)  return;
+        
+        input.Disable();
+        
+    }
 }

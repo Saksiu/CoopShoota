@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 public class DashingComponent : MonoBehaviour
@@ -11,21 +12,24 @@ public class DashingComponent : MonoBehaviour
     
     //[SerializeField] private float dashMaxDistance;
     [SerializeField] private float dashDuration;
+
+
+    [SerializeField] private CinemachineImpulseSource rumbleCameraEffect;
     
     private bool canDash = true;
-
-    private void FixedUpdate()
-    {
-        if(Input.GetKey(KeyCode.LeftShift)) 
-            Dash(PlayerController.localPlayer.playerCamera.transform.forward);
-    }
-
-    public void Dash(Vector3 direction)
+    
+    public void Dash()
     {
         if(!canDash) return;
         
-        PlayerController.localPlayer.onDash(dashDuration);
+        Vector3 direction = PlayerController.localPlayer.playerCamera.transform.forward;
+        
+        PlayerController.localPlayer.onDashFromComponent(dashDuration);
+        
+        PlayerController.localPlayer.rb.velocity = Vector3.zero;
         PlayerController.localPlayer.rb.AddForce(direction.normalized*dashForce,ForceMode.Impulse);
+        rumbleCameraEffect.GenerateImpulse();
+        
         StartCoroutine(dashCooldownCoroutine());
     }
 

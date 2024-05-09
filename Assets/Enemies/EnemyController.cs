@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
+using AIUtils;
 
 public class EnemyController : NetworkBehaviour
 {

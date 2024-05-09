@@ -8,6 +8,9 @@ using UnityEngine;
 
 public class RoomController : NetworkBehaviour
 {
+    public static RoomController LobbyRoom;
+    
+    
     [SerializeField] private EnemySpawnerController enemySpawner;
     //[Tooltip("0: Up, 1: Right, 2: Down, 3: Left, clockwise from top basically")]
     //[SerializeField] private RoomDoorController[] doors = new RoomDoorController[4];
@@ -30,7 +33,17 @@ public class RoomController : NetworkBehaviour
     private void Start()
     {
         registerNewRoom(this);
-        this.enabled = false;
+        if(Id==0)
+        {
+            LobbyRoom = this;
+            enabled = true;
+            //Initialize();
+        }
+        else
+        {
+            enabled = false;
+        }
+            
     }
 
     public void onDoorEntered(uint targetRoomID,uint targetDoorDirection)

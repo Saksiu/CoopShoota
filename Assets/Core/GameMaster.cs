@@ -24,16 +24,19 @@ public class GameMaster : SingletonNetwork<GameMaster>
     {
         print("onPlayerJoined "+playerId+" ");
         if(!IsServer) return;
+        print(NetworkManager.ConnectedClientsIds.Count);
+        print(NetworkManager.ConnectedClients[playerId].PlayerObject.name);
         var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
         
         if(player==null||_players.Contains(player))
             return;
+        
         _players.Add(player);
         
         
         setPlayerPositionClientRpc(playerId,spawnPoints[_players.Count-1].position);
         if (NetworkManager.ConnectedClientsIds.Count >= minPlayers)
-            InitGame();
+            onAllPlayersJoined();
     }
     public void onPlayerLeft(ulong playerId)
     {
@@ -61,22 +64,16 @@ public class GameMaster : SingletonNetwork<GameMaster>
         //transform.position = pos;
     }
 
-    private void InitGame()
+    private void onAllPlayersJoined()
     {
         print("2 or more players joined the game "+_players.ToArray());
+        //probably unlock all game systems outside of the lobby
+    }
 
-        foreach (var p in _players)
-        {
-            p.playerName.Value = "P"+p.OwnerClientId.ToString();
-            //p.healthComponent.HP.Value = p.healthComponent.maxHP;
-        }
-            
-        /*foreach (var player in _players)
-        {
-            player.setName("","P"+player.OwnerClientId.ToString());
-        }*/
-        //replicatePlayerNamesClientRpc();
-        _currentRoomController?.Initialize();
+    public void beginGameRound()
+    {
+        //1. initialize rooms
+        //2. transfer players to room1
     }
 
     public override void OnNetworkSpawn()

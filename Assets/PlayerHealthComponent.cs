@@ -54,4 +54,17 @@ public class PlayerHealthComponent : NetworkBehaviour
     {
         HP.Value = newHP;
     }
+    
+        
+    /*public struct PlayerHealthData: INetworkSerializable
+    {
+        public int HP;
+        public int MaxHP;
+        
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref HP);
+            serializer.SerializeValue(ref MaxHP);
+        }
+    }*/
 }

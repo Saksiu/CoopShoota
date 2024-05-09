@@ -35,4 +35,11 @@ public class SingletonNetwork<T> : NetworkBehaviour where T : Component
             enabled = false;
         }
     }
+
+    /*public override void OnNetworkSpawn()
+    {
+        if(!IsServer)
+            enabled = false;
+        base.OnNetworkSpawn();
+    }*/
 }

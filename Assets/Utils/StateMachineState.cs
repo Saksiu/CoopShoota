@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Utils
+namespace AIUtils
 {
     public class StateMachineState
     {

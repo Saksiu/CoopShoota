@@ -1,7 +1,7 @@
 
 using System.Linq;
 
-namespace Utils
+namespace AIUtils
 {
     public class StateMachine
     {
