@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInteractor : SingletonLocal<PlayerInteractor>
+public class PlayerInteractor : MonoBehaviour
 {
     private List<Interactable> interactables = new();
     private Interactable currentClosestInteractable;

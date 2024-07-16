@@ -22,13 +22,13 @@ public abstract class Interactable : NetworkBehaviour
     protected virtual void OnTriggerEnter(Collider other)
     {
         if(other.gameObject==PlayerController.localPlayer.gameObject)
-            PlayerInteractor.Instance.AddAvailableInteractable(this);
+            PlayerController.localPlayer.playerInteractor.AddAvailableInteractable(this);
     }
 
     protected virtual void OnTriggerExit(Collider other)
     {
         if(other.gameObject==PlayerController.localPlayer.gameObject)
-            PlayerInteractor.Instance.RemoveAvailableInteractable(this);
+            PlayerController.localPlayer.playerInteractor.RemoveAvailableInteractable(this);
     }
 
     public virtual void showPrompt()

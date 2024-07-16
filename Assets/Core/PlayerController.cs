@@ -20,6 +20,8 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public CameraController playerCamera;
     public PlayerHealthComponent healthComponent;
     
+    public PlayerInteractor playerInteractor;
+    
     public Rigidbody rb;
     
     [SerializeField] private DashingComponent dashComponent;
@@ -107,7 +109,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        PlayerInteractor.Instance.PerformInteraction();
+        playerInteractor.PerformInteraction();
     }
 
     #endregion

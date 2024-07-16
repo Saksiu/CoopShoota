@@ -290,6 +290,7 @@ GameObject:
   - component: {fileID: 3984734490633884180}
   - component: {fileID: 4130305766590942952}
   - component: {fileID: 8126238965896535386}
+  - component: {fileID: 5155239450264144764}
   m_Layer: 0
   m_Name: POV Camera
   m_TagString: Untagged
@@ -393,6 +394,36 @@ MonoBehaviour:
     m_FrequencyGain: 1
     m_Duration: 1
     m_NoiseOffsets: {x: 716.126, y: 774.2057, z: 558.06396}
+--- !u!114 &5155239450264144764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5523376103286926247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &6347878994290850454
 GameObject:
   m_ObjectHideFlags: 0
@@ -656,7 +687,7 @@ GameObject:
   - component: {fileID: 6014280962815253167}
   - component: {fileID: 9203916303395187452}
   - component: {fileID: 5700577814458290137}
-  - component: {fileID: 2074634917387915025}
+  - component: {fileID: -1617461065997845012}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -787,6 +818,7 @@ MonoBehaviour:
         byte0061: 0
   playerCamera: {fileID: 3984734490633884180}
   healthComponent: {fileID: 5582773866948914186}
+  playerInteractor: {fileID: -1617461065997845012}
   rb: {fileID: 6014280962815253167}
   dashComponent: {fileID: 5006041667006495767}
   jumpComponent: {fileID: 2606058140669270406}
@@ -1022,7 +1054,7 @@ MonoBehaviour:
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
   m_DefaultVelocity: {x: 0, y: 0, z: 1.2}
---- !u!114 &2074634917387915025
+--- !u!114 &-1617461065997845012
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1179,9 +1211,6 @@ PrefabInstance:
       addedObject: {fileID: 6551079566611137864}
     - targetCorrespondingSourceObject: {fileID: 4875518283939212026, guid: dc8c9d44cd60a1b42a420e7fe67e2c85, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 9105829350969687573}
-    - targetCorrespondingSourceObject: {fileID: 4875518283939212026, guid: dc8c9d44cd60a1b42a420e7fe67e2c85, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1596106648772519406}
     - targetCorrespondingSourceObject: {fileID: 4875518283939212026, guid: dc8c9d44cd60a1b42a420e7fe67e2c85, type: 3}
       insertIndex: -1
@@ -1214,36 +1243,6 @@ MonoBehaviour:
   gunNozzle: {fileID: 2690337617698888296}
   gunAnimator: {fileID: 1596106648772519406}
   shootEffect: {fileID: 4992102609937800989}
---- !u!114 &9105829350969687573
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1766451331754190866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!95 &1596106648772519406
 Animator:
   serializedVersion: 5
