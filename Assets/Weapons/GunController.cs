@@ -1,4 +1,5 @@
 using System.Collections;
+using Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ public class GunController : NetworkBehaviour
     [SerializeField] private Animator gunAnimator;
 
     [SerializeField] private ParticleSystem shootEffect;
+
+    [SerializeField] private CinemachineImpulseSource cameraShakeEffect;
     
     private PlayerController owningPlayer;
     
@@ -41,6 +44,7 @@ public class GunController : NetworkBehaviour
             RequestFireServerRpc(gunNozzle.up,gunNozzlePos);
             FireBullet(gunNozzle.up, gunNozzlePos);
             gunAnimator.SetTrigger(ShootTrigger);
+            cameraShakeEffect.GenerateImpulse();
         }
 
         /*if (ShootInput&&shootCoroutineHandle==null)
@@ -108,6 +112,7 @@ public class GunController : NetworkBehaviour
         //print(bulletPrefab==null);
         //Quaternion bulletDir = Quaternion.LookRotation(Vector3.forward, dir);
         Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
+        gunAnimator.SetTrigger(ShootTrigger);
         shootEffect.Play();
     }
     

@@ -1243,6 +1243,7 @@ MonoBehaviour:
   gunNozzle: {fileID: 2690337617698888296}
   gunAnimator: {fileID: 1596106648772519406}
   shootEffect: {fileID: 4992102609937800989}
+  cameraShakeEffect: {fileID: 6474540379559594555}
 --- !u!95 &1596106648772519406
 Animator:
   serializedVersion: 5
