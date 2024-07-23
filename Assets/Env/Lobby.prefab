@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1824110448296753308}
   - component: {fileID: 1451602876780896602}
-  - component: {fileID: 8516446715992983389}
   m_Layer: 0
   m_Name: Lobby
   m_TagString: Untagged
@@ -55,7 +54,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2716245548
+  GlobalObjectIdHash: 3634009001
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -63,20 +62,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &8516446715992983389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 235576083403764584}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c49389b3e53a9f418a51f1482043ac8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemySpawner: {fileID: 0}
-  Id: 0
 --- !u!1 &511100776889972824
 GameObject:
   m_ObjectHideFlags: 0

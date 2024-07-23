@@ -29,6 +29,9 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     
     [SerializeField] private float checkGroundDistance=1.2f;
     [SerializeField] private float walkSpeed=5;
+
+    [SerializeField] private float groundDrag=5f;
+    [SerializeField] private float airDrag=0.1f;
     private bool MovementEnabled = true;
     private float verticalAngle=0.0f;
 
@@ -64,21 +67,34 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
         //looking around
         Vector2 lookInput = input.Player.Look.ReadValue<Vector2>();
-        
+
         transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + (lookInput.x*playerCamera.cameraSensitivity), 0);
+    
         playerCamera.moveCamera(lookInput.y);
     }
     private void FixedUpdate()
     {
+        Vector2 moveDirInput=input.Player.Move.ReadValue<Vector2>();
+        Vector3 movementDirection = transform.TransformDirection(moveDirInput.x,0,moveDirInput.y);
         
+        
+        if(!MovementEnabled) return;
+
+        if(isGrounded()){
+            rb.drag = groundDrag;
+            //rb.velocity = new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z);
+            rb.AddForce(movementDirection*walkSpeed,ForceMode.VelocityChange);
+        }
+        else{
+            rb.drag = airDrag;
+            jumpComponent.OnMoveInput(movementDirection);
+        }
         if((!isGrounded())||(!MovementEnabled)) return;
             
-        Vector2 moveDir=input.Player.Move.ReadValue<Vector2>()*walkSpeed;
         
-        Vector3 movementDirection = transform.right * moveDir.x + transform.forward * moveDir.y;
-        //rb.AddForce(new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z),ForceMode.Force);
-        //transform.Translate(new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z));
-        rb.velocity = new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z);
+        
+        
+        
 
         //rb.velocity = ;
 
@@ -97,8 +113,10 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        if(context.performed)
+        if(context.performed){
             dashComponent.Dash();
+        }
+            
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -116,6 +134,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public void onDashFromComponent(float duration)
     {
         MovementEnabled = false;
+        rb.drag=airDrag;
         Invoke(nameof(enableMovement),duration);
     }
     private void enableMovement()=>MovementEnabled = true;
@@ -147,12 +166,12 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     private void onTouchGround()
     {
-        print("on touch ground!");
+        //print("on touch ground!");
         //rb.velocity = Vector3.zero;
     }
     private void onLeaveGround()
     {
-        print("on leave ground!");
+        //print("on leave ground!");
     }
 
     private void setName(FixedString64Bytes prevName, FixedString64Bytes newName)
