@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class RoomDoorController : Interactable
 {
-    private RoomController owningRoom;
+    //private RoomController owningRoom;
 
     [SerializeField] private Animator doorAnimator;
     public bool isOpen = false;
@@ -23,6 +23,17 @@ public class RoomDoorController : Interactable
         
         isOpen = true;
         doorAnimator.SetTrigger("Open");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void OpenDoorServerRpc(){
+        OpenDoorClientRpc();
+        GameMaster.Instance.onRunInit();
+    }
+
+    [ClientRpc]
+    private void OpenDoorClientRpc(){
+        Open();
     }
 
     public void Close()
@@ -43,8 +54,7 @@ public class RoomDoorController : Interactable
     }*/
     public override void Interact()
     {
-        if(!isOpen)
-            Open();
+        OpenDoorServerRpc();
     }
 
     public override bool IsInteractable()

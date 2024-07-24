@@ -8,19 +8,21 @@ using UnityEngine;
 
 public class RoomController : NetworkBehaviour
 {
-    public static RoomController LobbyRoom;
-    
-    
-    [SerializeField] private EnemySpawnerController enemySpawner;
-    //[Tooltip("0: Up, 1: Right, 2: Down, 3: Left, clockwise from top basically")]
-    //[SerializeField] private RoomDoorController[] doors = new RoomDoorController[4];
+    public Action InitRoom;
+    //private static Dictionary<uint,RoomController> _allRooms = new();
 
-    private static uint _nextId = 0;
-    public uint Id;
-    private static Dictionary<uint,RoomController> _allRooms = new();
-    public void Initialize()
+    private void Start(){
+        InitRoom+=InitializeRoom;
+    }
+    public void InitializeRoom()
     {
-        enemySpawner?.BeginSpawningEnemies();
+        //print("INITROOM action called");
+        //TODO: win conditions, ensuring some conditions, etc.
+    }
+
+    public override void OnDestroy(){
+        base.OnDestroy();
+        InitRoom-=InitializeRoom;
     }
     
     /*public override void OnNetworkSpawn()
@@ -30,7 +32,7 @@ public class RoomController : NetworkBehaviour
         GetComponentInChildren<TextMeshPro>().text = Id.ToString();
     }*/
 
-    private void Start()
+    /*private void Start()
     {
         registerNewRoom(this);
         if(Id==0)
@@ -44,9 +46,9 @@ public class RoomController : NetworkBehaviour
             enabled = false;
         }
             
-    }
+    }*/
 
-    public void onDoorEntered(uint targetRoomID,uint targetDoorDirection)
+    /*public void onDoorEntered(uint targetRoomID,uint targetDoorDirection)
     {
         //if(IsServer||!IsOwner) return;
         //enemySpawner?.StopSpawningEnemies();
@@ -89,7 +91,7 @@ public class RoomController : NetworkBehaviour
         //CameraController.Instance.changeCameraPos(targetRoom.cameraTargetPos.position);
         NetworkManager.LocalClient.PlayerObject.transform.position = spawnPoint;
         
-    }
+    }*/
 /*
     private void ChangeRoom(uint targetRoomID,Vector2 spawnPoint)
     {
@@ -104,14 +106,15 @@ public class RoomController : NetworkBehaviour
         return spawnPoint;*/
         return Vector2.zero;
     }
-    private RoomController tryGetRoomById(uint id)
+    /*private RoomController tryGetRoomById(uint id)
     {
         return _allRooms.TryGetValue(id, out var room) ? room : null;
-    }
-
+    }*/
+    /*
     private static void registerNewRoom(RoomController toAdd)
     {
         _allRooms.Add(toAdd.Id,toAdd);
     }
+    */
 }
 

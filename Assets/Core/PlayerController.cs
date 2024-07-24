@@ -32,6 +32,8 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     [SerializeField] private float groundDrag=5f;
     [SerializeField] private float airDrag=0.1f;
+
+    [Tooltip("Don't add mid air force if player is moving faster than this")]
     private bool MovementEnabled = true;
     private float verticalAngle=0.0f;
 
@@ -77,7 +79,6 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         Vector2 moveDirInput=input.Player.Move.ReadValue<Vector2>();
         Vector3 movementDirection = transform.TransformDirection(moveDirInput.x,0,moveDirInput.y);
         
-        
         if(!MovementEnabled) return;
 
         if(isGrounded()){
@@ -89,12 +90,6 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
             rb.drag = airDrag;
             jumpComponent.OnMoveInput(movementDirection);
         }
-        if((!isGrounded())||(!MovementEnabled)) return;
-            
-        
-        
-        
-        
 
         //rb.velocity = ;
 

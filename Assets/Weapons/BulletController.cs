@@ -7,12 +7,14 @@ public class BulletController : MonoBehaviour
 {
     [SerializeField] private float speed;
 
+    [SerializeField] private float lifeTime;
+
     private bool ignoringEnemies = false;
     public void Launch(Vector3 dir)
     {
         //GetComponent<Rigidbody2D>().AddForce(dir*speed,ForceMode2D.Impulse);
         GetComponent<Rigidbody>().AddForce(dir*speed,ForceMode.Impulse);
-        Invoke(nameof(DestroySelf), 5f);
+        Invoke(nameof(DestroySelf), lifeTime);
     }
 
     private void OnCollisionEnter(Collision col)
@@ -23,13 +25,17 @@ public class BulletController : MonoBehaviour
 
     private void OnCollisionCustom(GameObject other)
     {
+        print(name+" collided with "+other.name);
         if ((!ignoringEnemies)&&other.layer == LayerMask.NameToLayer("Ground"))
         {
             ignoringEnemies=true;
             GetComponent<Collider>().excludeLayers = LayerMask.GetMask("Enemy");
             return;
         }
-            
+        if(other==PlayerController.localPlayer.gameObject){
+            print(name+" collided with "+other.name+" player. This should not happen, yet it fucking does");
+            return;
+        }
         DestroySelf();
     }
     

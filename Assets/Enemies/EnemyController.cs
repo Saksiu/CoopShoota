@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using AIUtils;
+using UnityEngine.AI;
 
 public class EnemyController : NetworkBehaviour
 {
@@ -12,12 +13,13 @@ public class EnemyController : NetworkBehaviour
 
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Collider col;
+    [SerializeField] private NavMeshAgent agent;
     
     [SerializeField] private EnemyHealthComponent healthComponent;
     //[SerializeField] private HealthBarController healthBar;
 
     [SerializeField] private float playerDetectionRadius=10f;
-    private Vector3 targetPos=Vector3.zero;
+    private Transform target;
     //public override void OnNetworkSpawn() { }
 
     private StateMachine stateMachine;
@@ -49,28 +51,24 @@ public class EnemyController : NetworkBehaviour
         //print("onStartChase");
     }
 
+
+    //TODO: this is expensive to do on update, as we iterate through all players for each enemy, 
+    //and then recalculate the path to it, even if its the same
     private void onUpdateChase()
     {
-        Vector3 closestPlayerPos = Vector3.zero;
-        float closestDistance = float.MaxValue;
-        float nextPlayerDistance;
-        
-        foreach (var player in GameMaster.Instance._players)
-        {
-            if(player==null) break;
-            nextPlayerDistance = Vector3.Distance(player.transform.position, transform.position);
-            if (nextPlayerDistance < closestDistance)
-            {
-                closestDistance = nextPlayerDistance;
-                closestPlayerPos = player.transform.position;
-            }
+        if(target==null){
+            target=getClosestPlayer();
+            if(target==null) return;
         }
-        if(closestDistance<1f) targetPos = transform.position;
+
+        if(Vector3.Distance(transform.position,target.position)>playerDetectionRadius) return;
+
+        agent.SetDestination(target.position);
+
         
-        targetPos = closestPlayerPos;
-        if(Vector3.Distance(transform.position,targetPos)>playerDetectionRadius) return;
-        Vector3 direction= (targetPos - transform.position).normalized*speed;
-        rb.velocity = new Vector3(direction.x,rb.velocity.y,direction.z);
+        //! DEPRECATED: old direct-move code
+        //Vector3 direction= (target.position - transform.position).normalized*speed;
+        //rb.velocity = new Vector3(direction.x,rb.velocity.y,direction.z);
         //transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
     }
 
@@ -81,6 +79,26 @@ public class EnemyController : NetworkBehaviour
                 return true;
 
         return false;
+    }
+
+    private Transform getClosestPlayer(){
+        Transform closestPlayer = target;
+        float closestDistance = float.MaxValue;
+        float nextPlayerDistance;
+        
+        foreach (var player in GameMaster.Instance._players)
+        {
+            if(player==null) break;
+            nextPlayerDistance = Vector3.Distance(player.transform.position, transform.position);
+            if (nextPlayerDistance < closestDistance)
+            {
+                closestDistance = nextPlayerDistance;
+                closestPlayer = player.transform;
+            }
+        }
+        
+        if(closestDistance<1f) return null;
+        else return closestPlayer;
     }
     
     private void FixedUpdate()

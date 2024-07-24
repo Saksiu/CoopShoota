@@ -48,7 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9ed8608b85292e43841ba0baa321f57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 80
+  speed: 100
+  lifeTime: 10
 --- !u!54 &1492314461047736431
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -58,7 +59,7 @@ Rigidbody:
   m_GameObject: {fileID: 6674151579556854439}
   serializedVersion: 4
   m_Mass: 0.5
-  m_Drag: 0.05
+  m_Drag: 0
   m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -71,7 +72,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -145,7 +146,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.00026522
-  m_Height: 0.00288679
+  m_Radius: 0.006
+  m_Height: 0.02
   m_Direction: 1
-  m_Center: {x: 0, y: 0.001443395, z: 1.4551915e-11}
+  m_Center: {x: 0, y: 0.0014, z: 0}

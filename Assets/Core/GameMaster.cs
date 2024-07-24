@@ -11,7 +11,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     [SerializeField] private int minPlayers = 1;
     
     public List<PlayerController> _players = new();
-    [SerializeField] private RoomController _currentRoomController;
+    [SerializeField] private RoomController runRoomController;
     [SerializeField] private List<Transform> spawnPoints;
 
     public override void Awake()
@@ -68,6 +68,9 @@ public class GameMaster : SingletonNetwork<GameMaster>
     {
         print("2 or more players joined the game "+_players.ToArray());
         //probably unlock all game systems outside of the lobby
+    }
+    public void onRunInit(){
+        runRoomController.InitRoom.Invoke();
     }
 
     public void beginGameRound()

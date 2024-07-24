@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Tutorials.Core.Editor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -9,14 +10,37 @@ public class EnemySpawnerController : NetworkBehaviour
 {
     //[SerializeField] private GameObject enemyPrefab;
     [SerializeField] private List<EnemyWaveData> Waves;
+
+    [Tooltip("Global interval between each individual enemy spawn")]
     [SerializeField] private float spawnInterval;
     
     [SerializeField] private BoxCollider spawnArea;
     
     private Coroutine enemySpawnCoroutineRef;
 
+    private RoomController owningRoom;
+
+
+    private void Start()
+    {
+        //print("start called on enemyspawner "+NetworkBehaviourId+" isserver: "+IsServer);
+
+        owningRoom = GetComponentInParent<RoomController>();
+        if(owningRoom==null){
+            Debug.LogError("ERROR: "+name+" could not find RoomController in parents");
+            return;
+        }
+        //print("subscribing beginspawnEnemies to owner room initroom function");
+        owningRoom.InitRoom += BeginSpawningEnemies;
+
+        if(!IsServer){
+            enabled = false;
+            return;
+        }
+    }
     public void BeginSpawningEnemies()
     {
+        print("beginspawningenemies called on "+NetworkBehaviourId);
         if(!IsServer) return;
         if(enemySpawnCoroutineRef!=null) return; //already spawning enemies
         
@@ -60,10 +84,12 @@ public class EnemySpawnerController : NetworkBehaviour
         //return (Random.insideUnitCircle * spawnArea.radius)+(Vector2)spawnArea.transform.position;
     }
 
-    public void OnDestroy()
+    public override void OnDestroy()
     {
-        print("i am being destroyed!");
-        //base.OnDestroy();
+        //print("i am being destroyed!");
+        if(IsServer&&owningRoom!=null)
+            owningRoom.InitRoom -= BeginSpawningEnemies;
+        base.OnDestroy();
     }
 }
 [Serializable]

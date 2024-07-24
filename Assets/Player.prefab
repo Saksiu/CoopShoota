@@ -313,6 +313,7 @@ Transform:
   m_Children:
   - {fileID: 2508644729372714091}
   - {fileID: 1425497635842241192}
+  - {fileID: 8513429031089580014}
   m_Father: {fileID: 491946214014378281}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3984734490633884180
@@ -727,7 +728,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 50486377
+  GlobalObjectIdHash: 2893163074
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -825,7 +826,7 @@ MonoBehaviour:
   checkGroundDistance: 1.2
   walkSpeed: 2
   groundDrag: 5
-  airDrag: 0.1
+  airDrag: 0.05
 --- !u!114 &5582773866948914186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -873,7 +874,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpForce: 800
-  midAirMoveForce: 400
+  midAirMoveForce: 1400
+  airForceAddThreshold: 17
 --- !u!114 &5201997850010156075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -962,7 +964,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7612173290357226724}
   serializedVersion: 4
-  m_Mass: 100
+  m_Mass: 120
   m_Drag: 0.2
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -973,7 +975,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
@@ -994,7 +996,7 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -1064,11 +1066,42 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7612173290357226724}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 120b93747a95a2a4bb0b1770611679d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &9148677768423653111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8513429031089580014}
+  m_Layer: 0
+  m_Name: Nozzle_Cam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8513429031089580014
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9148677768423653111}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 46.92733, y: 46.92734, z: 46.92734}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 6495424899942071970}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!1001 &6569309489213145832
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1251,7 +1284,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 6674151579556854439, guid: 70733eb4693e02943bb3eb2655cab39f, type: 3}
   ShootCooldown: 0.17
-  gunNozzle: {fileID: 2690337617698888296}
+  gunNozzle: {fileID: 8513429031089580014}
   gunAnimator: {fileID: 1596106648772519406}
   shootEffect: {fileID: 4992102609937800989}
   cameraShakeEffect: {fileID: 6474540379559594555}
@@ -1329,11 +1362,6 @@ MonoBehaviour:
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
   m_DefaultVelocity: {x: 0, y: 0.01, z: -0.15}
---- !u!4 &2690337617698888296 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9115039233071323264, guid: dc8c9d44cd60a1b42a420e7fe67e2c85, type: 3}
-  m_PrefabInstance: {fileID: 6569309489213145832}
-  m_PrefabAsset: {fileID: 0}
 --- !u!198 &4992102609937800989 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 2192517391152553461, guid: dc8c9d44cd60a1b42a420e7fe67e2c85, type: 3}
