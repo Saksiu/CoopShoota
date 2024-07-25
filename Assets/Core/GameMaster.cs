@@ -51,6 +51,11 @@ public class GameMaster : SingletonNetwork<GameMaster>
             onAllPlayersJoined();
     }
 
+    public void updateSpawnPoints(List<Transform> newSpawnPoints)
+    {
+        spawnPoints = newSpawnPoints;
+    }
+
     public void onPlayerLeft(ulong playerId)
     {
         if(!IsServer) return;
@@ -61,13 +66,20 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
         player.healthComponent.OnDeathAction -= OnPlayerDeath;
 
-        //if(NetworkObject.IsSpawned)
-        //    NetworkObject.Despawn();
         if(!player.IsSpawned) return;
 
         NetworkManager.DisconnectClient(playerId);
         player.NetworkObject.Despawn();
+        DestroyPlayerObjectClientRpc(playerId);
+        
+    }
 
+    [ClientRpc]
+    private void DestroyPlayerObjectClientRpc(ulong playerId){
+        if(NetworkManager.LocalClientId!=playerId) return;
+
+        Destroy(NetworkManager.LocalClient.PlayerObject);
+        Destroy(NetworkManager.gameObject);
     }
 
     [ClientRpc]
@@ -86,7 +98,10 @@ public class GameMaster : SingletonNetwork<GameMaster>
     [ClientRpc]
     public void setPlayerPositionRandomSpawnPointClientRpc(ulong playerID,ClientRpcParams clientRpcParams=default)
     {
-        setPlayerPositionClientRpc(playerID,spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position);
+        if(runRoomController.isRunActive)
+            setPlayerPositionClientRpc(playerID,runRoomController.spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position);
+        else
+            setPlayerPositionClientRpc(playerID,spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position);
     }
 
     private void onAllPlayersJoined()

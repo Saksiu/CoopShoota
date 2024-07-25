@@ -34,6 +34,7 @@ public class RoomDoorController : Interactable
     [ClientRpc]
     private void OpenDoorClientRpc(){
         Open();
+        GameMaster.Instance.onRunInit();
     }
 
     public void Close()

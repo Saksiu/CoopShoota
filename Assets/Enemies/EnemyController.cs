@@ -74,6 +74,7 @@ public class EnemyController : NetworkBehaviour
         if(Vector3.Distance(transform.position,target.position)>playerDetectionRadius) return;
 
         agent.SetDestination(target.position);
+        agent.CalculatePath(target.position,agent.path);
 
         
         //! DEPRECATED: old direct-move code

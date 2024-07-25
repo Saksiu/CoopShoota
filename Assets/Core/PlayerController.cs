@@ -203,7 +203,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         playerName.OnValueChanged-=setName;
         if(!IsOwner)  return;
         
-        input.Disable();
+        input?.Disable();
         
     }
 }

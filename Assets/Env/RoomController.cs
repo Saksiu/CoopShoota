@@ -9,6 +9,10 @@ using UnityEngine;
 public class RoomController : NetworkBehaviour
 {
     public Action InitRoom;
+
+    public bool isRunActive = false;
+
+    public List<Transform> spawnPoints;
     //private static Dictionary<uint,RoomController> _allRooms = new();
 
     private void Start(){
@@ -18,6 +22,7 @@ public class RoomController : NetworkBehaviour
     {
         //print("INITROOM action called");
         //TODO: win conditions, ensuring some conditions, etc.
+        isRunActive = true;
     }
 
     public override void OnDestroy(){
