@@ -14,22 +14,19 @@ public class RoomDoorController : Interactable
 
     public override void OnNetworkSpawn()
     {
-        RoomController.Instance.isRunActive.OnValueChanged += OnRunStateChanged;
+        RoomController.Instance.OnRunStartAction += Open;
+        RoomController.Instance.OnRunEndAction += Close;
+        //print("door spawned on network, checking runstate "+RoomController.Instance.isRunActive.Value);
+
         base.OnNetworkSpawn();
     }
     public override void OnNetworkDespawn()
     {
-        RoomController.Instance.isRunActive.OnValueChanged -= OnRunStateChanged;
+        RoomController.Instance.OnRunStartAction -= Open;
+        RoomController.Instance.OnRunEndAction -= Close;
         base.OnNetworkDespawn();
     }
 
-    private void OnRunStateChanged(bool prev, bool curr)
-    {
-        if(curr)
-            Open();
-        else
-            Close();
-    }
 
     public void Open()
     {
@@ -52,7 +49,7 @@ public class RoomDoorController : Interactable
         //GameMaster.Instance.startRun();
     }*/
 
-    public void Close()
+    public void Close(bool win)
     {
         if(!isOpen) return;
         

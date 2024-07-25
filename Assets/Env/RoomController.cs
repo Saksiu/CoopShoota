@@ -9,13 +9,18 @@ using UnityEngine;
 public class RoomController : SingletonNetwork<RoomController>
 {
 
-    public NetworkVariable<bool> isRunActive = new NetworkVariable<bool>(false);
+    private NetworkVariable<bool> isRunActive = new NetworkVariable<bool>(false);
+
+    public Action OnRunStartAction;
+    public Action<bool> OnRunEndAction;
 
     public List<Transform> spawnPoints;
 
     public override void OnNetworkSpawn(){
         EnemyHealthComponent.OnEnemyDeathAction+=OnEnemyKilled;
         isRunActive.OnValueChanged+=onRunStateChanged;
+
+        isRunActive.OnValueChanged.Invoke(false,isRunActive.Value);
 
         base.OnNetworkSpawn();
     }
@@ -28,7 +33,13 @@ public class RoomController : SingletonNetwork<RoomController>
 
     private void onRunStateChanged(bool prev, bool curr){
         if(curr){
-            InitializeRoom();
+            if(!prev){
+                InitializeRoom();
+                OnRunStartAction?.Invoke();
+            }
+        }
+        else{
+            OnRunEndAction?.Invoke(true);
         }
     }
 

@@ -56,13 +56,6 @@ public class GameMaster : SingletonNetwork<GameMaster>
         spawnPoints = newSpawnPoints;
     }
 
-    public void onRunStateChanged(bool prev, bool curr){
-        if(curr)
-            OnRunStarted();
-        else
-            endRun(true);
-    }
-
     public void onPlayerLeft(ulong playerId)
     {
         if(!IsServer) return;
@@ -138,7 +131,8 @@ public class GameMaster : SingletonNetwork<GameMaster>
         NetworkManager.OnClientConnectedCallback += onPlayerJoined;
         NetworkManager.OnClientDisconnectCallback += onPlayerLeft;
 
-        RoomController.Instance.isRunActive.OnValueChanged += onRunStateChanged;
+        RoomController.Instance.OnRunStartAction += OnRunStarted;
+        RoomController.Instance.OnRunEndAction += endRun;
         /*if (!IsServer)
         {
             
@@ -169,7 +163,8 @@ public class GameMaster : SingletonNetwork<GameMaster>
         NetworkManager.OnClientConnectedCallback -= onPlayerJoined;
         NetworkManager.OnClientDisconnectCallback -= onPlayerLeft;
 
-        RoomController.Instance.isRunActive.OnValueChanged -= onRunStateChanged;
+        RoomController.Instance.OnRunStartAction -= OnRunStarted;
+        RoomController.Instance.OnRunEndAction -= endRun;
     }
 
     public override void OnDestroy()

@@ -31,7 +31,8 @@ public class EnemySpawnerController : NetworkBehaviour
             return;
         }
         //print("subscribing beginspawnEnemies to owner room initroom function");
-        RoomController.Instance.isRunActive.OnValueChanged += onRunStateChanged;
+        RoomController.Instance.OnRunStartAction += BeginSpawningEnemies;
+        RoomController.Instance.OnRunEndAction += StopSpawningEnemies;
 
         if(!IsServer){
             enabled = false;
@@ -39,20 +40,13 @@ public class EnemySpawnerController : NetworkBehaviour
         }
     }
 
-    private void onRunStateChanged(bool prev, bool curr)
-    {
-        if(curr)
-        {
-            BeginSpawningEnemies();
-        }
-        else
-        {
-            if(enemySpawnCoroutineRef!=null)
-                StopCoroutine(enemySpawnCoroutineRef);
+    private void StopSpawningEnemies(bool win){
+        if(enemySpawnCoroutineRef!=null)
+            StopCoroutine(enemySpawnCoroutineRef);
                 
-            enemySpawnCoroutineRef = null;
-        }
+        enemySpawnCoroutineRef = null;
     }
+
     public void BeginSpawningEnemies()
     {
         print("beginspawningenemies called on "+NetworkBehaviourId);
@@ -102,7 +96,9 @@ public class EnemySpawnerController : NetworkBehaviour
     public override void OnDestroy()
     {
         //print("i am being destroyed!");
-        RoomController.Instance.isRunActive.OnValueChanged -= onRunStateChanged;
+        RoomController.Instance.OnRunStartAction -= BeginSpawningEnemies;
+        RoomController.Instance.OnRunEndAction -= StopSpawningEnemies;
+
         base.OnDestroy();
     }
 }
