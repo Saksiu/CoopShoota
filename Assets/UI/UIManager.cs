@@ -29,7 +29,7 @@ public class UIManager : SingletonLocal<UIManager>
 
     private void DisplayDeathScreen(PlayerController player){
         showPromptFor("You died! You will respawn in "+GameMaster.Instance.respawnTime+" seconds.",GameMaster.Instance.respawnTime);
-        print("showing death screen on player "+player.playerName.Value);
+        //print("showing death screen on player "+player.playerName.Value);
     }
 
     private void OnDestroy()

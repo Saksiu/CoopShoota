@@ -17,7 +17,7 @@ public class EnemyHealthComponent : NetworkBehaviour
     [SerializeField] private Slider healthBar;
     
     
-    public Action<EnemyController> OnEnemyDeathACtion;
+    public static Action<EnemyController> OnEnemyDeathAction;
 
     public override void OnNetworkSpawn()
     {
@@ -52,7 +52,9 @@ public class EnemyHealthComponent : NetworkBehaviour
         if(HP.Value<=0) return;
         //print("deducting HP from "+playerName.Value+" by "+amount+" points");
         HP.Value -= amount;
-        if(HP.Value<=0)
-            OnEnemyDeathACtion.Invoke(GetComponent<EnemyController>());
+        if(HP.Value<=0){
+            OnEnemyDeathAction.Invoke(GetComponent<EnemyController>());
+        }
+            
     }
 }

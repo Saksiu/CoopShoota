@@ -11,10 +11,24 @@ public class RoomDoorController : Interactable
 
     [SerializeField] private Animator doorAnimator;
     public bool isOpen = false;
-    
-    private void Start()
+
+    public override void OnNetworkSpawn()
     {
-        //owningRoom = GetComponentInParent<RoomController>();
+        RoomController.Instance.isRunActive.OnValueChanged += OnRunStateChanged;
+        base.OnNetworkSpawn();
+    }
+    public override void OnNetworkDespawn()
+    {
+        RoomController.Instance.isRunActive.OnValueChanged -= OnRunStateChanged;
+        base.OnNetworkDespawn();
+    }
+
+    private void OnRunStateChanged(bool prev, bool curr)
+    {
+        if(curr)
+            Open();
+        else
+            Close();
     }
 
     public void Open()
@@ -27,15 +41,16 @@ public class RoomDoorController : Interactable
 
     [ServerRpc(RequireOwnership = false)]
     private void OpenDoorServerRpc(){
-        OpenDoorClientRpc();
-        GameMaster.Instance.onRunInit();
+        //OpenDoorClientRpc();
+        RoomController.Instance.setIsRunActiveServerRpc(true);
+        //GameMaster.Instance.startRun();
     }
 
-    [ClientRpc]
+ /*   [ClientRpc]
     private void OpenDoorClientRpc(){
         Open();
-        GameMaster.Instance.onRunInit();
-    }
+        //GameMaster.Instance.startRun();
+    }*/
 
     public void Close()
     {

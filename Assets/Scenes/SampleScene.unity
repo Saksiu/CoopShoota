@@ -3163,7 +3163,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minPlayers: 2
   _players: []
-  runRoomController: {fileID: 618848205}
   spawnPoints:
   - {fileID: 1951606055}
   - {fileID: 1701255513}
@@ -3380,7 +3379,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5089839690117206679, guid: b10fa565ae0175042a99988e76765857, type: 3}
       propertyPath: Waves.Array.size
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5089839690117206679, guid: b10fa565ae0175042a99988e76765857, type: 3}
       propertyPath: Waves.Array.data[1].enemyCount

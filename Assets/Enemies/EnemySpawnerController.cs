@@ -31,11 +31,26 @@ public class EnemySpawnerController : NetworkBehaviour
             return;
         }
         //print("subscribing beginspawnEnemies to owner room initroom function");
-        owningRoom.InitRoom += BeginSpawningEnemies;
+        RoomController.Instance.isRunActive.OnValueChanged += onRunStateChanged;
 
         if(!IsServer){
             enabled = false;
             return;
+        }
+    }
+
+    private void onRunStateChanged(bool prev, bool curr)
+    {
+        if(curr)
+        {
+            BeginSpawningEnemies();
+        }
+        else
+        {
+            if(enemySpawnCoroutineRef!=null)
+                StopCoroutine(enemySpawnCoroutineRef);
+                
+            enemySpawnCoroutineRef = null;
         }
     }
     public void BeginSpawningEnemies()
@@ -87,8 +102,7 @@ public class EnemySpawnerController : NetworkBehaviour
     public override void OnDestroy()
     {
         //print("i am being destroyed!");
-        if(IsServer&&owningRoom!=null)
-            owningRoom.InitRoom -= BeginSpawningEnemies;
+        RoomController.Instance.isRunActive.OnValueChanged -= onRunStateChanged;
         base.OnDestroy();
     }
 }

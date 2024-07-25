@@ -12,7 +12,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     [SerializeField] private int minPlayers = 1;
     
     public List<PlayerController> _players = new();
-    [SerializeField] private RoomController runRoomController;
+    //[SerializeField] private RoomController runRoomController;
     [SerializeField] private List<Transform> spawnPoints;
 
 
@@ -56,6 +56,13 @@ public class GameMaster : SingletonNetwork<GameMaster>
         spawnPoints = newSpawnPoints;
     }
 
+    public void onRunStateChanged(bool prev, bool curr){
+        if(curr)
+            OnRunStarted();
+        else
+            endRun(true);
+    }
+
     public void onPlayerLeft(ulong playerId)
     {
         if(!IsServer) return;
@@ -72,6 +79,13 @@ public class GameMaster : SingletonNetwork<GameMaster>
         player.NetworkObject.Despawn();
         DestroyPlayerObjectClientRpc(playerId);
         
+    }
+
+    private Vector3 getRandomLobbySpawnPos(){
+        return spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position;
+    }
+    private Vector3 getRandomRunSpawnPos(){
+        return RoomController.Instance.spawnPoints[UnityEngine.Random.Range(0, RoomController.Instance.spawnPoints.Count)].position;
     }
 
     [ClientRpc]
@@ -95,13 +109,10 @@ public class GameMaster : SingletonNetwork<GameMaster>
         //transform.position = pos;
     }
 
+
     [ClientRpc]
-    public void setPlayerPositionRandomSpawnPointClientRpc(ulong playerID,ClientRpcParams clientRpcParams=default)
-    {
-        if(runRoomController.isRunActive)
-            setPlayerPositionClientRpc(playerID,runRoomController.spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position);
-        else
-            setPlayerPositionClientRpc(playerID,spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position);
+    private void resetAllPlayersPositionsToLobbyClientRpc(){
+        setPlayerPositionClientRpc(NetworkManager.LocalClientId,getRandomLobbySpawnPos());
     }
 
     private void onAllPlayersJoined()
@@ -109,14 +120,25 @@ public class GameMaster : SingletonNetwork<GameMaster>
         print("2 or more players joined the game "+_players.ToArray());
         //probably unlock all game systems outside of the lobby
     }
-    public void onRunInit(){
-        runRoomController.InitRoom.Invoke();
+    public void OnRunStarted(){
+    }
+
+    public void endRun(bool win){
+        resetAllPlayersPositionsToLobbyClientRpc();
+        displayPromptForAllPlayersClientRpc(win?"You win!":"You lose!",3f);
+    }
+
+    [ClientRpc]
+    public void displayPromptForAllPlayersClientRpc(string message,float duration){
+        UIManager.Instance.showPromptFor(message,duration);
     }
 
     public override void OnNetworkSpawn()
     {
         NetworkManager.OnClientConnectedCallback += onPlayerJoined;
         NetworkManager.OnClientDisconnectCallback += onPlayerLeft;
+
+        RoomController.Instance.isRunActive.OnValueChanged += onRunStateChanged;
         /*if (!IsServer)
         {
             
@@ -139,13 +161,15 @@ public class GameMaster : SingletonNetwork<GameMaster>
         
         yield return new WaitForSeconds(respawnTime);
         player.healthComponent.resetHPServerRpc();
-        setPlayerPositionRandomSpawnPointClientRpc(player.OwnerClientId);
+        setPlayerPositionClientRpc(player.OwnerClientId,getRandomRunSpawnPos());
     }
 
     public override void OnNetworkDespawn()
     {
         NetworkManager.OnClientConnectedCallback -= onPlayerJoined;
         NetworkManager.OnClientDisconnectCallback -= onPlayerLeft;
+
+        RoomController.Instance.isRunActive.OnValueChanged -= onRunStateChanged;
     }
 
     public override void OnDestroy()

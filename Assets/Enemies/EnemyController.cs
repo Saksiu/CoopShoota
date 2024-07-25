@@ -36,15 +36,17 @@ public class EnemyController : NetworkBehaviour
         
         idle.AddTransition(anyPlayerInRange, chase);
         chase.AddTransition(()=>!anyPlayerInRange(), idle);
-        
-        healthComponent.OnEnemyDeathACtion += onDeath;
-
         stateMachine.CurrentState = idle;
+
+
+        EnemyHealthComponent.OnEnemyDeathAction += onDeath;
+
+        
     }
     public override void OnNetworkDespawn()
     {
         if(IsServer){
-            healthComponent.OnEnemyDeathACtion -= onDeath;
+            EnemyHealthComponent.OnEnemyDeathAction -= onDeath;
         }
 
         base.OnNetworkDespawn();
@@ -169,10 +171,11 @@ public class EnemyController : NetworkBehaviour
         }
     }
 
-    public void onDeath(EnemyController enemySelf)
+    public void onDeath(EnemyController enemyKilled)
     {
-        if(NetworkObject.IsSpawned)
-            NetworkObject.Despawn();
+        if(this!=enemyKilled||(!NetworkObject.IsSpawned))
+            return;
+        NetworkObject.Despawn();
     }
     private int actualValueOfLayerMask(LayerMask layerMask)=> (int)Mathf.Log(layerMask.value, 2);
 }

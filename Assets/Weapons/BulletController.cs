@@ -25,7 +25,7 @@ public class BulletController : MonoBehaviour
 
     private void OnCollisionCustom(GameObject other)
     {
-        print(name+" collided with "+other.name);
+        //print(name+" collided with "+other.name);
         if ((!ignoringEnemies)&&other.layer == LayerMask.NameToLayer("Ground"))
         {
             ignoringEnemies=true;
@@ -33,7 +33,7 @@ public class BulletController : MonoBehaviour
             return;
         }
         if(other==PlayerController.localPlayer.gameObject){
-            print(name+" collided with "+other.name+" player. This should not happen, yet it fucking does");
+            print(name+" collided with "+other.name+" player. This should not happen");
             return;
         }
         DestroySelf();
