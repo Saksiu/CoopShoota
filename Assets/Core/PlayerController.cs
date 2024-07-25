@@ -26,6 +26,8 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     
     [SerializeField] private DashingComponent dashComponent;
     [SerializeField] private PlayerJumpingComponent jumpComponent;
+
+    [SerializeField] private TextMeshPro playerNameText;
     
     [SerializeField] private float checkGroundDistance=1.2f;
     [SerializeField] private float walkSpeed=5;
@@ -35,7 +37,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     [Tooltip("Don't add mid air force if player is moving faster than this")]
     private bool MovementEnabled = true;
-    private float verticalAngle=0.0f;
+    //private float verticalAngle=0.0f;
 
     public override void OnNetworkSpawn()
     {
@@ -44,21 +46,22 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         
         playerCamera.Init(IsOwner);
 
-        TextMeshPro playerNameText = GetComponentInChildren<TextMeshPro>();
         playerNameText.text=playerName.Value.ToString();
         if(!IsOwner)
         {
             //GetComponentInChildren<PlayerJumpingComponent>().enabled = false;
             //GetComponent<PlayerInput>().enabled = false;
             //PlayerInteractor.Instance.enabled = false;
-            enabled = false;
+            //enabled = false;
+            playerNameText.enabled=true; 
             return;
         }
-
+        playerNameText.enabled=false;//you shouldnt see your own name tag
         input = new PlayerInputGenerated();
         input.Player.SetCallbacks(this);
         input.Enable();
         setNameServerRpc("P"+NetworkManager.LocalClientId);
+        UIManager.Instance.onPlayerSpawn(this);
         localPlayer = this;
         
         base.OnNetworkSpawn();
@@ -66,6 +69,9 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     private void Update()
     {
+        playerNameText.GetComponentInParent<Canvas>().transform.LookAt(localPlayer.transform);
+    
+        if(!IsOwner) return;
 
         //looking around
         Vector2 lookInput = input.Player.Look.ReadValue<Vector2>();
@@ -73,9 +79,13 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + (lookInput.x*playerCamera.cameraSensitivity), 0);
     
         playerCamera.moveCamera(lookInput.y);
+
+
     }
     private void FixedUpdate()
     {
+        if(!IsOwner) return;
+
         Vector2 moveDirInput=input.Player.Move.ReadValue<Vector2>();
         Vector3 movementDirection = transform.TransformDirection(moveDirInput.x,0,moveDirInput.y);
         
@@ -173,8 +183,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     {
         print("setting name to "+newName+" for player P"+NetworkManager.LocalClientId+"!");
         playerName.Value = newName;
-        TextMeshPro playerNameText = GetComponentInChildren<TextMeshPro>();
-        playerNameText.enabled = true;
+        //playerNameText.enabled = true;
         playerNameText.text=newName.ToString();
     }
     

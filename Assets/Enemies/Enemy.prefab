@@ -411,7 +411,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2209256934
+  GlobalObjectIdHash: 1738502558
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -454,21 +454,6 @@ MonoBehaviour:
     m_InternalValue: 0
   enemyCanvas: {fileID: 4108331389411058882}
   healthBar: {fileID: 7764881540480764128}
-  onDeath:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8112945742361106837}
-        m_TargetAssemblyTypeName: EnemyController, Assembly-CSharp
-        m_MethodName: onDeath
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &-6078274312333572976
 MonoBehaviour:
   m_ObjectHideFlags: 0

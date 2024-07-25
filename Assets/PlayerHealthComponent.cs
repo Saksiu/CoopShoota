@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -9,8 +10,7 @@ public class PlayerHealthComponent : NetworkBehaviour
     public int maxHP = 10;
     public NetworkVariable<int> HP = new();
     
-    
-    [SerializeField] private UnityEvent onDeath;
+    public Action<PlayerController> OnDeathAction;
 
     public override void OnNetworkSpawn()
     {
@@ -20,6 +20,7 @@ public class PlayerHealthComponent : NetworkBehaviour
         
         SetHPServerRpc(maxHP);
         //print("HP set to "+HP.Value+"!");
+
         base.OnNetworkSpawn();
     }
 
@@ -45,8 +46,23 @@ public class PlayerHealthComponent : NetworkBehaviour
         if(HP.Value<=0) return;
         //print("deducting HP from "+playerName.Value+" by "+amount+" points");
         HP.Value -= amount;
-        if(HP.Value<=0)
-            onDeath?.Invoke();
+        if(HP.Value<=0){
+            OnDeathAction.Invoke(GetComponent<PlayerController>());
+            OnDeathClientRpc();
+        }
+            
+    }
+
+    [ClientRpc]
+    private void OnDeathClientRpc(){
+        if(!IsOwner) return;
+        OnDeathAction.Invoke(GetComponent<PlayerController>());
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void resetHPServerRpc()
+    {
+        SetHPServerRpc(maxHP);
     }
 
     [ServerRpc]

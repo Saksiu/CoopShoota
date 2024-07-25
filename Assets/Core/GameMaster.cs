@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class GameMaster : SingletonNetwork<GameMaster>
 {
@@ -13,6 +14,11 @@ public class GameMaster : SingletonNetwork<GameMaster>
     public List<PlayerController> _players = new();
     [SerializeField] private RoomController runRoomController;
     [SerializeField] private List<Transform> spawnPoints;
+
+
+    public Action<PlayerController> OnPlayerSpawned;
+
+    public float respawnTime = 3f;
 
     public override void Awake()
     {
@@ -23,21 +29,28 @@ public class GameMaster : SingletonNetwork<GameMaster>
     public void onPlayerJoined(ulong playerId)
     {
         print("onPlayerJoined "+playerId+" ");
+
         if(!IsServer) return;
-        print(NetworkManager.ConnectedClientsIds.Count);
-        print(NetworkManager.ConnectedClients[playerId].PlayerObject.name);
-        var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
+        print("total players joined: "+NetworkManager.ConnectedClientsIds.Count);
+        //print(NetworkManager.ConnectedClients[playerId].PlayerObject.name);
         
+        var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
         if(player==null||_players.Contains(player))
             return;
         
         _players.Add(player);
         
         
+        OnPlayerSpawned?.Invoke(player);
         setPlayerPositionClientRpc(playerId,spawnPoints[_players.Count-1].position);
+
+
+        player.healthComponent.OnDeathAction += OnPlayerDeath;
+        
         if (NetworkManager.ConnectedClientsIds.Count >= minPlayers)
             onAllPlayersJoined();
     }
+
     public void onPlayerLeft(ulong playerId)
     {
         if(!IsServer) return;
@@ -45,9 +58,15 @@ public class GameMaster : SingletonNetwork<GameMaster>
         var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
         if(player!=null&&_players.Contains(player))
             _players.Remove(player);
-        
-        if(NetworkObject.IsSpawned)
-            NetworkObject.Despawn();
+
+        player.healthComponent.OnDeathAction -= OnPlayerDeath;
+
+        //if(NetworkObject.IsSpawned)
+        //    NetworkObject.Despawn();
+        if(!player.IsSpawned) return;
+
+        NetworkManager.DisconnectClient(playerId);
+        player.NetworkObject.Despawn();
 
     }
 
@@ -64,6 +83,12 @@ public class GameMaster : SingletonNetwork<GameMaster>
         //transform.position = pos;
     }
 
+    [ClientRpc]
+    public void setPlayerPositionRandomSpawnPointClientRpc(ulong playerID,ClientRpcParams clientRpcParams=default)
+    {
+        setPlayerPositionClientRpc(playerID,spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position);
+    }
+
     private void onAllPlayersJoined()
     {
         print("2 or more players joined the game "+_players.ToArray());
@@ -71,12 +96,6 @@ public class GameMaster : SingletonNetwork<GameMaster>
     }
     public void onRunInit(){
         runRoomController.InitRoom.Invoke();
-    }
-
-    public void beginGameRound()
-    {
-        //1. initialize rooms
-        //2. transfer players to room1
     }
 
     public override void OnNetworkSpawn()
@@ -90,16 +109,22 @@ public class GameMaster : SingletonNetwork<GameMaster>
         //_currentRoomController = FindObjectsOfType<RoomController>();
     }
 
-    private void Start()
+    public void OnPlayerDeath(PlayerController deadPlayer)
     {
-        /*if (!IsOwnedByServer)
-        {
-            enabled = false;
-            return;
-        }*/
-        //NetworkManager.OnClientStarted += onPlayerJoined;
+        Assert.IsTrue(IsServer);
+        print("game over for "+deadPlayer.playerName.Value);
+
+        StartCoroutine(PlayerRespawn(deadPlayer));
+
+    }
+
+    private IEnumerator PlayerRespawn(PlayerController player)
+    {
+        Assert.IsTrue(IsServer);
         
-        
+        yield return new WaitForSeconds(respawnTime);
+        player.healthComponent.resetHPServerRpc();
+        setPlayerPositionRandomSpawnPointClientRpc(player.OwnerClientId);
     }
 
     public override void OnNetworkDespawn()
@@ -113,14 +138,6 @@ public class GameMaster : SingletonNetwork<GameMaster>
         //NetworkManager.OnClientStarted -= onPlayerJoined;
         
         base.OnDestroy();
-    }
-    public void onPlayerDeath(PlayerController deadPlayer)
-    {
-        if(!IsServer) return;
-        print("game over for "+deadPlayer.playerName.Value);
-        if(NetworkObject.IsSpawned)
-            NetworkObject.Despawn();
-
     }
     
     private void beginShutDown()

@@ -37,10 +37,19 @@ public class EnemyController : NetworkBehaviour
         idle.AddTransition(anyPlayerInRange, chase);
         chase.AddTransition(()=>!anyPlayerInRange(), idle);
         
-        
+        healthComponent.OnEnemyDeathACtion += onDeath;
+
         stateMachine.CurrentState = idle;
     }
-    
+    public override void OnNetworkDespawn()
+    {
+        if(IsServer){
+            healthComponent.OnEnemyDeathACtion -= onDeath;
+        }
+
+        base.OnNetworkDespawn();
+    }
+
     private void onStartIdle()
     {
         //print("onStartIdle");
@@ -52,7 +61,8 @@ public class EnemyController : NetworkBehaviour
     }
 
 
-    //TODO: this is expensive to do on update, as we iterate through all players for each enemy, 
+    //TODO: improve performance
+    //this is expensive to do on update, as we iterate through all players for each enemy, 
     //and then recalculate the path to it, even if its the same
     private void onUpdateChase()
     {
@@ -158,7 +168,7 @@ public class EnemyController : NetworkBehaviour
         }
     }
 
-    public void onDeath()
+    public void onDeath(EnemyController enemySelf)
     {
         if(NetworkObject.IsSpawned)
             NetworkObject.Despawn();
