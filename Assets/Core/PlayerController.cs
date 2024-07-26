@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Numerics;
 using TMPro;
 using Unity.Collections;
@@ -16,7 +17,8 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public NetworkVariable<FixedString64Bytes> playerName=new(
         "",NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
-    private PlayerInputGenerated input;
+    //private PlayerInputGenerated input;
+    //public PlayerInput inputButNotGenerated;
     public CameraController playerCamera;
     public PlayerHealthComponent healthComponent;
     
@@ -57,9 +59,14 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
             return;
         }
         playerNameText.enabled=false;//you shouldnt see your own name tag
-        input = new PlayerInputGenerated();
-        input.Player.SetCallbacks(this);
-        input.Enable();
+
+        InputManager.PlayerInput.Player.SetCallbacks(this);
+        InputManager.PlayerInput.UI.SetCallbacks(UIManager.Instance);
+
+        InputManager.PlayerInput.Player.Enable();
+        InputManager.PlayerInput.UI.Disable();
+
+
         setNameServerRpc("P"+NetworkManager.LocalClientId);
         UIManager.Instance.onPlayerSpawn(this);
         localPlayer = this;
@@ -74,7 +81,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         if(!IsOwner) return;
 
         //looking around
-        Vector2 lookInput = input.Player.Look.ReadValue<Vector2>();
+        Vector2 lookInput = InputManager.PlayerInput.Player.Look.ReadValue<Vector2>();
 
         transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + (lookInput.x*playerCamera.cameraSensitivity), 0);
     
@@ -82,11 +89,13 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
 
     }
+
+    //TODO: constant horizontal movement with lerping as acceleration and slowing down rather than modifying drag
     private void FixedUpdate()
     {
         if(!IsOwner) return;
 
-        Vector2 moveDirInput=input.Player.Move.ReadValue<Vector2>();
+        Vector2 moveDirInput=InputManager.PlayerInput.Player.Move.ReadValue<Vector2>();
         Vector3 movementDirection = transform.TransformDirection(moveDirInput.x,0,moveDirInput.y);
         
         if(!MovementEnabled) return;
@@ -132,7 +141,12 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        playerInteractor.PerformInteraction();
+        if(context.performed)
+            playerInteractor.PerformInteraction();
+    }
+
+    public void OnShoot(InputAction.CallbackContext context)
+    {
     }
 
     #endregion
@@ -142,8 +156,31 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         rb.drag=airDrag;
         Invoke(nameof(enableMovement),duration);
     }
-    private void enableMovement()=>MovementEnabled = true;
+    public void enableMovement()=>MovementEnabled = true;
+    public void disableMovement()=>MovementEnabled = false;
+
+    public void switchToUIInput(){
+        InputManager.PlayerInput.UI.Enable();
+        InputManager.PlayerInput.Player.Disable();
+    }
+
     
+    public void switchToPlayerInput(){
+        InputManager.PlayerInput.Player.Enable();
+        InputManager.PlayerInput.UI.Disable();
+    }
+    /*
+    public void switchActionMap(PlayerInputGenerated.PlayerActions from,PlayerInputGenerated.PlayerActions to)
+    {
+        StartCoroutine(switchActionMapCoroutine(from,to));
+    }
+
+    private IEnumerator switchActionMapCoroutine(PlayerInputGenerated. from,PlayerInputGenerated.PlayerActions to)
+    {
+        yield return new WaitForEndOfFrame();
+        to.Enable();
+        from.Disable();
+    }*/
     
     private bool wasGrounded = false;
     public bool isGrounded()
@@ -203,7 +240,8 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         playerName.OnValueChanged-=setName;
         if(!IsOwner)  return;
         
-        input?.Disable();
+        InputManager.PlayerInput?.Disable();
         
     }
+
 }

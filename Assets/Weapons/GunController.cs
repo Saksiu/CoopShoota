@@ -17,7 +17,7 @@ public class GunController : NetworkBehaviour
     
     private PlayerController owningPlayer;
     
-    private bool ShootInput => Input.GetMouseButton(0);
+    private bool ShootInput => InputManager.PlayerInput.Player.Shoot.ReadValue<float>() > 0.0f;
     private bool canShoot = true;
     private Coroutine shootCoroutineHandle;
     

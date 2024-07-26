@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class UIManager : SingletonLocal<UIManager>
+public class UIManager : SingletonLocal<UIManager>, PlayerInputGenerated.IUIActions
 {
     [SerializeField] private TextMeshProUGUI HPText;
     [SerializeField] private TextMeshProUGUI promptText;
+
 
     private GameObject promptPanel;
 
@@ -73,4 +75,65 @@ public class UIManager : SingletonLocal<UIManager>
         promptPanel.SetActive(false);
         promptText.text = "";
     }
+
+    public void OnExitInteractableMenu(InputAction.CallbackContext context)
+    {
+        print("exit interactable menu called from "+context.action.actionMap.name);
+        if(!context.performed) return;
+        
+        GameConsoleController.Instance.Close();
+
+    }  
+
+    #region unused input events
+    public void OnNavigate(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnSubmit(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnCancel(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnPoint(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnClick(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnScrollWheel(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnMiddleClick(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnRightClick(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnTrackedDevicePosition(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void OnTrackedDeviceOrientation(InputAction.CallbackContext context)
+    {
+        //throw new NotImplementedException();
+    }
+    #endregion
 }
