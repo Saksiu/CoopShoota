@@ -14,6 +14,8 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerActions
 {
     public static PlayerController localPlayer;
+
+    public static Action<PlayerController> OnPlayerSpawned;
     public NetworkVariable<FixedString64Bytes> playerName=new(
         "",NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
@@ -44,6 +46,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public override void OnNetworkSpawn()
     {
         print("network spawn called on player"+NetworkManager.LocalClientId);
+        OnPlayerSpawned?.Invoke(this);
         playerName.OnValueChanged+=setName;
         
         playerCamera.Init(IsOwner);
@@ -145,9 +148,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
             playerInteractor.PerformInteraction();
     }
 
-    public void OnShoot(InputAction.CallbackContext context)
-    {
-    }
+    public void OnShoot(InputAction.CallbackContext context){}
 
     #endregion
     public void onDashFromComponent(float duration)
@@ -157,7 +158,10 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         Invoke(nameof(enableMovement),duration);
     }
     public void enableMovement()=>MovementEnabled = true;
-    public void disableMovement()=>MovementEnabled = false;
+    public void disableMovement(){
+        MovementEnabled = false;
+        rb.velocity = Vector3.zero;
+    }
 
     public void switchToUIInput(){
         InputManager.PlayerInput.UI.Enable();
@@ -169,18 +173,6 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         InputManager.PlayerInput.Player.Enable();
         InputManager.PlayerInput.UI.Disable();
     }
-    /*
-    public void switchActionMap(PlayerInputGenerated.PlayerActions from,PlayerInputGenerated.PlayerActions to)
-    {
-        StartCoroutine(switchActionMapCoroutine(from,to));
-    }
-
-    private IEnumerator switchActionMapCoroutine(PlayerInputGenerated. from,PlayerInputGenerated.PlayerActions to)
-    {
-        yield return new WaitForEndOfFrame();
-        to.Enable();
-        from.Disable();
-    }*/
     
     private bool wasGrounded = false;
     public bool isGrounded()

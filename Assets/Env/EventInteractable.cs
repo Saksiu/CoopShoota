@@ -13,6 +13,13 @@ public class EventInteractable : Interactable
     
     public UnityEvent onPlayerEnter;
     public UnityEvent onPlayerExit;
+
+    private bool overrideIsInteractableValue = true;
+
+    public void overrideIsInteractable(bool isInteractable)
+    {
+        overrideIsInteractableValue = isInteractable;
+    }
     
     protected new virtual void OnTriggerEnter(Collider other)
     {
@@ -37,6 +44,6 @@ public class EventInteractable : Interactable
 
     public override bool IsInteractable()
     {
-        return true;
+        return overrideIsInteractableValue;
     }
 }

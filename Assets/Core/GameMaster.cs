@@ -16,7 +16,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     [SerializeField] private List<Transform> spawnPoints;
 
 
-    public Action<PlayerController> OnPlayerSpawned;
+    //public Action<PlayerController> OnPlayerSpawned;
 
     public float respawnTime = 3f;
 
@@ -41,7 +41,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         _players.Add(player);
         
         
-        OnPlayerSpawned?.Invoke(player);
+        //OnPlayerSpawned?.Invoke(player);
         setPlayerPositionClientRpc(playerId,spawnPoints[_players.Count-1].position);
 
 

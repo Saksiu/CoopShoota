@@ -788,7 +788,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2893163074
+  GlobalObjectIdHash: 50486377
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -886,7 +886,7 @@ MonoBehaviour:
   playerNameText: {fileID: 7534468789744124498}
   checkGroundDistance: 1.2
   walkSpeed: 2
-  groundDrag: 5
+  groundDrag: 8
   airDrag: 0.05
 --- !u!114 &5582773866948914186
 MonoBehaviour:
