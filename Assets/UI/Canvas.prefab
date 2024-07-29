@@ -530,7 +530,9 @@ MonoBehaviour:
   - diffID: 3
     diffName: Too Easy
   - diffID: 4
-    diffName: Too Easy
+    diffName: OK
+  - diffID: 5
+    diffName: Decent
   selectedDifficulty:
     m_InternalValue: 0
 --- !u!114 &4582090674009686775
