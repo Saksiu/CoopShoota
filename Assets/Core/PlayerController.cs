@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
@@ -19,14 +20,15 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public NetworkVariable<FixedString64Bytes> playerName=new(
         "",NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
-    //private PlayerInputGenerated input;
-    //public PlayerInput inputButNotGenerated;
     public CameraController playerCamera;
     public PlayerHealthComponent healthComponent;
     
     public PlayerInteractor playerInteractor;
     
     public Rigidbody rb;
+
+    [NonSerialized] public GunController currentGun;
+    [SerializeField] private Transform CamNozzle;
     
     [SerializeField] private DashingComponent dashComponent;
     [SerializeField] private PlayerJumpingComponent jumpComponent;
@@ -54,10 +56,6 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         playerNameText.text=playerName.Value.ToString();
         if(!IsOwner)
         {
-            //GetComponentInChildren<PlayerJumpingComponent>().enabled = false;
-            //GetComponent<PlayerInput>().enabled = false;
-            //PlayerInteractor.Instance.enabled = false;
-            //enabled = false;
             playerNameText.enabled=true; 
             return;
         }
@@ -92,6 +90,20 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
 
     }
+    public void OnHeldGunChanged(){
+        GunController newGun = GetComponentInChildren<GunController>();
+        Assert.IsNotNull(newGun, "Failed to find gun in children of player");
+        newGun.transform.localPosition = Vector3.zero;
+        newGun.gunNozzle=CamNozzle;
+        newGun.isControlledByPlayer = true;
+        currentGun = newGun;
+
+    }
+    public Transform getGunAnchor(){
+        //return playerCamera.transform; //correct, but we would have to make the camera its own networkobjects, 
+        //spawned after spawning the player, and hooking it up
+        return transform;
+    }
 
     //TODO: constant horizontal movement with lerping as acceleration and slowing down rather than modifying drag
     private void FixedUpdate()
@@ -119,13 +131,14 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     #region input
     
-    //empty as we need to read their values on update functions anyway
-    public void OnMove(InputAction.CallbackContext context) {}
-    public void OnLook(InputAction.CallbackContext context) {}
 
-    public void OnFire(InputAction.CallbackContext context)
+    public void OnWeaponSwitch(InputAction.CallbackContext context)
     {
-        print("fire!");
+        if(context.performed){
+            if(currentGun==null){
+                GunsManager.Instance.ChangeHeldWeaponServerRpc(NetworkManager.LocalClientId,"AKM_Rifle");
+            }
+        }
     }
 
     public void OnDash(InputAction.CallbackContext context)
@@ -148,6 +161,9 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
             playerInteractor.PerformInteraction();
     }
 
+    //empty as we read their values on updates
+    public void OnMove(InputAction.CallbackContext context) {}
+    public void OnLook(InputAction.CallbackContext context) {}
     public void OnShoot(InputAction.CallbackContext context){}
 
     #endregion

@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class GunController : NetworkBehaviour
 {
+
+    [SerializeField] public string gunName;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float ShootCooldown;
-    [SerializeField] private Transform gunNozzle;
+    public Transform gunNozzle;
     
     [SerializeField] private Animator gunAnimator;
 
@@ -15,7 +17,8 @@ public class GunController : NetworkBehaviour
 
     [SerializeField] private CinemachineImpulseSource cameraShakeEffect;
     
-    private PlayerController owningPlayer;
+    //private PlayerController owningPlayer;
+    public bool isControlledByPlayer = false;
     
     private bool ShootInput => InputManager.PlayerInput.Player.Shoot.ReadValue<float>() > 0.0f;
     private bool canShoot = true;
@@ -28,6 +31,7 @@ public class GunController : NetworkBehaviour
     private void FixedUpdate()
     {
         if(!IsOwner) return;
+        if(!isControlledByPlayer) return;
 
         //Vector2 dir = getDirTowardsMouse();
         //rotateGunTowards(dir);
@@ -83,10 +87,10 @@ public class GunController : NetworkBehaviour
         canShoot = true;
     }
 
-    private void Start()
+    /*private void Start()
     {
         owningPlayer = GetComponentInParent<PlayerController>();
-    }
+    }*/
 
     private void rotateGunTowards(Vector3 dir)
     {
