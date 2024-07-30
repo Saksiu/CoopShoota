@@ -54,8 +54,14 @@ public class GunsManager : SingletonNetwork<GunsManager>
         GunController availableGun = getWeaponToReparent(gunName.ToString());
 
         Assert.IsNotNull(availableGun, "Failed to find gun of name "+gunName);
+
+        PlayerController player = GameMaster.Instance.getPlayer(playerID);
         //reparent to player
-        availableGun.transform.SetParent(GameMaster.Instance._players[(int)playerID].getGunAnchor(),false);
+        //availableGun.transform.SetParent(player.transform,false);
+        availableGun.NetworkObject.TryRemoveParent();
+        availableGun.gunAnchor=player.playerCamera.transform.GetChild(2);
+        availableGun.gunNozzle=player.CamNozzle;
+        availableGun.isControlledByPlayer = true;
 
         //remove from unused guns
         unusedGuns.Remove(availableGun);

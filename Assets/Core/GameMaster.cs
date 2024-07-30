@@ -12,6 +12,11 @@ public class GameMaster : SingletonNetwork<GameMaster>
     [SerializeField] private int minPlayers = 1;
     
     public List<PlayerController> _players = new();
+
+    public PlayerController getPlayer(ulong playerId)
+    {
+        return _players.Find(player => player.OwnerClientId == playerId);
+    }
     //[SerializeField] private RoomController runRoomController;
     [SerializeField] private List<Transform> spawnPoints;
 

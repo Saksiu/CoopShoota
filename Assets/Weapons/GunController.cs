@@ -10,6 +10,7 @@ public class GunController : NetworkBehaviour
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float ShootCooldown;
     public Transform gunNozzle;
+    public Transform gunAnchor;
     
     [SerializeField] private Animator gunAnimator;
 
@@ -26,7 +27,18 @@ public class GunController : NetworkBehaviour
     
     private static readonly int Shoot = Animator.StringToHash("Shoot");
     private static readonly int ShootTrigger= Animator.StringToHash("ShootTrigger");
-    
+
+    private void Update()
+    {
+        if(!IsOwner) return;
+        if(isControlledByPlayer){
+            
+        }
+
+        
+        //transform.Rotate(0, 90, 0);
+    }
+
 
     private void FixedUpdate()
     {
@@ -36,7 +48,10 @@ public class GunController : NetworkBehaviour
         //Vector2 dir = getDirTowardsMouse();
         //rotateGunTowards(dir);
 
+        transform.SetPositionAndRotation(gunAnchor.position, gunAnchor.rotation);
 
+        print("gun update called, gunanchor pos: "+gunAnchor.position+" gun pos: "+transform.position);
+        
         if (ShootInput&&canShoot)
         {
             canShoot = false;

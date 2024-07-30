@@ -28,7 +28,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public Rigidbody rb;
 
     [NonSerialized] public GunController currentGun;
-    [SerializeField] private Transform CamNozzle;
+    [SerializeField] public Transform CamNozzle;
     
     [SerializeField] private DashingComponent dashComponent;
     [SerializeField] private PlayerJumpingComponent jumpComponent;
@@ -100,9 +100,9 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     }
     public Transform getGunAnchor(){
-        //return playerCamera.transform; //correct, but we would have to make the camera its own networkobjects, 
+        return playerCamera.transform; //correct, but we would have to make the camera its own networkobjects, 
         //spawned after spawning the player, and hooking it up
-        return transform;
+        //return transform;
     }
 
     //TODO: constant horizontal movement with lerping as acceleration and slowing down rather than modifying drag
