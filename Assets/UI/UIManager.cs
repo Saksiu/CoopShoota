@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 public class UIManager : SingletonLocal<UIManager>, PlayerInputGenerated.IUIActions
 {
     [SerializeField] private TextMeshProUGUI HPText;
+    [SerializeField] private TextMeshProUGUI ammoText;
     [SerializeField] private TextMeshProUGUI promptText;
 
 
@@ -32,6 +33,10 @@ public class UIManager : SingletonLocal<UIManager>, PlayerInputGenerated.IUIActi
     private void DisplayDeathScreen(PlayerController player){
         showPromptFor("You died! You will respawn in "+GameMaster.Instance.respawnTime+" seconds.",GameMaster.Instance.respawnTime);
         //print("showing death screen on player "+player.playerName.Value);
+    }
+    public void updateAmmoLeft(uint newAmmo)
+    {
+        ammoText.text = "Ammo: " + newAmmo;
     }
 
     private void OnDestroy()

@@ -151,6 +151,17 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
             Debug.LogError("Reached illegal state: currently held gun could not be found in list, how??");
         }
     }
+    public void OnReload(InputAction.CallbackContext context)
+    {
+        if(!context.performed) return;
+
+        if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
+            print("No gun to reload");
+            return;
+        }
+
+        getGunReference().Reload();
+    }
 
     public void OnDash(InputAction.CallbackContext context)
     {
@@ -262,5 +273,4 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         InputManager.PlayerInput?.Disable();
         
     }
-
 }

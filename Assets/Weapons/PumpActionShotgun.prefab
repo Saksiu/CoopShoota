@@ -241,8 +241,10 @@ MonoBehaviour:
   gunName: Pump_Shotgun
   bulletPrefab: {fileID: 2871185545854695455, guid: f4450526348d3b747b575214045db2da, type: 3}
   ShootCooldown: 2
-  gunNozzle: {fileID: 0}
-  gunAnchor: {fileID: 0}
+  bulletDistribution: 1
+  magazineSize: 8
+  bulletsPerShot: 8
+  bulletSpread: 0.1
   gunAnimator: {fileID: 8653825201948435179}
   shootEffect: {fileID: 5209081103076520046}
   cameraShakeEffect: {fileID: 3701633434445315458}

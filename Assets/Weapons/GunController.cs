@@ -1,17 +1,41 @@
+using System;
 using System.Collections;
 using Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GunController : NetworkBehaviour
 {
 
     [SerializeField] public string gunName;
+
+    [Header("Shooting Config")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float ShootCooldown;
-    public Transform gunNozzle;
-    public Transform gunAnchor;
+    [SerializeField] private BulletDistribution bulletDistribution;
+
+    [SerializeField] private uint magazineSize = 30;
+    [SerializeField] private float reloadTime = 2.0f;
+
+    private uint INTERNAL_ammoLeft;
+    public uint AmmoLeft
+    {
+        get => INTERNAL_ammoLeft;
+        set
+        {
+            INTERNAL_ammoLeft = value;
+            if(IsOwner)
+                UIManager.Instance.updateAmmoLeft(value);
+        }
+    }
+    [SerializeField] private uint bulletsPerShot = 1;
+
+    [Tooltip("This is only applied for BurstRandom distribution type")]
+    [SerializeField] private float bulletSpread = 0.1f;
     
+
+    [Header("Effects")]
     [SerializeField] private Animator gunAnimator;
 
     [SerializeField] private ParticleSystem shootEffect;
@@ -22,6 +46,9 @@ public class GunController : NetworkBehaviour
 
     //? could be replaced by the networkobject owning it, but works so no touchy
     public bool isControlledByPlayer = false; 
+
+    [NonSerialized] public Transform gunNozzle;
+    [NonSerialized] public Transform gunAnchor;
     
     private bool ShootInput => InputManager.PlayerInput.Player.Shoot.ReadValue<float>() > 0.0f;
     private bool canShoot = true;
@@ -48,14 +75,15 @@ public class GunController : NetworkBehaviour
         if(!isControlledByPlayer) return;
 
         
-        if (ShootInput&&canShoot)
+        if (ShootInput&&canShoot&&AmmoLeft>0)
         {
             canShoot = false;
             Invoke(nameof(enableShootingAfterCooldown),ShootCooldown);
             
             //dir = getDirTowardsMouse();
             Vector3 gunNozzlePos = gunNozzle.position;
-            
+            Vector3 nozzleDir=gunNozzle.up;
+
             RequestFireServerRpc(gunNozzle.up,gunNozzlePos);
             FireBullet(gunNozzle.up, gunNozzlePos);
             gunAnimator.SetTrigger(ShootTrigger);
@@ -69,6 +97,7 @@ public class GunController : NetworkBehaviour
             isControlledByPlayer=true;
             gunAnchor=parentNetworkObject.GetComponent<PlayerController>().playerCamera.transform.GetChild(2);;
             gunNozzle=parentNetworkObject.GetComponent<PlayerController>().CamNozzle;
+            AmmoLeft=magazineSize; //! just for now though
         }else if(parentNetworkObject.GetComponent<GunsManager>()!=null){
             isControlledByPlayer=false;
             gunAnchor=null;
@@ -112,6 +141,7 @@ public class GunController : NetworkBehaviour
     [ServerRpc]
     private void RequestFireServerRpc(Vector3 dir,Vector3 initPos)
     {
+        AmmoLeft--;
         FireBullet(dir,initPos);
         FireBulletClientRpc(dir,initPos);
     }
@@ -124,11 +154,57 @@ public class GunController : NetworkBehaviour
 
     private void FireBullet(Vector3 dir,Vector3 initPos)
     { 
-        //print(bulletPrefab==null);
-        //Quaternion bulletDir = Quaternion.LookRotation(Vector3.forward, dir);
-        Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
+        switch (bulletDistribution)
+            {
+                case BulletDistribution.BurstRandom:
+                    for(int j = 0; j < bulletsPerShot; j++)
+                    {
+                        Vector3 randomizedDir = dir + new Vector3(UnityEngine.Random.Range(-bulletSpread, bulletSpread), UnityEngine.Random.Range(-bulletSpread, bulletSpread), 0);
+                        Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(randomizedDir);
+                    }
+                    break;
+                case BulletDistribution.BurstEqual:
+                    break;
+                case BulletDistribution.Series:
+                    break;
+                default: case BulletDistribution.Single:
+                    if(bulletsPerShot>1)
+                        Debug.LogError("BulletDistribution.Single used with bulletsPerShot > 1, firing only 1");
+                    Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
+                    break;
+            }
+        
         gunAnimator.SetTrigger(ShootTrigger);
         shootEffect.Play();
     }
+    private Coroutine reloadCoroutineHandle;
+    public void Reload()
+    {
+        if(AmmoLeft==magazineSize){
+            reloadCoroutineHandle=null;
+            return;
+        }
+        
+        if(reloadCoroutineHandle!=null)
+            StopCoroutine(reloadCoroutineHandle);
+        reloadCoroutineHandle=StartCoroutine(ReloadCoroutine());
+    }
+
+    private IEnumerator ReloadCoroutine()
+    {
+        canShoot = false;
+        yield return new WaitForSeconds(reloadTime);
+        AmmoLeft = magazineSize;
+        canShoot = true;
+    }
     
+}
+
+[Serializable]
+public enum BulletDistribution
+{
+    Single,
+    BurstRandom,
+    BurstEqual,
+    Series
 }
