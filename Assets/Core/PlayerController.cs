@@ -136,7 +136,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     {
         if(context.performed){
             if(currentGun==null){
-                GunsManager.Instance.ChangeHeldWeaponServerRpc(NetworkManager.LocalClientId,"AKM_Rifle");
+                GunsManager.Instance.ChangeHeldWeaponServerRpc(this.NetworkObject,"AKM_Rifle");
             }
         }
     }

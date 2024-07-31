@@ -31,9 +31,9 @@ public class GunController : NetworkBehaviour
     private void Update()
     {
         if(!IsOwner) return;
-        if(isControlledByPlayer){
-            
-        }
+        if(isControlledByPlayer){ 
+            transform.SetPositionAndRotation(gunAnchor.position, gunAnchor.rotation);
+        } //! we shouldnt rely on framerate to determine shooting position, but I'm fine with this for now
 
         
         //transform.Rotate(0, 90, 0);
@@ -45,12 +45,6 @@ public class GunController : NetworkBehaviour
         if(!IsOwner) return;
         if(!isControlledByPlayer) return;
 
-        //Vector2 dir = getDirTowardsMouse();
-        //rotateGunTowards(dir);
-
-        transform.SetPositionAndRotation(gunAnchor.position, gunAnchor.rotation);
-
-        print("gun update called, gunanchor pos: "+gunAnchor.position+" gun pos: "+transform.position);
         
         if (ShootInput&&canShoot)
         {
@@ -65,17 +59,6 @@ public class GunController : NetworkBehaviour
             gunAnimator.SetTrigger(ShootTrigger);
             cameraShakeEffect.GenerateImpulse();
         }
-
-        /*if (ShootInput&&shootCoroutineHandle==null)
-        {
-            shootCoroutineHandle = StartCoroutine(ShootCoroutine());
-        }
-        else if (!ShootInput&&shootCoroutineHandle!=null)
-        {
-            StopCoroutine(shootCoroutineHandle);
-            Invoke(nameof(enableShootingAfterCooldown),ShootCooldown);
-            shootCoroutineHandle = null;
-        }*/
     }
     
     private IEnumerator ShootCoroutine()
