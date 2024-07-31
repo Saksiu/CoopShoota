@@ -40,7 +40,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
                 transform);
                 gunInstance.GetComponent<NetworkObject>().Spawn();
                 unusedGuns.Add(gunInstance);
-                gunInstance.transform.SetParent(transform,true);
+                gunInstance.NetworkObject.TrySetParent(NetworkObject);
             }
             Assert.IsTrue(unusedGuns.Count > 0, "No guns found instantiated under gunsmanager SERVER");
             }
@@ -49,6 +49,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
     [ServerRpc(RequireOwnership = false)]
     public void ChangeHeldWeaponServerRpc(NetworkObjectReference playerRef, FixedString32Bytes gunName){
+
         GunController availableGun = getWeaponToReparent(gunName.ToString());
 
         Assert.IsNotNull(availableGun, "Failed to find gun of name "+gunName);
@@ -57,20 +58,24 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
         Assert.IsNotNull(player, "Failed to find player with ID "+playerRef.NetworkObjectId);
 
+        //return previous gun to holding area
+        if(player.getGunNetworkObject() != null){
+            player.getGunNetworkObject().TrySetParent(NetworkObject);
+            player.getGunNetworkObject().ChangeOwnership(NetworkManager.ServerClientId);
+            player.getGunNetworkObject().transform.position = transform.position+new Vector3(0,0,GUN_HOLDING_AREA_DISTANCE*unusedGuns.Count);
+            unusedGuns.Add(player.getGunReference());
+            player.currentGun.Value=default;
+        }
+
         //reparent to player
         availableGun.NetworkObject.TrySetParent((NetworkObject)playerRef);
         availableGun.NetworkObject.ChangeOwnership(player.OwnerClientId);
+        Assert.IsNotNull(player.currentGun, "Player current gun is null");
+        player.currentGun.Value = availableGun.NetworkObject;
 
         //remove from unused guns
         unusedGuns.Remove(availableGun);
     }
-
-    /*private List<GunController> getUnusedGuns(){
-        List<GunController> unusedGunsLocal = new List<GunController>();
-        foreach(NetworkObject gun in unusedGuns)
-                unusedGunsLocal.Add(gun.GetComponent<GunController>());
-        return unusedGunsLocal;
-    }*/
 
     public GunController getWeaponToReparent(string gunName){
         foreach(GunController gun in unusedGuns)

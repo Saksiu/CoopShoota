@@ -19,7 +19,9 @@ public class GunController : NetworkBehaviour
     [SerializeField] private CinemachineImpulseSource cameraShakeEffect;
     
     //private PlayerController owningPlayer;
-    public bool isControlledByPlayer = false;
+
+    //? could be replaced by the networkobject owning it, but works so no touchy
+    public bool isControlledByPlayer = false; 
     
     private bool ShootInput => InputManager.PlayerInput.Player.Shoot.ReadValue<float>() > 0.0f;
     private bool canShoot = true;
@@ -67,6 +69,10 @@ public class GunController : NetworkBehaviour
             isControlledByPlayer=true;
             gunAnchor=parentNetworkObject.GetComponent<PlayerController>().playerCamera.transform.GetChild(2);;
             gunNozzle=parentNetworkObject.GetComponent<PlayerController>().CamNozzle;
+        }else if(parentNetworkObject.GetComponent<GunsManager>()!=null){
+            isControlledByPlayer=false;
+            gunAnchor=null;
+            gunNozzle=null;
         }
 
 
@@ -97,11 +103,6 @@ public class GunController : NetworkBehaviour
         canShoot = true;
     }
 
-    /*private void Start()
-    {
-        owningPlayer = GetComponentInParent<PlayerController>();
-    }*/
-
     private void rotateGunTowards(Vector3 dir)
     {
         transform.rotation = Quaternion.LookRotation(Vector3.forward, dir);
@@ -130,10 +131,4 @@ public class GunController : NetworkBehaviour
         shootEffect.Play();
     }
     
-    /*private Vector2 getDirTowardsMouse()
-    {
-        //Vector2 mousePos = CameraController.Instance.Camera.ScreenToWorldPoint(Input.mousePosition);
-        //return (mousePos - (Vector2)transform.position).normalized;
-        return Vector2.zero;
-    }*/
 }

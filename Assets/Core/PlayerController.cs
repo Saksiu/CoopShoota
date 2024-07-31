@@ -27,7 +27,9 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     
     public Rigidbody rb;
 
-    [NonSerialized] public GunController currentGun;
+    public NetworkVariable<NetworkObjectReference> currentGun=new();
+    public GunController getGunReference()=>((NetworkObject)currentGun.Value).GetComponent<GunController>();
+    public NetworkObject getGunNetworkObject()=>(NetworkObject)currentGun.Value;
     [SerializeField] public Transform CamNozzle;
     
     [SerializeField] private DashingComponent dashComponent;
@@ -90,15 +92,15 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
 
     }
-    public void OnHeldGunChanged(){
+    /*public void OnHeldGunChanged(){
         GunController newGun = GetComponentInChildren<GunController>();
         Assert.IsNotNull(newGun, "Failed to find gun in children of player");
         newGun.transform.localPosition = Vector3.zero;
         newGun.gunNozzle=CamNozzle;
         newGun.isControlledByPlayer = true;
-        currentGun = newGun;
+        currentGun = getGunReference();
 
-    }
+    }*/
     public Transform getGunAnchor(){
         return playerCamera.transform; //correct, but we would have to make the camera its own networkobjects, 
         //spawned after spawning the player, and hooking it up
@@ -134,10 +136,19 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     public void OnWeaponSwitch(InputAction.CallbackContext context)
     {
-        if(context.performed){
-            if(currentGun==null){
-                GunsManager.Instance.ChangeHeldWeaponServerRpc(this.NetworkObject,"AKM_Rifle");
-            }
+        if(!context.performed) return;
+
+        if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
+            GunsManager.Instance.ChangeHeldWeaponServerRpc(this.NetworkObject,"AKM_Rifle");
+        }
+        else if(getGunReference().gunName=="AKM_Rifle"){
+            GunsManager.Instance.ChangeHeldWeaponServerRpc(this.NetworkObject,"Pump_Shotgun");
+        }
+        else if(getGunReference().gunName=="Pump_Shotgun"){
+            GunsManager.Instance.ChangeHeldWeaponServerRpc(this.NetworkObject,"AKM_Rifle");
+        }
+        else{
+            Debug.LogError("Reached illegal state: currently held gun could not be found in list, how??");
         }
     }
 

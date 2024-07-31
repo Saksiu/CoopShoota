@@ -179,7 +179,7 @@ GameObject:
   - component: {fileID: 687775070569766241}
   - component: {fileID: 8653825201948435179}
   - component: {fileID: 3701633434445315458}
-  - component: {fileID: 2830695633265236451}
+  - component: {fileID: -4118819629224002688}
   m_Layer: 0
   m_Name: PumpActionShotgun
   m_TagString: Untagged
@@ -218,7 +218,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 440748357
+  GlobalObjectIdHash: 120845917
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -242,9 +242,11 @@ MonoBehaviour:
   bulletPrefab: {fileID: 2871185545854695455, guid: f4450526348d3b747b575214045db2da, type: 3}
   ShootCooldown: 2
   gunNozzle: {fileID: 0}
+  gunAnchor: {fileID: 0}
   gunAnimator: {fileID: 8653825201948435179}
   shootEffect: {fileID: 5209081103076520046}
   cameraShakeEffect: {fileID: 3701633434445315458}
+  isControlledByPlayer: 0
 --- !u!95 &8653825201948435179
 Animator:
   serializedVersion: 5
@@ -258,7 +260,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 53ba236595f5bcf4caad3b3310e5e38a, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -319,7 +321,7 @@ MonoBehaviour:
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
   m_DefaultVelocity: {x: 0, y: 0.01, z: -0.15}
---- !u!114 &2830695633265236451
+--- !u!114 &-4118819629224002688
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -328,13 +330,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 6928456815955258123}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 1
+  SyncRotAngleX: 0
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
   SyncScaleX: 0
