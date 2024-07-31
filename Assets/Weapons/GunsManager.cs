@@ -24,9 +24,9 @@ public class GunsManager : SingletonNetwork<GunsManager>
     // Start is called before the first frame update
     [SerializeField] private List<GunController> gunPrefabs;
 
-    public NetworkList<NetworkObjectReference> unusedGuns = new NetworkList<NetworkObjectReference>();
+    //public NetworkList<NetworkObjectReference> unusedGuns = new NetworkList<NetworkObjectReference>();
 
-    //private List<GunController> unusedGuns=new List<GunController>();
+    private List<GunController> unusedGuns=new List<GunController>();
 
     public override void OnNetworkSpawn()
     {
@@ -39,7 +39,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
                 Quaternion.identity,
                 transform);
                 gunInstance.GetComponent<NetworkObject>().Spawn();
-                unusedGuns.Add(gunInstance.NetworkObject);
+                unusedGuns.Add(gunInstance);
                 gunInstance.transform.SetParent(transform,true);
             }
             Assert.IsTrue(unusedGuns.Count > 0, "No guns found instantiated under gunsmanager SERVER");
@@ -53,49 +53,27 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
         Assert.IsNotNull(availableGun, "Failed to find gun of name "+gunName);
 
-        //PlayerController player = GameMaster.Instance.getPlayer(playerRef.NetworkObjectId);
-        NetworkObject newOwnerNO;
-        playerRef.TryGet(out newOwnerNO);
-        PlayerController player = newOwnerNO.GetComponent<PlayerController>();
+        PlayerController player = ((NetworkObject)playerRef).GetComponent<PlayerController>();
 
         Assert.IsNotNull(player, "Failed to find player with ID "+playerRef.NetworkObjectId);
 
-        ChangeHeldWeaponClientRpc(playerRef,gunName);
         //reparent to player
-        //availableGun.transform.SetParent(player.transform,false);
-        availableGun.NetworkObject.TryRemoveParent();
-        availableGun.gunAnchor=player.playerCamera.transform.GetChild(2);
-        availableGun.gunNozzle=player.CamNozzle;
+        availableGun.NetworkObject.TrySetParent((NetworkObject)playerRef);
         availableGun.NetworkObject.ChangeOwnership(player.OwnerClientId);
-        availableGun.isControlledByPlayer = true;
 
         //remove from unused guns
-        unusedGuns.Remove(availableGun.NetworkObject);
+        unusedGuns.Remove(availableGun);
     }
 
-    [ClientRpc]
-    public void ChangeHeldWeaponClientRpc(NetworkObjectReference playerRef, FixedString32Bytes gunName){
-        //if(NetworkManager.LocalClientId!=playerID) return;
-
-        PlayerController newOwner = ((NetworkObject)playerRef).GetComponent<PlayerController>();
-
-        GunController availableGun = getWeaponToReparent(gunName.ToString());
-        Assert.IsNotNull(availableGun, "Failed to find gun of name "+gunName);
-        Assert.IsNotNull(newOwner, "Failed to find player with ID of name "+playerRef+" on "+NetworkManager.LocalClientId);
-        availableGun.gunAnchor=newOwner.playerCamera.transform.GetChild(2);
-        availableGun.gunNozzle=newOwner.CamNozzle;
-        availableGun.isControlledByPlayer = true;
-
-    }
-    private List<GunController> getUnusedGuns(){
+    /*private List<GunController> getUnusedGuns(){
         List<GunController> unusedGunsLocal = new List<GunController>();
         foreach(NetworkObject gun in unusedGuns)
                 unusedGunsLocal.Add(gun.GetComponent<GunController>());
         return unusedGunsLocal;
-    }
+    }*/
 
     public GunController getWeaponToReparent(string gunName){
-        foreach(GunController gun in getUnusedGuns())
+        foreach(GunController gun in unusedGuns)
             if(gun.gunName == gunName)
                 return gun;
         return null; //failed to find gun of that name

@@ -60,7 +60,19 @@ public class GunController : NetworkBehaviour
             cameraShakeEffect.GenerateImpulse();
         }
     }
-    
+    public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
+    {
+        if(parentNetworkObject==null) return;
+        if(parentNetworkObject.GetComponent<PlayerController>()!=null){
+            isControlledByPlayer=true;
+            gunAnchor=parentNetworkObject.GetComponent<PlayerController>().playerCamera.transform.GetChild(2);;
+            gunNozzle=parentNetworkObject.GetComponent<PlayerController>().CamNozzle;
+        }
+
+
+        base.OnNetworkObjectParentChanged(parentNetworkObject);
+    }
+
     private IEnumerator ShootCoroutine()
     {
         //Vector2 dir;
