@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Unity.VisualStudio.Editor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,6 +11,8 @@ public class UIManager : SingletonLocal<UIManager>, PlayerInputGenerated.IUIActi
     [SerializeField] private TextMeshProUGUI HPText;
     [SerializeField] private TextMeshProUGUI ammoText;
     [SerializeField] private TextMeshProUGUI promptText;
+
+    [SerializeField] private Animator reloadRadialAnimator;
 
 
     private GameObject promptPanel;
@@ -33,6 +36,13 @@ public class UIManager : SingletonLocal<UIManager>, PlayerInputGenerated.IUIActi
     private void DisplayDeathScreen(PlayerController player){
         showPromptFor("You died! You will respawn in "+GameMaster.Instance.respawnTime+" seconds.",GameMaster.Instance.respawnTime);
         //print("showing death screen on player "+player.playerName.Value);
+    }
+
+    public void ShowReload(float reloadTime)
+    {
+        reloadRadialAnimator.SetFloat("ReloadTime",1.0f/reloadTime);
+        reloadRadialAnimator.SetTrigger("Reload");
+        
     }
     public void updateAmmoLeft(uint newAmmo)
     {

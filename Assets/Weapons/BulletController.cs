@@ -9,12 +9,24 @@ public class BulletController : MonoBehaviour
 
     [SerializeField] private float lifeTime;
 
+    [SerializeField] private LineRenderer bulletTraceRenderer;
+
+    private Vector3 startingPos;
+
     private bool ignoringEnemies = false;
-    public void Launch(Vector3 dir)
+    public void Launch(Vector3 dir,Vector3 visualInitPos)
     {
+        startingPos = visualInitPos;
+        bulletTraceRenderer.SetPosition(1,startingPos);
         //GetComponent<Rigidbody2D>().AddForce(dir*speed,ForceMode2D.Impulse);
         GetComponent<Rigidbody>().AddForce(dir*speed,ForceMode.Impulse);
         Invoke(nameof(DestroySelf), lifeTime);
+    }
+    private void Update()
+    {
+        //bulletTraceRenderer.GetPosition(1).Set(startingPos.x,startingPos.y,startingPos.z);
+        bulletTraceRenderer.SetPosition(0,transform.position);
+        
     }
 
     private void OnCollisionEnter(Collision col)
@@ -26,6 +38,12 @@ public class BulletController : MonoBehaviour
     private void OnCollisionCustom(GameObject other)
     {
         //print(name+" collided with "+other.name);
+        if(other.layer == LayerMask.NameToLayer("Ground"))
+        {
+            DestroySelf();
+            return;
+        }
+
         if ((!ignoringEnemies)&&other.layer == LayerMask.NameToLayer("Ground"))
         {
             ignoringEnemies=true;

@@ -58,10 +58,12 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         playerNameText.text=playerName.Value.ToString();
         if(!IsOwner)
         {
-            playerNameText.enabled=true; 
+            playerNameText.enabled=true;
+            //GetComponent<MeshRenderer>().enabled=true;
             return;
         }
         playerNameText.enabled=false;//you shouldnt see your own name tag
+       // GetComponent<MeshRenderer>().enabled=false;
 
         InputManager.PlayerInput.Player.SetCallbacks(this);
         InputManager.PlayerInput.UI.SetCallbacks(UIManager.Instance);

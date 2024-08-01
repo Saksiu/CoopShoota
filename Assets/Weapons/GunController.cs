@@ -18,17 +18,16 @@ public class GunController : NetworkBehaviour
     [SerializeField] private uint magazineSize = 30;
     [SerializeField] private float reloadTime = 2.0f;
 
-    private uint INTERNAL_ammoLeft;
-    public uint AmmoLeft
-    {
-        get => INTERNAL_ammoLeft;
-        set
-        {
-            INTERNAL_ammoLeft = value;
-            if(IsOwner)
-                UIManager.Instance.updateAmmoLeft(value);
+
+    private uint Internal_Ammoleft=0;
+    private uint AmmoLeft{
+        get=>Internal_Ammoleft;
+        set{
+            Internal_Ammoleft=value;
+            onAmmoLeftValueChanged(value);
         }
     }
+
     [SerializeField] private uint bulletsPerShot = 1;
 
     [Tooltip("This is only applied for BurstRandom distribution type")]
@@ -47,6 +46,7 @@ public class GunController : NetworkBehaviour
     //? could be replaced by the networkobject owning it, but works so no touchy
     public bool isControlledByPlayer = false; 
 
+    [SerializeField] private Transform visualNozzle;
     [NonSerialized] public Transform gunNozzle;
     [NonSerialized] public Transform gunAnchor;
     
@@ -57,6 +57,20 @@ public class GunController : NetworkBehaviour
     private static readonly int Shoot = Animator.StringToHash("Shoot");
     private static readonly int ShootTrigger= Animator.StringToHash("ShootTrigger");
 
+
+    /*public override void OnNetworkSpawn()
+    {
+        
+        AmmoLeft.OnValueChanged += onAmmoLeftValueChanged;
+        base.OnNetworkSpawn();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        AmmoLeft.OnValueChanged -= onAmmoLeftValueChanged;
+        base.OnNetworkDespawn();
+    }*/
+
     private void Update()
     {
         if(!IsOwner) return;
@@ -66,6 +80,13 @@ public class GunController : NetworkBehaviour
 
         
         //transform.Rotate(0, 90, 0);
+    }
+
+    private void onAmmoLeftValueChanged(uint newAmmo)
+    {
+        if (!IsOwner) return;
+        //print("ammo left changed from " + prev + " to " + curr+" on "+NetworkManager.LocalClientId+" is he the fuckin owner?"+IsOwner);
+        UIManager.Instance.updateAmmoLeft(newAmmo);
     }
 
 
@@ -97,7 +118,11 @@ public class GunController : NetworkBehaviour
             isControlledByPlayer=true;
             gunAnchor=parentNetworkObject.GetComponent<PlayerController>().playerCamera.transform.GetChild(2);;
             gunNozzle=parentNetworkObject.GetComponent<PlayerController>().CamNozzle;
-            AmmoLeft=magazineSize; //! just for now though
+
+            //print("gun on parent changed: owner? "+IsOwner+" id: "+NetworkManager.LocalClientId);
+            if(IsOwner)
+                AmmoLeft=magazineSize;
+                
         }else if(parentNetworkObject.GetComponent<GunsManager>()!=null){
             isControlledByPlayer=false;
             gunAnchor=null;
@@ -132,16 +157,10 @@ public class GunController : NetworkBehaviour
         canShoot = true;
     }
 
-    private void rotateGunTowards(Vector3 dir)
-    {
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, dir);
-        //transform.Rotate(0, 0, 90);
-    }
-
     [ServerRpc]
     private void RequestFireServerRpc(Vector3 dir,Vector3 initPos)
     {
-        AmmoLeft--;
+        
         FireBullet(dir,initPos);
         FireBulletClientRpc(dir,initPos);
     }
@@ -149,18 +168,19 @@ public class GunController : NetworkBehaviour
     [ClientRpc]
     private void FireBulletClientRpc(Vector3 dir,Vector3 initPos)
     {
-        if(!IsOwner) FireBullet(dir,initPos);
+        if(IsOwner) AmmoLeft--;
+        else FireBullet(dir,initPos);
     }
 
     private void FireBullet(Vector3 dir,Vector3 initPos)
     { 
         switch (bulletDistribution)
             {
-                case BulletDistribution.BurstRandom:
+                case BulletDistribution.BurstRandom: //! this means the actual bullets fly differently on the server and each client. bad, very bad
                     for(int j = 0; j < bulletsPerShot; j++)
                     {
                         Vector3 randomizedDir = dir + new Vector3(UnityEngine.Random.Range(-bulletSpread, bulletSpread), UnityEngine.Random.Range(-bulletSpread, bulletSpread), 0);
-                        Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(randomizedDir);
+                        Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(randomizedDir,visualNozzle.position);
                     }
                     break;
                 case BulletDistribution.BurstEqual:
@@ -170,7 +190,7 @@ public class GunController : NetworkBehaviour
                 default: case BulletDistribution.Single:
                     if(bulletsPerShot>1)
                         Debug.LogError("BulletDistribution.Single used with bulletsPerShot > 1, firing only 1");
-                    Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir);
+                    Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir,visualNozzle.position);
                     break;
             }
         
@@ -178,13 +198,18 @@ public class GunController : NetworkBehaviour
         shootEffect.Play();
     }
     private Coroutine reloadCoroutineHandle;
+
+    private bool isReloading=false;
+
     public void Reload()
     {
+        //print("reload called on "+NetworkManager.LocalClientId);
         if(AmmoLeft==magazineSize){
             reloadCoroutineHandle=null;
             return;
         }
-        
+        if(isReloading) return;
+
         if(reloadCoroutineHandle!=null)
             StopCoroutine(reloadCoroutineHandle);
         reloadCoroutineHandle=StartCoroutine(ReloadCoroutine());
@@ -192,10 +217,13 @@ public class GunController : NetworkBehaviour
 
     private IEnumerator ReloadCoroutine()
     {
+        isReloading=true;
         canShoot = false;
+        UIManager.Instance.ShowReload(reloadTime);
         yield return new WaitForSeconds(reloadTime);
         AmmoLeft = magazineSize;
         canShoot = true;
+        isReloading=false;
     }
     
 }

@@ -60,19 +60,21 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
         //return previous gun to holding area
         if(player.getGunNetworkObject() != null){
-            player.getGunNetworkObject().TrySetParent(NetworkObject);
             if(player.getGunNetworkObject().OwnerClientId!=NetworkManager.ServerClientId)
                 player.getGunNetworkObject().ChangeOwnership(NetworkManager.ServerClientId);
+            
+            player.getGunNetworkObject().TrySetParent(NetworkObject);
             player.getGunNetworkObject().transform.position = transform.position+new Vector3(0,0,GUN_HOLDING_AREA_DISTANCE*unusedGuns.Count);
             unusedGuns.Add(player.getGunReference());
             player.currentGun.Value=default;
         }
 
-        //reparent to player
-        availableGun.NetworkObject.TrySetParent((NetworkObject)playerRef);
         
         if(availableGun.NetworkObject.OwnerClientId!=player.OwnerClientId)
             availableGun.NetworkObject.ChangeOwnership(player.OwnerClientId);
+
+            //reparent to player
+        availableGun.NetworkObject.TrySetParent((NetworkObject)playerRef);
 
         Assert.IsNotNull(player.currentGun, "Player current gun is null");
         player.currentGun.Value = availableGun.NetworkObject;
