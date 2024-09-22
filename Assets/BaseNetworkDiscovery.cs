@@ -66,7 +66,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
             throw new InvalidOperationException("Cannot send client broadcast while not running in client mode. Call StartClient first.");
         }
 
-        var endPoint = new IPEndPoint(IPAddress.Broadcast, m_Port);
+        var endPoint = new IPEndPoint(IPAddress.Parse("192.168.88.255"), m_Port);
 
         using var writer = new FastBufferWriter(1024, Allocator.Temp, 1024 * 64);
         WriteHeader(writer, MessageType.BroadCast);
@@ -152,8 +152,8 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
 
         // If we are not a server we use the 0 port (let udp client assign a free port to us)
         var port = isServer ? m_Port : 0;
-
-        m_Client = new UdpClient(port) {EnableBroadcast = true, MulticastLoopback = false};
+        m_Client = new UdpClient(new IPEndPoint(IPAddress.Any, m_Port)) { EnableBroadcast = true,MulticastLoopback=false };
+        //m_Client = new UdpClient(port) {EnableBroadcast = true, MulticastLoopback = false};
 
         _ = ListenAsync(isServer ? ReceiveBroadcastAsync : new Func<Task>(ReceiveResponseAsync));
 
