@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using ParrelSync;
+using Unity.Netcode.Transports.UTP;
 
 public class NetworkDebugButtons : MonoBehaviour
 {

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -22,6 +23,11 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
 
     //public Action<PlayerController> OnPlayerSpawned;
+
+    public void printServerFoundMessage(IPEndPoint endPoint, DiscoveryResponseData data)
+    {
+        print("Server found at "+endPoint+" with data "+data);
+    }
 
     public float respawnTime = 3f;
 

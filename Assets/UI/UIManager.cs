@@ -51,7 +51,8 @@ public class UIManager : SingletonLocal<UIManager>, PlayerInputGenerated.IUIActi
 
     private void OnDestroy()
     {
-        PlayerController.localPlayer.healthComponent.OnDeathAction -= DisplayDeathScreen;
+        if(PlayerController.localPlayer!=null)
+            PlayerController.localPlayer.healthComponent.OnDeathAction -= DisplayDeathScreen;
     }
     public void updateDisplayedHP(int newHP)
     {
