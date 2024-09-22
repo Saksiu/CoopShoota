@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(NetworkManager))]
-public class MyNetworkDiscovery : NetworkDiscovery<DiscoveryBroadcastData, DiscoveryResponseData>
+public class MyNetworkDiscovery : BaseNetworkDiscovery<DiscoveryBroadcastData, DiscoveryResponseData>
 {
     [Serializable]
     public class ServerFoundEvent : UnityEvent<IPEndPoint, DiscoveryResponseData>
@@ -27,16 +27,18 @@ public class MyNetworkDiscovery : NetworkDiscovery<DiscoveryBroadcastData, Disco
 
     public void Awake()
     {
+        Debug.Log("Awake called");
         m_NetworkManager = GetComponent<NetworkManager>();
     }
 
     public void Update()
     {
-        print($"IsRunning: {IsRunning}, IsServer: {m_NetworkManager.IsServer}, HasStartedWithServer: {m_HasStartedWithServer}");
+        Debug.Log($"Update called - IsRunning: {IsRunning}, IsServer: {m_NetworkManager.IsServer}, HasStartedWithServer: {m_HasStartedWithServer}");
         if (m_StartWithServer && m_HasStartedWithServer == false && IsRunning == false)
         {
             if (m_NetworkManager.IsServer)
             {
+                Debug.Log("Starting server in Update");
                 StartServer();
                 m_HasStartedWithServer = true;
             }
@@ -45,7 +47,7 @@ public class MyNetworkDiscovery : NetworkDiscovery<DiscoveryBroadcastData, Disco
 
     protected override bool ProcessBroadcast(IPEndPoint sender, DiscoveryBroadcastData broadCast, out DiscoveryResponseData response)
     {
-        print($"ProcessBroadcast called from {sender.Address}");
+        Debug.Log($"ProcessBroadcast called from {sender.Address}");
         response = new DiscoveryResponseData()
         {
             ServerName = ServerName,
@@ -56,7 +58,7 @@ public class MyNetworkDiscovery : NetworkDiscovery<DiscoveryBroadcastData, Disco
 
     protected override void ResponseReceived(IPEndPoint sender, DiscoveryResponseData response)
     {
-        print($"Server found: {response.ServerName} at {sender.Address}:{response.Port}");
+        Debug.Log($"ResponseReceived called - Server found: {response.ServerName} at {sender.Address}:{response.Port}");
         OnServerFound.Invoke(sender, response);
     }
 }
