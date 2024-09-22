@@ -59,6 +59,24 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
 
     public void ClientBroadcast(TBroadCast broadCast)
     {
+    Debug.Log("ClientBroadcast called");
+
+    if (!IsClient)
+    {
+        throw new InvalidOperationException("Cannot send client broadcast while not running in client mode. Call StartClient first.");
+    }
+
+    using var writer = new FastBufferWriter(1024, Allocator.Temp, 1024 * 64);
+    WriteHeader(writer, MessageType.BroadCast);
+    writer.WriteNetworkSerializable(broadCast);
+    var data = writer.ToArray();
+
+    // Broadcast to all subnets
+    NetworkUtils.BroadcastToAllSubnets(m_Client, data, m_Port);
+    }
+
+    /*public void ClientBroadcast(TBroadCast broadCast)
+    {
         Debug.Log("ClientBroadcast called");
 
         if (!IsClient)
@@ -66,7 +84,12 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
             throw new InvalidOperationException("Cannot send client broadcast while not running in client mode. Call StartClient first.");
         }
 
-        var endPoint = new IPEndPoint(IPAddress.Parse("192.168.88.255"), m_Port);
+        //WORKING, BUT SPECIFIES THE INTERFACE AGAIN
+        var endPoint = new IPEndPoint(IPAddress.Any, m_Port);
+
+        //DOES NOT WORK
+        //var endPoint = new IPEndPoint(IPAddress.Broadcast, m_Port);
+        //var endPoint = new IPEndPoint(IPAddress.Parse("192.168.255.255"), m_Port);
 
         using var writer = new FastBufferWriter(1024, Allocator.Temp, 1024 * 64);
         WriteHeader(writer, MessageType.BroadCast);
@@ -83,7 +106,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
         {
             Debug.LogError(e);
         }
-    }
+    }*/
 
     /// <summary>
     /// Starts the discovery in server mode which will respond to client broadcasts searching for servers.
