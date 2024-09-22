@@ -57,6 +57,13 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
         }
     }
 
+    /// <summary>
+    /// Sends a broadcast looking for open servers by iterating through all available interfaces
+    /// and sending a UDP broadcast to each subnet.
+    /// Done this way to circumvent the issue of not being able to send a broadcast to the global broadcast address.
+    /// </summary>
+    /// <param name="broadCast"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void ClientBroadcast(TBroadCast broadCast)
     {
     Debug.Log("ClientBroadcast called");
@@ -75,6 +82,9 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
     NetworkUtils.BroadcastToAllSubnets(m_Client, data, m_Port);
     }
 
+    //original method from github, but would only work when partially specifing submask,
+    //defeating the point
+
     /*public void ClientBroadcast(TBroadCast broadCast)
     {
         Debug.Log("ClientBroadcast called");
@@ -85,7 +95,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
         }
 
         //WORKING, BUT SPECIFIES THE INTERFACE AGAIN
-        var endPoint = new IPEndPoint(IPAddress.Any, m_Port);
+        var endPoint = new IPEndPoint(IPAddress.Parse("192.168.88.255"), m_Port);
 
         //DOES NOT WORK
         //var endPoint = new IPEndPoint(IPAddress.Broadcast, m_Port);
