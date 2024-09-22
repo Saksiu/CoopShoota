@@ -123,7 +123,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
     /// </summary>
     public void StartServer()
     {
-        Debug.Log("StartServer called");
+        //Debug.Log("StartServer called");
         StartDiscovery(true);
     }
 
@@ -132,13 +132,13 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
     /// </summary>
     public void StartClient()
     {
-        Debug.Log("StartClient called");
+        //Debug.Log("StartClient called");
         StartDiscovery(false);
     }
 
     public void StopDiscovery()
     {
-        Debug.Log("StopDiscovery called");
+        //Debug.Log("StopDiscovery called");
 
         IsClient = false;
         IsServer = false;
@@ -177,7 +177,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
 
     void StartDiscovery(bool isServer)
     {
-        Debug.Log($"StartDiscovery called with isServer: {isServer}");
+       // Debug.Log($"StartDiscovery called with isServer: {isServer}");
         StopDiscovery();
 
         IsServer = isServer;
@@ -195,7 +195,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
 
     async Task ListenAsync(Func<Task> onReceiveTask)
     {
-        Debug.Log("ListenAsync started");
+        //Debug.Log("ListenAsync started");
 
         while (true)
         {
@@ -218,7 +218,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
 
     async Task ReceiveResponseAsync()
     {
-        Debug.Log("ReceiveResponseAsync called");
+        //Debug.Log("ReceiveResponseAsync called");
 
         UdpReceiveResult udpReceiveResult = await m_Client.ReceiveAsync();
 
@@ -243,7 +243,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
 
     async Task ReceiveBroadcastAsync()
     {
-        Debug.Log("ReceiveBroadcastAsync called");
+        //Debug.Log("ReceiveBroadcastAsync called");
 
         UdpReceiveResult udpReceiveResult = await m_Client.ReceiveAsync();
 
@@ -278,7 +278,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
     
     private void WriteHeader(FastBufferWriter writer, MessageType messageType)
     {
-        Debug.Log("WriteHeader called");
+        //Debug.Log("WriteHeader called");
 
         // Serialize unique application id to make sure packet received is from same application.
         writer.WriteValueSafe(m_UniqueApplicationId);
@@ -289,7 +289,7 @@ public abstract class BaseNetworkDiscovery<TBroadCast, TResponse> : MonoBehaviou
 
     private bool ReadAndCheckHeader(FastBufferReader reader, MessageType expectedType)
     {
-        Debug.Log("ReadAndCheckHeader called");
+        //Debug.Log("ReadAndCheckHeader called");
 
         reader.ReadValueSafe(out long receivedApplicationId);
         if (receivedApplicationId != m_UniqueApplicationId)

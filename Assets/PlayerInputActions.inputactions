@@ -1,5 +1,5 @@
 {
-    "name": "CoopShoota",
+    "name": "PlayerInputActions",
     "maps": [
         {
             "name": "Player",
@@ -257,6 +257,17 @@
                 },
                 {
                     "name": "",
+                    "id": "6ba68f63-e7f8-488d-9a1b-99856b44ba74",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "36a96512-7149-47c2-8c3c-482c788217d5",
                     "path": "<Keyboard>/space",
                     "interactions": "",
@@ -268,11 +279,33 @@
                 },
                 {
                     "name": "",
+                    "id": "aa4837df-c933-4558-b004-4beca837fd32",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "aca3356f-ea84-4428-80b7-0e9c24ba81c1",
                     "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a1113477-a2ca-4fdf-8b53-13a803240eb9",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
                     "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -291,10 +324,10 @@
                 {
                     "name": "",
                     "id": "f110fe8b-62f3-4798-84cc-9a25d2b76b10",
-                    "path": "",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Gamepad",
                     "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -312,11 +345,33 @@
                 },
                 {
                     "name": "",
+                    "id": "4030ac71-ec3c-4a72-9c85-f98177bc6882",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "WeaponSwitch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "6baa3c03-0047-4741-8813-f19faea3eeca",
                     "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
+                    "action": "Reload",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "baa5aec2-85ab-4981-958e-ee4454837c1f",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
                     "action": "Reload",
                     "isComposite": false,
                     "isPartOfComposite": false

@@ -33,7 +33,7 @@ public class MyNetworkDiscovery : BaseNetworkDiscovery<DiscoveryBroadcastData, D
 
     public void Update()
     {
-        Debug.Log($"Update called - IsRunning: {IsRunning}, IsServer: {m_NetworkManager.IsServer}, HasStartedWithServer: {m_HasStartedWithServer}");
+        //Debug.Log($"Update called - IsRunning: {IsRunning}, IsServer: {m_NetworkManager.IsServer}, HasStartedWithServer: {m_HasStartedWithServer}");
         if (m_StartWithServer && m_HasStartedWithServer == false && IsRunning == false)
         {
             if (m_NetworkManager.IsServer)
@@ -47,7 +47,7 @@ public class MyNetworkDiscovery : BaseNetworkDiscovery<DiscoveryBroadcastData, D
 
     protected override bool ProcessBroadcast(IPEndPoint sender, DiscoveryBroadcastData broadCast, out DiscoveryResponseData response)
     {
-        Debug.Log($"ProcessBroadcast called from {sender.Address}");
+        //Debug.Log($"ProcessBroadcast called from {sender.Address}");
         response = new DiscoveryResponseData()
         {
             ServerName = ServerName,
@@ -58,7 +58,7 @@ public class MyNetworkDiscovery : BaseNetworkDiscovery<DiscoveryBroadcastData, D
 
     protected override void ResponseReceived(IPEndPoint sender, DiscoveryResponseData response)
     {
-        Debug.Log($"ResponseReceived called - Server found: {response.ServerName} at {sender.Address}:{response.Port}");
+        //Debug.Log($"ResponseReceived called - Server found: {response.ServerName} at {sender.Address}:{response.Port}");
         OnServerFound.Invoke(sender, response);
     }
 }
