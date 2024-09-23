@@ -178,6 +178,11 @@ public class GameMaster : SingletonNetwork<GameMaster>
         RoomController.Instance.OnRunEndAction -= endRun;
     }
 
+    //TODO: handle host/client disconnects here probably
+    public void ExitGame(){
+        beginShutDown();
+        Application.Quit();
+    }
     public override void OnDestroy()
     {
         //NetworkManager.OnClientStarted -= onPlayerJoined;

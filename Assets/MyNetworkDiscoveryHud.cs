@@ -35,16 +35,16 @@ public class MyNetworkDiscoveryHud : MonoBehaviour
         if (m_Discovery == null) // This will only happen once because m_Discovery is a serialize field
         {
             m_Discovery = GetComponent<MyNetworkDiscovery>();
-            UnityEventTools.AddPersistentListener(m_Discovery.OnServerFound, OnServerFound);
+            UnityEventTools.AddPersistentListener(m_Discovery.OnServerFound, MainMenuManager.Instance.handleServerFound);
             Undo.RecordObjects(new Object[] { this, m_Discovery}, "Set NetworkDiscovery");
         }
     }
 #endif
 
-    void OnServerFound(IPEndPoint sender, DiscoveryResponseData response)
+    /*void OnServerFound(IPEndPoint sender, DiscoveryResponseData response)
     {
         discoveredServers[sender.Address] = response;
-    }
+    }*/
 
     void OnGUI()
     {
@@ -59,7 +59,7 @@ public class MyNetworkDiscoveryHud : MonoBehaviour
         }
         else
         {
-            ClientSearchGUI();
+            //ClientSearchGUI();
         }
 
         GUILayout.EndArea();
