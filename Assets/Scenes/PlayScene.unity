@@ -4210,6 +4210,18 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2519930496294445039}
+    - target: {fileID: 3795524940621397958, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3795524940621397958, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3795524940621397958, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50
+      objectReference: {fileID: 0}
     - target: {fileID: 4072154512691858065, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_Alpha
       value: 1
@@ -4258,6 +4270,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5197193461539902631, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5197193461539902631, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5197193461539902631, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5197193461539902631, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6411946885598060306, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_Discovery
       value: 
@@ -4276,6 +4304,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6656767677429259717, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522043461022447001, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_Spacing
+      value: -300
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522043461022447001, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_ChildAlignment
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522043461022447001, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_ReverseArrangement
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8010935836376279865, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
