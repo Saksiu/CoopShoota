@@ -96,6 +96,7 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
         m_Discovery.ClientBroadcast(new DiscoveryBroadcastData());
     }
     public void handleServerFound(IPEndPoint sender, DiscoveryResponseData response){
+        print($"Server found: {response.ServerName} at {sender.Address}:{response.Port}");
         discoveredServers[sender.Address] = response;
         UpdateDisplayedFoundServers();
     }
