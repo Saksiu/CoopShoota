@@ -65,6 +65,7 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     }
 
     public void JoinServer(IPAddress server, DiscoveryResponseData data){
+        print($"Joining server at {server.ToString()} with data {data.Port}");
         UnityTransport transport = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
         transport.SetConnectionData(server.ToString(), data.Port);
         NetworkManager.Singleton.StartClient();
@@ -102,6 +103,7 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     }
 
     private void UpdateDisplayedFoundServers(){
+        print("Updating displayed found servers");
         foreach (Transform child in foundServerEntryParent)
         {
             Destroy(child.gameObject);

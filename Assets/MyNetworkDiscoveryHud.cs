@@ -59,7 +59,7 @@ public class MyNetworkDiscoveryHud : MonoBehaviour
         }
         else
         {
-            //ClientSearchGUI();
+            ClientSearchGUI();
         }
 
         GUILayout.EndArea();
