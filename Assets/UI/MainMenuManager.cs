@@ -69,7 +69,12 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
 
     public void handleJoinDirectlyButtonPressed(){
         try{
-            JoinServer(IPAddress.Parse(GetHostAddress()), new DiscoveryResponseData());
+            UnityTransport transport=(UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
+            
+            JoinServer(IPAddress.Parse(GetHostAddress()), new DiscoveryResponseData{
+            Port=transport.ConnectionData.Port,
+            ServerName="Direct Connection"
+            });
         }catch(Exception e){handleError(e.Message);}
     }
 
@@ -78,6 +83,7 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
         UnityTransport transport = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
         transport.SetConnectionData(server.ToString(), data.Port);
         NetworkManager.Singleton.StartClient();
+        disableMainMenu();
     }
 
     
