@@ -34,6 +34,15 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     Dictionary<IPAddress, DiscoveryResponseData> discoveredServers = new Dictionary<IPAddress, DiscoveryResponseData>();
 
 
+    void Start()
+    {
+        m_Discovery.OnServerFound.AddListener(handleServerFound);
+    }
+    void OnDestroy()
+    {
+        if(m_Discovery!=null)
+            m_Discovery.OnServerFound.RemoveListener(handleServerFound);
+    }
     public void disableMainMenu(){
         mainMenuCanvasGroup.alpha=0;
         mainMenuCanvasGroup.blocksRaycasts=false;
