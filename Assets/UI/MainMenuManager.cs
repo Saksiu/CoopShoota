@@ -77,19 +77,12 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
                 IPAddress.Parse(GetHostAddress()), 
                 new DiscoveryResponseData{
                     Port=transport.ConnectionData.Port,
-                    ServerName="Direct Connection"},
-                GetPlayerName());
+                    ServerName="Direct Connection"});
         }catch(Exception e){handleError(e.Message);}
     }
 
     public void JoinServer(IPAddress server, DiscoveryResponseData data){
-        try{
-            JoinServer(server, data, GetPlayerName());
-        }catch(Exception e){handleError(e.Message);}
-        
-    }
-
-    public void JoinServer(IPAddress server, DiscoveryResponseData data,string playerName){
+        GetPlayerName();
         print($"Joining server at {server.ToString()} with data {data.Port}");
         UnityTransport transport = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
         transport.SetConnectionData(server.ToString(), data.Port);

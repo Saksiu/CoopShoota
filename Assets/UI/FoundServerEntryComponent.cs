@@ -32,6 +32,7 @@ public class FoundServerEntryComponent : MonoBehaviour
 
 
     private void handleJoinButtonPressed(){
+        
         MainMenuManager.Instance.JoinServer(sender,data);
     }
 }
