@@ -98,6 +98,15 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MainMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""cb549ff1-0d78-4815-86df-2079caafbb5d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -395,6 +404,28 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Reload"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ba1a5846-b3b6-4828-9878-a9b4d2ec436e"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""MainMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e70393b5-bc6a-4206-ac19-c201bb4e9c0f"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""MainMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1010,6 +1041,7 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
         m_Player_Shoot = m_Player.FindAction("Shoot", throwIfNotFound: true);
         m_Player_WeaponSwitch = m_Player.FindAction("WeaponSwitch", throwIfNotFound: true);
         m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
+        m_Player_MainMenu = m_Player.FindAction("MainMenu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1092,6 +1124,7 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Shoot;
     private readonly InputAction m_Player_WeaponSwitch;
     private readonly InputAction m_Player_Reload;
+    private readonly InputAction m_Player_MainMenu;
     public struct PlayerActions
     {
         private @PlayerInputGenerated m_Wrapper;
@@ -1104,6 +1137,7 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
         public InputAction @Shoot => m_Wrapper.m_Player_Shoot;
         public InputAction @WeaponSwitch => m_Wrapper.m_Player_WeaponSwitch;
         public InputAction @Reload => m_Wrapper.m_Player_Reload;
+        public InputAction @MainMenu => m_Wrapper.m_Player_MainMenu;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1137,6 +1171,9 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
             @Reload.started += instance.OnReload;
             @Reload.performed += instance.OnReload;
             @Reload.canceled += instance.OnReload;
+            @MainMenu.started += instance.OnMainMenu;
+            @MainMenu.performed += instance.OnMainMenu;
+            @MainMenu.canceled += instance.OnMainMenu;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1165,6 +1202,9 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
             @Reload.started -= instance.OnReload;
             @Reload.performed -= instance.OnReload;
             @Reload.canceled -= instance.OnReload;
+            @MainMenu.started -= instance.OnMainMenu;
+            @MainMenu.performed -= instance.OnMainMenu;
+            @MainMenu.canceled -= instance.OnMainMenu;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1363,6 +1403,7 @@ public partial class @PlayerInputGenerated: IInputActionCollection2, IDisposable
         void OnShoot(InputAction.CallbackContext context);
         void OnWeaponSwitch(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);
+        void OnMainMenu(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

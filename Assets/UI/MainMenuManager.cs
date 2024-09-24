@@ -68,11 +68,12 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
         discoveredServers.Clear();
         UpdateDisplayedFoundServers();
 
-        EventSystem.current.SetSelectedGameObject(playerNameInputField.gameObject);
         mainMenuCanvasGroup.alpha=1;
         mainMenuCanvasGroup.blocksRaycasts=true;
         mainMenuCanvasGroup.interactable=true;
         Cursor.lockState = CursorLockMode.None;
+        EventSystem.current.SetSelectedGameObject(playerNameInputField.gameObject);
+        
     }
 
     public void handleHostButtonPressed(){

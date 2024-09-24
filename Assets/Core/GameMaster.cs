@@ -7,6 +7,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
 public class GameMaster : SingletonNetwork<GameMaster>
 {
@@ -23,6 +24,9 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
 
     //public Action<PlayerController> OnPlayerSpawned;
+
+    public static Action onPlayerSpawned;
+    public static Action onPlayerDespawned;
 
     public void printServerFoundMessage(IPEndPoint endPoint, DiscoveryResponseData data)
     {
@@ -60,6 +64,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         
         if (NetworkManager.ConnectedClientsIds.Count >= minPlayers)
             onAllPlayersJoined();
+        onPlayerSpawned?.Invoke();
     }
 
     public void updateSpawnPoints(List<Transform> newSpawnPoints)
@@ -70,6 +75,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     public void onPlayerLeft(ulong playerId)
     {
         if(!IsServer) return;
+        onPlayerDespawned?.Invoke();
         
         var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
         if(player!=null&&_players.Contains(player))
@@ -190,34 +196,41 @@ public class GameMaster : SingletonNetwork<GameMaster>
         base.OnDestroy();
     }
     
-    private void beginShutDown()
+    public void beginShutDown(bool exitGame=false)
     {
         if (IsServer)
-            StartCoroutine(HostShutdown());
+            StartCoroutine(HostShutdown(exitGame));
         else
-            Shutdown();
+            Shutdown(exitGame);
     }
     
-    private IEnumerator HostShutdown()
+    private IEnumerator HostShutdown(bool exitGame)
     {
         // Tell all clients to shutdown
-        ShutdownClientRpc();
+        ShutdownClientRpc(false);
 
         // Wait some time for the message to get to clients
         yield return new WaitForSeconds(0.5f);
 
         // Shutdown server/host
-        Shutdown();
+        Shutdown(exitGame);
     }
     
     [ClientRpc]
-    private void ShutdownClientRpc()
+    private void ShutdownClientRpc(bool exitGame)
     {
         if(!IsOwner) return;
-        Shutdown();
+        Shutdown(exitGame);
     }
-    private void Shutdown()
+    private void Shutdown(bool exitGame)
     {
         NetworkManager.Singleton.Shutdown();
+        if(exitGame){Application.Quit();}
+        else{
+            NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
+            SceneManager.LoadSceneAsync("PlayScene");
+           // MainMenuManager.Instance.enableMainMenu();
+        }
+            
     }
 }

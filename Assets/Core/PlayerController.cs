@@ -193,6 +193,14 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public void OnLook(InputAction.CallbackContext context) {}
     public void OnShoot(InputAction.CallbackContext context){}
 
+    
+    public void OnMainMenu(InputAction.CallbackContext context)
+    {
+        if(!context.performed) return;
+
+        InGameMenuManager.Instance.toggleInGameMenu(IsHost);
+    }
+
     #endregion
     public void onDashFromComponent(float duration)
     {
@@ -280,4 +288,5 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         InputManager.PlayerInput?.Disable();
         
     }
+
 }
