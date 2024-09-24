@@ -231,6 +231,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     }
     private void Shutdown(bool exitGame)
     {
+        print("Shutdown called");
         NetworkManager.Singleton.Shutdown();
         if(exitGame){Application.Quit();}
         else{
