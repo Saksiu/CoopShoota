@@ -64,7 +64,7 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
             m_Discovery.ServerName=serverName;
             string playerName=GetPlayerName();
             NetworkManager.Singleton.StartHost();
-            PlayerController.localPlayer.changePlayerName(playerName);
+            //PlayerController.localPlayer.changePlayerName(playerName);
             disableMainMenu();
         }catch(Exception e){handleError(e.Message);}
     }
@@ -88,12 +88,13 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
         }catch(Exception e){handleError(e.Message);}
         
     }
+
     public void JoinServer(IPAddress server, DiscoveryResponseData data,string playerName){
         print($"Joining server at {server.ToString()} with data {data.Port}");
         UnityTransport transport = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
         transport.SetConnectionData(server.ToString(), data.Port);
         NetworkManager.Singleton.StartClient();
-        PlayerController.localPlayer.changePlayerName(playerName); 
+        //PlayerController.localPlayer.changePlayerName(playerName); 
         disableMainMenu();
     }
 
@@ -145,7 +146,7 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     }
 
     #region input
-    private string GetPlayerName(){
+    public string GetPlayerName(){
         string playerNameRaw=playerNameInputField.text;
 
         if(playerNameRaw.Length>=5)

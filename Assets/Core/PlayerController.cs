@@ -72,7 +72,10 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         InputManager.PlayerInput.UI.Disable();
 
 
-        setNameServerRpc("P"+NetworkManager.LocalClientId);
+        //setNameServerRpc("P"+NetworkManager.LocalClientId);
+        
+        //no need to verify name here, as we would not start the client if it were invalid
+        setNameServerRpc(MainMenuManager.Instance.GetPlayerName());
         UIManager.Instance.onPlayerSpawn(this);
         localPlayer = this;
         
