@@ -36,14 +36,13 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
 
         connectedPlayerNames=new NetworkList<FixedString64Bytes>(
         new List<FixedString64Bytes>(),NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+        connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;
 
         if(Instance!=this) return;
         clearDisplayedPlayersList();
         disableInGameMenu();
     }
     public override void OnNetworkSpawn(){
-
-        connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;
 
         if(!IsServer) return;
 
