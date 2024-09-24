@@ -46,6 +46,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     public override void OnNetworkSpawn(){
         print("InGameMenu Manager NetworkSpawned on "+NetworkManager.LocalClientId);
         playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
+        redrawPlayerList();
         if(!IsServer) return;
 
         NetworkManager.OnClientConnectedCallback+=handlePlayerJoined;
