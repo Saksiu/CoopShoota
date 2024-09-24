@@ -198,7 +198,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     
     public void beginShutDown(bool exitGame=false)
     {
-        if (IsServer)
+        if (IsHost)
             StartCoroutine(HostShutdown(exitGame));
         else
             Shutdown(exitGame);
