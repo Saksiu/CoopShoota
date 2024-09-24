@@ -2573,150 +2573,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1428128462}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1608242428
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1608242431}
-  - component: {fileID: 1608242430}
-  - component: {fileID: 1608242429}
-  - component: {fileID: 1608242433}
-  - component: {fileID: 1608242432}
-  m_Layer: 0
-  m_Name: NetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1608242429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1608242428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ProtocolType: 0
-  m_MaxPacketQueueSize: 128
-  m_MaxPayloadSize: 6144
-  m_HeartbeatTimeoutMS: 500
-  m_ConnectTimeoutMS: 1000
-  m_MaxConnectAttempts: 60
-  m_DisconnectTimeoutMS: 30000
-  ConnectionData:
-    Address: 168.192.88.16
-    Port: 7777
-    ServerListenAddress: 0.0.0.0
-  DebugSimulator:
-    PacketDelayMS: 0
-    PacketJitterMS: 0
-    PacketDropRate: 0
---- !u!114 &1608242430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1608242428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NetworkConfig:
-    ProtocolVersion: 0
-    NetworkTransport: {fileID: 1608242429}
-    PlayerPrefab: {fileID: 7612173290357226724, guid: c134199d29372e14c9bbb02803f1c30f, type: 3}
-    Prefabs:
-      NetworkPrefabsLists:
-      - {fileID: 11400000, guid: f74a6b23f22fd7b4ca54903c055cb5ec, type: 2}
-    TickRate: 30
-    ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
-    ConnectionData: 
-    EnableTimeResync: 0
-    TimeResyncInterval: 30
-    EnsureNetworkVariableLengthSafety: 0
-    EnableSceneManagement: 1
-    ForceSamePrefabs: 1
-    RecycleNetworkIds: 1
-    NetworkIdRecycleDelay: 120
-    RpcHashSize: 0
-    LoadSceneTimeOut: 120
-    SpawnTimeout: 1
-    EnableNetworkLogs: 1
-    OldPrefabList: []
-  RunInBackground: 1
-  LogLevel: 0
---- !u!4 &1608242431
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1608242428}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.10370814, y: -0.5739416, z: 0.017659742}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1608242432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1608242428}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab58ae5b45acbef4a8bdafd71955fadd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Discovery: {fileID: 1608242433}
-  DrawOffset: {x: 10, y: 210}
---- !u!114 &1608242433
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1608242428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4509b1e3db010fa45ae06356512108dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Port: 47777
-  m_UniqueApplicationId: 4879275254399638861
-  m_StartWithServer: 1
-  ServerName: EnterName
-  OnServerFound:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1608242432}
-        m_TargetAssemblyTypeName: MyNetworkDiscoveryHud, Assembly-CSharp
-        m_MethodName: OnServerFound
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &1787735294
 GameObject:
   m_ObjectHideFlags: 0
@@ -4153,6 +4009,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 254816128373127301, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
+      propertyPath: m_text
+      value: Open
+      objectReference: {fileID: 0}
     - target: {fileID: 618058137639071646, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -4416,7 +4276,7 @@ PrefabInstance:
     - target: {fileID: 6411946885598060306, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_Discovery
       value: 
-      objectReference: {fileID: 1608242433}
+      objectReference: {fileID: 0}
     - target: {fileID: 7026796083881685116, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -4564,7 +4424,7 @@ PrefabInstance:
     - target: {fileID: 8712336113409229504, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_Discovery
       value: 
-      objectReference: {fileID: 1608242433}
+      objectReference: {fileID: 0}
     - target: {fileID: 8956103500237700926, guid: 0a965bd3b3043944eb4e03d3761afcd8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -5153,7 +5013,6 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1608242431}
   - {fileID: 775374033693203561}
   - {fileID: 860820434}
   - {fileID: 6431559081540495423}

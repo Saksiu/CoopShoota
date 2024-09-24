@@ -35,8 +35,19 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     public float respawnTime = 3f;
 
+    //private NetworkManager initialNetworkManager;
     public override void Awake()
     {
+        //we REALLY probably don't wanna do this
+        /*if(initialNetworkManager==null)
+            initialNetworkManager = NetworkManager.Singleton;
+        FindObjectsOfType<NetworkManager>().ToList().ForEach(nm => {
+            if(nm!=initialNetworkManager){
+                print("found duplicate network manager "+nm.gameObject.name+" destroying it");
+                Destroy(nm.gameObject);
+            }
+        });
+        initialNetworkManager.SetSingleton();*/
         base.Awake();
         //Cursor.lockState = CursorLockMode.Locked;
     }

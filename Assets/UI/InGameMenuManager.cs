@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
 {
-    [SerializeField] private MyNetworkDiscovery m_Discovery;
+    
     [SerializeField] private CanvasGroup MAIN_inGameMenuCanvasGroup;
 
     [SerializeField] private GameObject connectedPlayerEntryPrefab;
@@ -28,12 +28,12 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     //NetworkList<PlayerController>
 
     public NetworkList<FixedString64Bytes> connectedPlayerNames;
-
+    private MyNetworkDiscovery m_Discovery;
 
 
     public override void Awake(){
         base.Awake();
-
+        m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
         connectedPlayerNames=new NetworkList<FixedString64Bytes>(
         new List<FixedString64Bytes>(),NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
         connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;

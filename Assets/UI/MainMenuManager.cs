@@ -32,14 +32,14 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     [SerializeField] private GameObject foundServerEntryPrefab;
     [SerializeField] private Transform foundServerEntryParent;
 
-    [SerializeField] MyNetworkDiscovery m_Discovery;
-    
+    MyNetworkDiscovery m_Discovery;
 
     Dictionary<IPAddress, DiscoveryResponseData> discoveredServers = new Dictionary<IPAddress, DiscoveryResponseData>();
 
 
     void Start()
     {
+        m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
         if(string.IsNullOrEmpty(PlayerPrefs.GetString("PlayerID"))){
             PlayerPrefs.SetString("PlayerID", Guid.NewGuid().ToString());
             print("initial launch detected, generating unique player ID "+PlayerPrefs.GetString("PlayerID"));
