@@ -7,12 +7,16 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 public class MainMenuManager : SingletonLocal<MainMenuManager>
 {
-    [SerializeField] private TMP_InputField playerNameInputField;
 
+    public string getPlayerID()=>PlayerPrefs.GetString("PlayerID");
+    [SerializeField] private TMP_InputField playerNameInputField;
+    [SerializeField] private TextMeshProUGUI playerIDText;
     [SerializeField] private ErrorPanelComponent ErrorPanel;
 
     [SerializeField] private CanvasGroup mainMenuCanvasGroup;
@@ -36,7 +40,17 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
 
     void Start()
     {
+        if(string.IsNullOrEmpty(PlayerPrefs.GetString("PlayerID"))){
+            PlayerPrefs.SetString("PlayerID", Guid.NewGuid().ToString());
+            print("initial launch detected, generating unique player ID "+PlayerPrefs.GetString("PlayerID"));
+        }
+        playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
+        string savedPlayerName=PlayerPrefs.GetString("PlayerName");
+        playerNameInputField.text=string.IsNullOrEmpty(savedPlayerName)?"":savedPlayerName;
         m_Discovery.OnServerFound.AddListener(handleServerFound);
+
+        enableMainMenu();
+
     }
     void OnDestroy()
     {
@@ -51,10 +65,13 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     }
 
     public void enableMainMenu(){
-        
-        mainMenuCanvasGroup.alpha=0;
-        mainMenuCanvasGroup.blocksRaycasts=false;
-        mainMenuCanvasGroup.interactable=false;
+        discoveredServers.Clear();
+        UpdateDisplayedFoundServers();
+
+        EventSystem.current.SetSelectedGameObject(playerNameInputField.gameObject);
+        mainMenuCanvasGroup.alpha=1;
+        mainMenuCanvasGroup.blocksRaycasts=true;
+        mainMenuCanvasGroup.interactable=true;
         Cursor.lockState = CursorLockMode.None;
     }
 
@@ -146,13 +163,13 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     public string GetPlayerName(){
         string playerNameRaw=playerNameInputField.text;
 
-        if(playerNameRaw.Length>=5)
-            if(playerNameRaw.Length<=16)
-                return playerNameRaw;
-            else
-                throw new ArgumentException("Player Name has to be at most 16 characters long");
-        else
+        if(playerNameRaw.Length<5)
             throw new ArgumentException("Player Name needs to be at least 5 character long");
+        if(playerNameRaw.Length>16)
+            throw new ArgumentException("Player Name has to be at most 16 characters long");
+
+        PlayerPrefs.SetString("PlayerName", playerNameRaw);    
+        return playerNameRaw;
     }
 
     private string GetServerName(){

@@ -12,14 +12,14 @@ public class FoundServerEntryComponent : MonoBehaviour
     [SerializeField] private TextMeshProUGUI serverIPText;
     [SerializeField] private Button joinButton;
 
-    private IPAddress sender;
+    private IPAddress hostAddress;
     private DiscoveryResponseData data;
-    public void SetServerInfo(IPAddress sender, DiscoveryResponseData data)
+    public void SetServerInfo(IPAddress hostAddress, DiscoveryResponseData data)
     {
-        this.sender = sender;
+        this.hostAddress = hostAddress;
         this.data = data;
         serverNameText.text = data.ServerName;
-        serverIPText.text = sender.ToString();
+        serverIPText.text = hostAddress.ToString();
 
         joinButton.onClick.AddListener(handleJoinButtonPressed);
     }
@@ -33,6 +33,6 @@ public class FoundServerEntryComponent : MonoBehaviour
 
     private void handleJoinButtonPressed(){
         
-        MainMenuManager.Instance.JoinServer(sender,data);
+        MainMenuManager.Instance.JoinServer(hostAddress,data);
     }
 }
