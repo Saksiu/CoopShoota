@@ -218,7 +218,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     {
         if (IsServer)
             StartCoroutine(HostShutdown(exitGame));
-        else
+        else if (!IsHost)
             Shutdown(exitGame);
     }
     
@@ -238,6 +238,8 @@ public class GameMaster : SingletonNetwork<GameMaster>
     private void ShutdownClientRpc(bool exitGame)
     {
         if(!IsOwner) return;
+        if(IsHost) return;
+
         Shutdown(exitGame);
     }
     private void Shutdown(bool exitGame)
