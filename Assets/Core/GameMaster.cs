@@ -25,8 +25,8 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     //public Action<PlayerController> OnPlayerSpawned;
 
-    public static Action onPlayerSpawned;
-    public static Action onPlayerDespawned;
+    //public static Action onPlayerSpawned;
+    //public static Action onPlayerDespawned;
 
     public void printServerFoundMessage(IPEndPoint endPoint, DiscoveryResponseData data)
     {
@@ -64,7 +64,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         
         if (NetworkManager.ConnectedClientsIds.Count >= minPlayers)
             onAllPlayersJoined();
-        onPlayerSpawned?.Invoke();
+        //onPlayerSpawned?.Invoke();
     }
 
     public void updateSpawnPoints(List<Transform> newSpawnPoints)
@@ -75,7 +75,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     public void onPlayerLeft(ulong playerId)
     {
         if(!IsServer) return;
-        onPlayerDespawned?.Invoke();
+        //onPlayerDespawned?.Invoke();
         
         var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
         if(player!=null&&_players.Contains(player))
@@ -145,11 +145,14 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     public override void OnNetworkSpawn()
     {
+        RoomController.Instance.OnRunStartAction += OnRunStarted;
+        RoomController.Instance.OnRunEndAction += endRun;
+        
+        if(!IsServer) return;
+
         NetworkManager.OnClientConnectedCallback += onPlayerJoined;
         NetworkManager.OnClientDisconnectCallback += onPlayerLeft;
 
-        RoomController.Instance.OnRunStartAction += OnRunStarted;
-        RoomController.Instance.OnRunEndAction += endRun;
         /*if (!IsServer)
         {
             
@@ -177,11 +180,15 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     public override void OnNetworkDespawn()
     {
+        RoomController.Instance.OnRunStartAction -= OnRunStarted;
+        RoomController.Instance.OnRunEndAction -= endRun;
+
+        if(!IsServer) return;
+
         NetworkManager.OnClientConnectedCallback -= onPlayerJoined;
         NetworkManager.OnClientDisconnectCallback -= onPlayerLeft;
 
-        RoomController.Instance.OnRunStartAction -= OnRunStarted;
-        RoomController.Instance.OnRunEndAction -= endRun;
+        
     }
 
     //TODO: handle host/client disconnects here probably
