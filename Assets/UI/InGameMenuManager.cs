@@ -35,7 +35,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         disableInGameMenu();
     }
     public override void OnNetworkSpawn(){
-        Assert.IsTrue(IsServer);
+        if(!IsServer) return;
 
         playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
         NetworkManager.OnClientConnectedCallback+=handlePlayerJoined;
@@ -46,7 +46,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
 
     public override void OnNetworkDespawn()
     {
-        Assert.IsTrue(IsServer);
+        if(!IsServer) return;
         NetworkManager.OnClientConnectedCallback-=handlePlayerJoined;
         NetworkManager.OnClientDisconnectCallback-=handlePlayerLeft;
         base.OnNetworkDespawn();
@@ -66,7 +66,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
 
     [ClientRpc]
     private void updatePlayerListClientRpc(FixedString64Bytes changedPlayerId){
-        Assert.IsTrue(IsOwner);
+        //if(!IsOwner) return;
 
         foreach (Transform child in connectedPlayerEntryParent)
             Destroy(child.gameObject);
