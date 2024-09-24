@@ -38,15 +38,16 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         new List<FixedString64Bytes>(),NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
         connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;
 
+
         if(Instance!=this) return;
         clearDisplayedPlayersList();
         disableInGameMenu();
     }
     public override void OnNetworkSpawn(){
-
+        print("InGameMenu Manager NetworkSpawned on "+NetworkManager.LocalClientId);
+        playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
         if(!IsServer) return;
 
-        playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
         NetworkManager.OnClientConnectedCallback+=handlePlayerJoined;
         NetworkManager.OnClientDisconnectCallback+=handlePlayerLeft;
         base.OnNetworkSpawn();
