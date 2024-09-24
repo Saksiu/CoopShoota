@@ -62,7 +62,9 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
         try{
             string serverName=GetServerName();
             m_Discovery.ServerName=serverName;
+            string playerName=GetPlayerName();
             NetworkManager.Singleton.StartHost();
+            PlayerController.localPlayer.changePlayerName(playerName);
             disableMainMenu();
         }catch(Exception e){handleError(e.Message);}
     }
@@ -71,18 +73,27 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
         try{
             UnityTransport transport=(UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
             
-            JoinServer(IPAddress.Parse(GetHostAddress()), new DiscoveryResponseData{
-            Port=transport.ConnectionData.Port,
-            ServerName="Direct Connection"
-            });
+            JoinServer(
+                IPAddress.Parse(GetHostAddress()), 
+                new DiscoveryResponseData{
+                    Port=transport.ConnectionData.Port,
+                    ServerName="Direct Connection"},
+                GetPlayerName());
         }catch(Exception e){handleError(e.Message);}
     }
 
     public void JoinServer(IPAddress server, DiscoveryResponseData data){
+        try{
+            JoinServer(server, data, GetPlayerName());
+        }catch(Exception e){handleError(e.Message);}
+        
+    }
+    public void JoinServer(IPAddress server, DiscoveryResponseData data,string playerName){
         print($"Joining server at {server.ToString()} with data {data.Port}");
         UnityTransport transport = (UnityTransport)NetworkManager.Singleton.NetworkConfig.NetworkTransport;
         transport.SetConnectionData(server.ToString(), data.Port);
         NetworkManager.Singleton.StartClient();
+        PlayerController.localPlayer.changePlayerName(playerName); 
         disableMainMenu();
     }
 
@@ -98,19 +109,23 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
     }
     private void startServerSearch(){
         m_Discovery.StartClient();
+        discoveredServers.Clear();
+        UpdateDisplayedFoundServers();
         m_Discovery.ClientBroadcast(new DiscoveryBroadcastData());
     }
 
     private void stopServerSearch(){
         m_Discovery.StopDiscovery();
-        discoveredServers.Clear();
-        UpdateDisplayedFoundServers();
+        //discoveredServers.Clear();
+        //UpdateDisplayedFoundServers();
     }
+
     public void handleRefreshButtonPressed(){
         discoveredServers.Clear();
         UpdateDisplayedFoundServers();
         m_Discovery.ClientBroadcast(new DiscoveryBroadcastData());
     }
+
     public void handleServerFound(IPEndPoint sender, DiscoveryResponseData response){
         print($"Server found: {response.ServerName} at {sender.Address}:{response.Port}");
         discoveredServers[sender.Address] = response;
@@ -119,12 +134,10 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
 
     private void UpdateDisplayedFoundServers(){
         print("Updating displayed found servers");
-        foreach (Transform child in foundServerEntryParent)
-        {
+        foreach (Transform child in foundServerEntryParent){
             Destroy(child.gameObject);
         }
-        foreach (var server in discoveredServers)
-        {
+        foreach (var server in discoveredServers){
             var entry = Instantiate(foundServerEntryPrefab, foundServerEntryParent).GetComponent<FoundServerEntryComponent>();
             entry.SetServerInfo(server.Key, server.Value);
         }

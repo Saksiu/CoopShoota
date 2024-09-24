@@ -248,6 +248,9 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         //print("on leave ground!");
     }
 
+    public void changePlayerName(string newName){
+        setNameServerRpc(newName);
+    }
     private void setName(FixedString64Bytes prevName, FixedString64Bytes newName)
     {
         print("setting name to "+newName+" for player P"+NetworkManager.LocalClientId+"!");
@@ -259,7 +262,6 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     [ServerRpc]
     private void setNameServerRpc(FixedString64Bytes newName)=> playerName.Value = newName;
 
-    
     private void OnDrawGizmos()
     {
         //grounded check
