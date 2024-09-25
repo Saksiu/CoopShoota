@@ -226,10 +226,10 @@ public class GameMaster : SingletonNetwork<GameMaster>
     private IEnumerator HostShutdown(bool exitGame)
     {
         // Tell all clients to shutdown
-        //ShutdownClientRpc(false);
+        ShutdownClientRpc(false);
 
         // Wait some time for the message to get to clients
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1.5f);
 
         // Shutdown server/host
         Shutdown(exitGame);
