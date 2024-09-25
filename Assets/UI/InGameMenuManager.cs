@@ -181,11 +181,11 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         if(!IsOwner) return;
         //TODO: Warning dialog
         disableInGameMenu();
-        GameMaster.Instance.beginShutDown(exitGame: false);
+        GameMaster.Instance.beginShutDown(PlayerController.localPlayer,exitGame: false);
     }
     public void handleExitGameButtonPressed(){
         if(!IsOwner) return;
-        GameMaster.Instance.beginShutDown(exitGame: true);
+        GameMaster.Instance.beginShutDown(PlayerController.localPlayer,exitGame: true);
     }
 
     public void disableInGameMenu()=>disableCanvasGroup(MAIN_inGameMenuCanvasGroup);
