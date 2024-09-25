@@ -178,7 +178,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
 
     public void handleMainMenuButtonPressed(){
         print("handleMainMenuButtonPressed");
-        if(!IsOwner) return;
+        //if(!IsOwner) return;
         //TODO: Warning dialog
         disableInGameMenu();
         GameMaster.Instance.beginShutDown(PlayerController.localPlayer,exitGame: false);
