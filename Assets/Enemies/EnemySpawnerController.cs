@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Tutorials.Core.Editor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
