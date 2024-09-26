@@ -48,7 +48,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         base.OnNetworkSpawn();
         print("InGameMenu Manager NetworkSpawned on "+NetworkManager.LocalClientId);
         playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
-        redrawPlayerListClientRpc();
+        redrawPlayerList();
         if(IsServer){
             NetworkManager.OnConnectionEvent+=handlePlayerCountChanged;
         }
@@ -69,7 +69,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     private void onPlayerNamesListChanged(NetworkListEvent<FixedString64Bytes> changeEvent){
         print($"onPlayerNamesListChanged, event type: {changeEvent.Type} for {changeEvent.Value}");
         //if(!IsServer) return;
-        switch(changeEvent.Type){
+        /*switch(changeEvent.Type){
             case NetworkListEvent<FixedString64Bytes>.EventType.Add:
                 addToDisplayedPlayersList(changeEvent.Value.ToString());
                 break;
@@ -79,7 +79,14 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
             default: case NetworkListEvent<FixedString64Bytes>.EventType.Clear:
                 clearDisplayedPlayersList();
                 break;
+        }*/
+        if(changeEvent.Type==NetworkListEvent<FixedString64Bytes>.EventType.Clear){
+            clearDisplayedPlayersList();
+            return;
         }
+        redrawPlayerList();
+
+
     }
 
     private void handlePlayerCountChanged(NetworkManager networkManager, ConnectionEventData eventData){
@@ -124,8 +131,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
             entryText.color=Color.green;
     }
 
-    [ClientRpc]
-    private void redrawPlayerListClientRpc(){
+    private void redrawPlayerList(){
         clearDisplayedPlayersList();
 
         foreach (var playerName in connectedPlayerNames)
