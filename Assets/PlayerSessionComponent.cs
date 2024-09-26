@@ -8,6 +8,7 @@ public class PlayerSessionComponent : NetworkBehaviour
 {
     public void beginShutDown(bool exitGame=false)
     {
+        print("beginshutdown called for "+NetworkManager.LocalClientId);
         //caller.
         //print("beginshutdown called for "+caller.playerName.Value);
         if (IsServer)
