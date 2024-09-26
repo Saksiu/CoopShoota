@@ -204,8 +204,8 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     //TODO: handle host/client disconnects here probably
     public void ExitGame(){
-        beginShutDown(PlayerController.localPlayer);
-        Application.Quit();
+        PlayerController.localPlayer.sessionComponent.beginShutDown(exitGame: true);
+        //Application.Quit();
     }
     public override void OnDestroy()
     {
@@ -214,9 +214,10 @@ public class GameMaster : SingletonNetwork<GameMaster>
         base.OnDestroy();
     }
     
-    public void beginShutDown(PlayerController caller,bool exitGame=false)
+    /*public void beginShutDown(bool exitGame=false)
     {
-        print("beginshutdown called for "+caller.playerName.Value);
+        //caller.
+        //print("beginshutdown called for "+caller.playerName.Value);
         if (IsServer)
             StartCoroutine(HostShutdown(exitGame));
         else
@@ -229,7 +230,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         ShutdownClientRpc(false);
 
         // Wait some time for the message to get to clients
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(0.5f);
 
         // Shutdown server/host
         Shutdown(exitGame);
@@ -254,5 +255,5 @@ public class GameMaster : SingletonNetwork<GameMaster>
            // MainMenuManager.Instance.enableMainMenu();
         }
             
-    }
+    }*/
 }

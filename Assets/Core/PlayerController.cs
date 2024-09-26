@@ -12,6 +12,7 @@ using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
+[RequireComponent(typeof(PlayerSessionComponent))]
 public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerActions
 {
     public static PlayerController localPlayer;
@@ -46,6 +47,11 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     [Tooltip("Don't add mid air force if player is moving faster than this")]
     private bool MovementEnabled = true;
     //private float verticalAngle=0.0f;
+
+    public PlayerSessionComponent sessionComponent;
+    private void Awake(){
+        sessionComponent=GetComponent<PlayerSessionComponent>();
+    }
 
     public override void OnNetworkSpawn()
     {
