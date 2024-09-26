@@ -152,7 +152,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     [ClientRpc]
     public void displayPromptForAllPlayersClientRpc(string message,float duration){
-        UIManager.Instance.showPromptFor(message,duration);
+        HUDManager.Instance.showPromptFor(message,duration);
     }
 
     public override void OnNetworkSpawn()

@@ -34,7 +34,7 @@ public class PlayerHealthComponent : NetworkBehaviour
     {
         if(!IsOwner) return;
         //print("onHpChanged called");
-        UIManager.Instance.updateDisplayedHP(curr);
+        HUDManager.Instance.updateDisplayedHP(curr);
         
         //pint("HP changed from "+prev+" to "+curr);
         //UIManager.Instance.updateDisplayedHP(curr);

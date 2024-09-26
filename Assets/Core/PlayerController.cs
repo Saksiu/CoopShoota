@@ -72,7 +72,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
        // GetComponent<MeshRenderer>().enabled=false;
 
         InputManager.PlayerInput.Player.SetCallbacks(this);
-        InputManager.PlayerInput.UI.SetCallbacks(UIManager.Instance);
+        InputManager.PlayerInput.UI.SetCallbacks(HUDManager.Instance);
 
         InputManager.PlayerInput.Player.Enable();
         InputManager.PlayerInput.UI.Disable();
@@ -82,7 +82,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         
         //no need to verify name here, as we would not start the client if it were invalid
         setNameServerRpc(MainMenuManager.Instance.GetPlayerName());
-        UIManager.Instance.onPlayerSpawn(this);
+        HUDManager.Instance.onPlayerSpawn(this);
         localPlayer = this;
         
         base.OnNetworkSpawn();

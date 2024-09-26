@@ -135,7 +135,6 @@ GameObject:
   - component: {fileID: 169104058}
   - component: {fileID: 169104057}
   - component: {fileID: 169104056}
-  - component: {fileID: 169104055}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -143,20 +142,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &169104055
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 169104054}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab58ae5b45acbef4a8bdafd71955fadd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Discovery: {fileID: 169104056}
-  DrawOffset: {x: 10, y: 210}
 --- !u!114 &169104056
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class UIManager : SingletonLocal<UIManager>, PlayerInputGenerated.IUIActions
+public class HUDManager : SingletonLocal<HUDManager>, PlayerInputGenerated.IUIActions
 {
     [SerializeField] private TextMeshProUGUI HPText;
     [SerializeField] private TextMeshProUGUI ammoText;

@@ -33,12 +33,12 @@ public abstract class Interactable : NetworkBehaviour
 
     public virtual void showPrompt()
     {
-        UIManager.Instance.showPrompt("[E] "+promptText);
+        HUDManager.Instance.showPrompt("[E] "+promptText);
     }
 
     public virtual void hidePrompt()
     {
-        UIManager.Instance.hidePrompt();
+        HUDManager.Instance.hidePrompt();
     }
 
     public abstract void Interact();

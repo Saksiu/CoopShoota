@@ -86,7 +86,7 @@ public class GunController : NetworkBehaviour
     {
         if (!IsOwner) return;
         //print("ammo left changed from " + prev + " to " + curr+" on "+NetworkManager.LocalClientId+" is he the fuckin owner?"+IsOwner);
-        UIManager.Instance.updateAmmoLeft(newAmmo);
+        HUDManager.Instance.updateAmmoLeft(newAmmo);
     }
 
 
@@ -219,7 +219,7 @@ public class GunController : NetworkBehaviour
     {
         isReloading=true;
         canShoot = false;
-        UIManager.Instance.ShowReload(reloadTime);
+        HUDManager.Instance.ShowReload(reloadTime);
         yield return new WaitForSeconds(reloadTime);
         AmmoLeft = magazineSize;
         canShoot = true;
