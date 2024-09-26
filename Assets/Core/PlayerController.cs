@@ -96,6 +96,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
         //looking around
         Vector2 lookInput = InputManager.PlayerInput.Player.Look.ReadValue<Vector2>();
+        print("update called on owner, lookinput="+lookInput);
 
         transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + (lookInput.x*playerCamera.cameraSensitivity), 0);
     

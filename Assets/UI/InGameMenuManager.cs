@@ -30,9 +30,10 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     public NetworkList<FixedString64Bytes> connectedPlayerNames;
     private MyNetworkDiscovery m_Discovery;
 
-    public void Update(){
+    /*public void Update(){
         print($"InGameMenuManager Update, IsServer: {IsServer}, IsClient: {IsClient}, IsOwner: {IsOwner}, Localplayer name: {PlayerController.localPlayer?.playerName.Value}");
-    }
+    }*/
+
     public override void Awake(){
         base.Awake();
         m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
