@@ -85,6 +85,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     public void onPlayerLeft(ulong playerId)
     {
+        print("onPlayerLeft "+playerId);
         if(!IsServer) return;
         //onPlayerDespawned?.Invoke();
         

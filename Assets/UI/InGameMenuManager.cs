@@ -30,7 +30,9 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     public NetworkList<FixedString64Bytes> connectedPlayerNames;
     private MyNetworkDiscovery m_Discovery;
 
-
+    public void Update(){
+        print($"InGameMenuManager Update, IsServer: {IsServer}, IsClient: {IsClient}, IsOwner: {IsOwner}, Localplayer name: {PlayerController.localPlayer?.playerName.Value}");
+    }
     public override void Awake(){
         base.Awake();
         m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
@@ -44,14 +46,14 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         disableInGameMenu();
     }
     public override void OnNetworkSpawn(){
+        base.OnNetworkSpawn();
         print("InGameMenu Manager NetworkSpawned on "+NetworkManager.LocalClientId);
         playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
         redrawPlayerList();
-        if(!IsServer) return;
-
-        NetworkManager.OnClientConnectedCallback+=handlePlayerJoined;
-        NetworkManager.OnClientDisconnectCallback+=handlePlayerLeft;
-        base.OnNetworkSpawn();
+        if(IsServer){
+            NetworkManager.OnClientConnectedCallback+=handlePlayerJoined;
+            NetworkManager.OnClientDisconnectCallback+=handlePlayerLeft;
+        }
         disableInGameMenu();
     }
 
@@ -59,9 +61,11 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     {
         connectedPlayerNames.OnListChanged-=onPlayerNamesListChanged;
 
-        if(!IsServer) return;
-        NetworkManager.OnClientConnectedCallback-=handlePlayerJoined;
-        NetworkManager.OnClientDisconnectCallback-=handlePlayerLeft;
+        if(IsServer){
+            NetworkManager.OnClientConnectedCallback-=handlePlayerJoined;
+            NetworkManager.OnClientDisconnectCallback-=handlePlayerLeft;
+        }
+
         base.OnNetworkDespawn();
     }
 
