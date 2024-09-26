@@ -37,7 +37,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
         connectedPlayerNames=new NetworkList<FixedString64Bytes>(
         new List<FixedString64Bytes>(),NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
-        //connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;
+        connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;
 
 
         if(Instance!=this) return;
@@ -50,25 +50,24 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
         redrawPlayerListClientRpc();
         if(IsServer){
-            NetworkManager.OnClientConnectedCallback+=handlePlayerCountChanged;
-            NetworkManager.OnClientDisconnectCallback+=handlePlayerCountChanged;
+            NetworkManager.OnConnectionEvent+=handlePlayerCountChanged;
         }
         disableInGameMenu();
     }
 
     public override void OnNetworkDespawn()
     {
-        //connectedPlayerNames.OnListChanged-=onPlayerNamesListChanged;
+        connectedPlayerNames.OnListChanged-=onPlayerNamesListChanged;
 
         if(IsServer){
-            NetworkManager.OnClientConnectedCallback-=handlePlayerCountChanged;
-            NetworkManager.OnClientDisconnectCallback-=handlePlayerCountChanged;
+            NetworkManager.OnConnectionEvent-=handlePlayerCountChanged;
         }
 
         base.OnNetworkDespawn();
     }
 
-    /*private void onPlayerNamesListChanged(NetworkListEvent<FixedString64Bytes> changeEvent){
+    private void onPlayerNamesListChanged(NetworkListEvent<FixedString64Bytes> changeEvent){
+        print($"onPlayerNamesListChanged, event type: {changeEvent.Type} for {changeEvent.Value}");
         //if(!IsServer) return;
         switch(changeEvent.Type){
             case NetworkListEvent<FixedString64Bytes>.EventType.Add:
@@ -81,14 +80,25 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
                 clearDisplayedPlayersList();
                 break;
         }
-    }*/
+    }
 
-    private void handlePlayerCountChanged(ulong playerID){
+    private void handlePlayerCountChanged(NetworkManager networkManager, ConnectionEventData eventData){
+        print($"handlePlayerCountChanged, event type: {eventData.EventType}, local client id: {NetworkManager.Singleton.LocalClientId}");
+
         Assert.IsTrue(IsServer,"Non-Server entity tried to handle player joined event");
-        connectedPlayerNames.Clear();
-        foreach(var client in NetworkManager.ConnectedClients.Values)
-            connectedPlayerNames.Add(client.PlayerObject.GetComponent<PlayerController>().playerName.Value);
-        redrawPlayerListClientRpc();
+
+        if(eventData.EventType==ConnectionEvent.ClientConnected){
+            connectedPlayerNames.Add(NetworkManager.ConnectedClients[eventData.ClientId].PlayerObject.GetComponent<PlayerController>().playerName.Value);
+            //redrawPlayerListClientRpc();
+        }
+        else if(eventData.EventType==ConnectionEvent.ClientDisconnected){
+            connectedPlayerNames.Remove(NetworkManager.ConnectedClients[eventData.ClientId].PlayerObject.GetComponent<PlayerController>().playerName.Value);
+            //redrawPlayerListClientRpc();
+        }
+        //connectedPlayerNames.Clear();
+        //foreach(var client in NetworkManager.ConnectedClients.Values)
+        //    connectedPlayerNames.Add(client.PlayerObject.GetComponent<PlayerController>().playerName.Value);
+        //redrawPlayerListClientRpc();
         //updatePlayerListClientRpc(NetworkManager.ConnectedClients[playerID].PlayerObject.GetComponent<PlayerController>().playerName.Value);
     }
 
