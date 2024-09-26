@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -27,7 +28,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
 
     //NetworkList<PlayerController>
 
-    public NetworkList<FixedString64Bytes> connectedPlayerNames;
+    private List<string> connectedPlayerNames=new();
     private MyNetworkDiscovery m_Discovery;
 
     /*public void Update(){
@@ -37,9 +38,9 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     public override void Awake(){
         base.Awake();
         m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
-        connectedPlayerNames=new NetworkList<FixedString64Bytes>(
-        new List<FixedString64Bytes>(),NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
-        connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;
+        //connectedPlayerNames=new NetworkList<FixedString64Bytes>(
+        //new List<FixedString64Bytes>(),NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+        //connectedPlayerNames.OnListChanged+=onPlayerNamesListChanged;
 
 
         if(Instance!=this) return;
@@ -52,25 +53,25 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
         redrawPlayerList();
         if(IsServer){
-            NetworkManager.OnClientConnectedCallback+=handlePlayerJoined;
-            NetworkManager.OnClientDisconnectCallback+=handlePlayerLeft;
+            NetworkManager.OnClientConnectedCallback+=handlePlayerCountChange;
+            NetworkManager.OnClientDisconnectCallback+=handlePlayerCountChange;
         }
         disableInGameMenu();
     }
 
     public override void OnNetworkDespawn()
     {
-        connectedPlayerNames.OnListChanged-=onPlayerNamesListChanged;
+        //connectedPlayerNames.OnListChanged-=onPlayerNamesListChanged;
 
         if(IsServer){
-            NetworkManager.OnClientConnectedCallback-=handlePlayerJoined;
-            NetworkManager.OnClientDisconnectCallback-=handlePlayerLeft;
+            NetworkManager.OnClientConnectedCallback-=handlePlayerCountChange;
+            NetworkManager.OnClientDisconnectCallback-=handlePlayerCountChange;
         }
 
         base.OnNetworkDespawn();
     }
 
-    private void onPlayerNamesListChanged(NetworkListEvent<FixedString64Bytes> changeEvent){
+    /*private void onPlayerNamesListChanged(NetworkListEvent<FixedString64Bytes> changeEvent){
         //if(!IsServer) return;
         switch(changeEvent.Type){
             case NetworkListEvent<FixedString64Bytes>.EventType.Add:
@@ -83,28 +84,30 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
                 clearDisplayedPlayersList();
                 break;
         }
-    }
+    }*/
 
-    private void handlePlayerJoined(ulong playerID){
-        Assert.IsTrue(IsServer,"Non-Server entity tried to handle player joined event");
-        connectedPlayerNames.Add(NetworkManager.ConnectedClients[playerID].PlayerObject
-        .GetComponent<PlayerController>().playerName.Value);
+    private void handlePlayerCountChange(ulong playerID){
+        Assert.IsTrue(IsServer,"Non-Server entity tried to handle player count changed event");
+        connectedPlayerNames.Clear();
+        connectedPlayerNames.AddRange(NetworkManager.ConnectedClients.Values
+            .Select(client=>client.PlayerObject.GetComponent<PlayerController>().playerName.Value.ToString()));
+        redrawPlayerList();
         //updatePlayerListClientRpc(NetworkManager.ConnectedClients[playerID].PlayerObject.GetComponent<PlayerController>().playerName.Value);
     }
 
-    private void handlePlayerLeft(ulong playerID){
+    /*private void handlePlayerLeft(ulong playerID){
         Assert.IsTrue(IsServer,"Non-Server entity tried to handle player left event");
         connectedPlayerNames.Remove(NetworkManager.ConnectedClients[playerID].PlayerObject
         .GetComponent<PlayerController>().playerName.Value);
         //updatePlayerListClientRpc(NetworkManager.ConnectedClients[playerID].PlayerObject.GetComponent<PlayerController>().playerName.Value);
-    }
+    }*/
 
     //[ClientRpc]
     private void clearDisplayedPlayersList(){
         foreach (Transform child in connectedPlayerEntryParent)
             Destroy(child.gameObject);
     }
-    private void removeFromDisplayedPlayersList(string playerName){
+    /*private void removeFromDisplayedPlayersList(string playerName){
         foreach (Transform child in connectedPlayerEntryParent)
             if(child.GetChild(0).GetComponent<TextMeshProUGUI>().text==playerName){
                 Destroy(child.gameObject);
@@ -118,7 +121,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         entryText.text=playerName;
         if(playerName==PlayerPrefs.GetString("PlayerName")) //if is local player basically
             entryText.color=Color.green;
-    }
+    }*/
 
     private void redrawPlayerList(){
         //if(!IsOwner) return;
@@ -137,7 +140,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
 
         foreach (var playerName in connectedPlayerNames){
             var entryText = Instantiate(connectedPlayerEntryPrefab, connectedPlayerEntryParent).transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-            entryText.text=playerName.Value;
+            entryText.text=playerName;
             if(playerName==PlayerPrefs.GetString("PlayerName"))
                 entryText.color=Color.green;
         }
