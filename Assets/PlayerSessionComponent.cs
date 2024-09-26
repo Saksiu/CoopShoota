@@ -20,11 +20,12 @@ public class PlayerSessionComponent : NetworkBehaviour
     private IEnumerator HostShutdown(bool exitGame)
     {
         // Tell all clients to shutdown
+        print("HostShutdown called, sending shutdown message to clients");
         ShutdownClientRpc(false);
 
         // Wait some time for the message to get to clients
         yield return new WaitForSeconds(0.5f);
-
+        print("Shutting down host itself after 0.5s wait");
         // Shutdown server/host
         Shutdown(exitGame);
     }
@@ -32,6 +33,7 @@ public class PlayerSessionComponent : NetworkBehaviour
     [ClientRpc]
     private void ShutdownClientRpc(bool exitGame)
     {
+        print("ShutdownClientRpc called "+NetworkManager.LocalClientId+" IsOwner?: "+IsOwner);
         if(!IsOwner) return;
         //if(IsHost) return;
 
@@ -39,7 +41,7 @@ public class PlayerSessionComponent : NetworkBehaviour
     }
     private void Shutdown(bool exitGame)
     {
-        print("Shutdown called");
+        print("Shutdown called "+NetworkManager.LocalClientId);
         NetworkManager.Singleton.Shutdown();
         if(exitGame){Application.Quit();}
         else{
