@@ -34,11 +34,18 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
 
     MyNetworkDiscovery m_Discovery;
 
+    private string initialBindIP;
+    private ushort initialBindPort;
+
     Dictionary<IPAddress, DiscoveryResponseData> discoveredServers = new Dictionary<IPAddress, DiscoveryResponseData>();
 
 
     void Start()
     {
+        var connectionData=NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData;
+        initialBindIP=connectionData.Address;
+        initialBindPort=connectionData.Port;
+
         m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
         if(string.IsNullOrEmpty(PlayerPrefs.GetString("PlayerID"))){
             PlayerPrefs.SetString("PlayerID", Guid.NewGuid().ToString());
@@ -81,10 +88,11 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
             string serverName=GetServerName();
             m_Discovery.ServerName=serverName;
             string playerName=GetPlayerName();
-            var connectionData=NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData;
-            print($"starting host on address {connectionData.Address} and port {connectionData.Port}");
-            if(!NetworkManager.Singleton.StartHost())
-                throw new Exception("Failed to start host");
+
+            var transport=NetworkManager.Singleton.GetComponent<UnityTransport>();
+            transport.SetConnectionData(initialBindIP, initialBindPort,"0.0.0.0");
+            print($"starting host on address {transport.ConnectionData.Address} and port {transport.ConnectionData.Port}");
+            NetworkManager.Singleton.StartHost();
             //PlayerController.localPlayer.changePlayerName(playerName);
             disableMainMenu();
         }catch(Exception e){handleError(e.Message);}
