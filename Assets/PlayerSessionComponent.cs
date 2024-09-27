@@ -12,11 +12,26 @@ public class PlayerSessionComponent : NetworkBehaviour
         
         //caller.
         //print("beginshutdown called for "+caller.playerName.Value);
-        if (IsServer)
+        if (IsServer){
             Shutdown(exitGame);
-            //StartCoroutine(HostShutdown(exitGame));
-        else if(IsOwner)
+        }else if(IsOwner){
             DisconnectClientServerRpc(NetworkManager.LocalClientId);
+            Shutdown(exitGame);
+        }
+            
+    }
+
+    public void Awake(){
+        NetworkManager.OnClientStopped+=handleClientStopped;
+    }
+
+    private void handleClientStopped(bool wasHost){
+        
+    }
+
+    public override void OnDestroy(){
+        NetworkManager.OnClientStopped-=handleClientStopped;
+        base.OnDestroy();
     }
     
     /*private IEnumerator HostShutdown(bool exitGame)

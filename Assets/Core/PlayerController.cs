@@ -88,6 +88,20 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         base.OnNetworkSpawn();
     }
 
+    public override void OnNetworkDespawn()
+    {
+        playerName.OnValueChanged-=setName;
+        if(!IsOwner)  return;
+
+        InputManager.PlayerInput.Player.RemoveCallbacks(this);
+        InputManager.PlayerInput.UI.RemoveCallbacks(HUDManager.Instance);
+
+        InputManager.PlayerInput.UI.Disable();
+        InputManager.PlayerInput.Player.Disable();
+        
+        //InputManager.PlayerInput?.Disable();
+        
+    }
     private void Update()
     {
         playerNameText.GetComponentInParent<Canvas>().transform.LookAt(localPlayer.transform);
@@ -285,15 +299,6 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         //grounded check
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * checkGroundDistance);
-    }
-    
-    public override void OnNetworkDespawn()
-    {
-        playerName.OnValueChanged-=setName;
-        if(!IsOwner)  return;
-        
-        //InputManager.PlayerInput?.Disable();
-        
     }
 
 }
