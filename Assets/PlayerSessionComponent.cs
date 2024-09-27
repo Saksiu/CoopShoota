@@ -17,8 +17,8 @@ public class PlayerSessionComponent : NetworkBehaviour
             Shutdown(exitGame);
         }else if(IsOwner){
             DisconnectClientServerRpc(NetworkManager.LocalClientId);
-            //Shutdown(exitGame);
-            StartCoroutine(ClientShutdownCoroutine(exitGame));
+            Shutdown(exitGame);
+            //StartCoroutine(ClientShutdownCoroutine(exitGame));
         }
             
     }
@@ -28,7 +28,7 @@ public class PlayerSessionComponent : NetworkBehaviour
     }
 
     private void handleClientStopped(bool wasHost){
-        
+        SceneManager.LoadSceneAsync("PlayScene");
     }
 
     public override void OnDestroy(){
@@ -36,14 +36,16 @@ public class PlayerSessionComponent : NetworkBehaviour
         base.OnDestroy();
     }
 
-    private IEnumerator ClientShutdownCoroutine(bool exitGame)
+    /*private IEnumerator ClientShutdownCoroutine(bool exitGame)
     {
         Debug.Log("Shutdown called for client " + NetworkManager.LocalClientId);
         
         // Call the async shutdown method and wait for it to complete
-        var shutdownTask = ShutdownAsync();
+        //var shutdownTask = ShutdownAsync();
         print("waiting for async shutdown to complete");
-        yield return new WaitUntil(() => shutdownTask.IsCompleted);
+        NetworkManager.Singleton.Shutdown();
+        NetworkManager.
+        //yield return new WaitUntil(() => shutdownTask.IsCompleted);
         print("async shutdown completed");
         if (exitGame)
         {
@@ -66,7 +68,7 @@ public class PlayerSessionComponent : NetworkBehaviour
         {
             await Task.Yield(); // Yield control back to the main thread
         }
-    }
+    }*/
     
     /*private IEnumerator HostShutdown(bool exitGame)
     {
@@ -88,16 +90,6 @@ public class PlayerSessionComponent : NetworkBehaviour
         print($"disconnect request made to server for {playerID}");
         NetworkManager.DisconnectClient(playerID);
     }
-    
-    /*[ClientRpc]
-    private void ShutdownClientRpc(bool exitGame)
-    {
-        print("ShutdownClientRpc called "+NetworkManager.LocalClientId+" IsOwner?: "+IsOwner);
-        if(!IsOwner) return;
-        //if(IsHost) return;
-
-        Shutdown(exitGame);
-    }*/
 
     private void Shutdown(bool exitGame)
     {
@@ -106,7 +98,6 @@ public class PlayerSessionComponent : NetworkBehaviour
         if(exitGame){Application.Quit();}
         else{
             NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
-            SceneManager.LoadSceneAsync("PlayScene");
            // MainMenuManager.Instance.enableMainMenu();
         }
             
