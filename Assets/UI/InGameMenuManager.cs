@@ -189,10 +189,10 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
             PlayerSessionManager.Instance.beginShutDown(exitGame: false);
     }
     public void handleExitGameButtonPressed(){
-        if(IsClient&&!IsHost)
-            DisconnectClientServerRpc(NetworkManager.LocalClientId);
-        else
-            PlayerSessionManager.Instance.beginShutDown(exitGame: false);
+        //if(IsClient&&!IsHost)
+           // DisconnectClientServerRpc(NetworkManager.LocalClientId);
+        //else
+        PlayerSessionManager.Instance.beginShutDown(exitGame: false);
     }
 
     [ServerRpc(RequireOwnership = false)]

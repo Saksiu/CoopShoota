@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.SceneManagement;
@@ -32,11 +33,11 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
     }
 
     private void handleClientStopping(bool wasHost){
-        print("Server Stopped, shutting down client was host?"+wasHost);
+        print("Shutting down client was host?"+wasHost);
         if(wasHost) return;
-        
         NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
         SceneManager.LoadScene("PlayScene");
+
     }
 
     private IEnumerator shutDownCoroutine(bool exitGame){

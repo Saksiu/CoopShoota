@@ -81,7 +81,10 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
             string serverName=GetServerName();
             m_Discovery.ServerName=serverName;
             string playerName=GetPlayerName();
-            NetworkManager.Singleton.StartHost();
+            var connectionData=NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData;
+            print($"starting host on address {connectionData.Address} and port {connectionData.Port}");
+            if(!NetworkManager.Singleton.StartHost())
+                throw new Exception("Failed to start host");
             //PlayerController.localPlayer.changePlayerName(playerName);
             disableMainMenu();
         }catch(Exception e){handleError(e.Message);}
