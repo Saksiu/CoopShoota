@@ -32,7 +32,7 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         //print("beginshutdown called for "+caller.playerName.Value);
 
         if(NetworkManager.Singleton.IsHost)
-            DisconnectClientServerRpc(NetworkManager.Singleton.LocalClientId);
+            DisconnectAllClients();
 
         Shutdown(exitGame);
         
@@ -49,10 +49,13 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         SceneManager.LoadScene("PlayScene");
     }
 
-    [ServerRpc]
-    private void DisconnectClientServerRpc(ulong playerID){
-        print($"disconnect request made to server for {playerID}");
-        NetworkManager.Singleton.DisconnectClient(playerID);
+    private void DisconnectAllClients(){
+        //print($"disconnect request made to server for {playerID}");
+        foreach (var clientID in NetworkManager.Singleton.ConnectedClientsIds)
+        {      
+            NetworkManager.Singleton.DisconnectClient(clientID);  
+        }
+        //NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
     }
 
     private void Shutdown(bool exitGame)
