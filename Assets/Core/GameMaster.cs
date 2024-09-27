@@ -113,16 +113,16 @@ public class GameMaster : SingletonNetwork<GameMaster>
         print("onPlayerLeft "+playerId);
         if(!IsServer) return;
         //onPlayerDespawned?.Invoke();
-        
-        playersDict.Remove(playerId);
+    
 
         //player.healthComponent.OnDeathAction -= OnPlayerDeath;
 
         //if(!player.IsSpawned) return;
 
         //NetworkManager.DisconnectClient(playerId);
-        //player.NetworkObject.Despawn();
+        playersDict[playerId].NetworkObject.Despawn();
         //DestroyPlayerObjectClientRpc(playerId);
+        playersDict.Remove(playerId);
         
     }
 
