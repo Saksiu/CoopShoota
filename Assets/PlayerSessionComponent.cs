@@ -29,7 +29,7 @@ public class PlayerSessionComponent : NetworkBehaviour
     }
 
     private void handleClientStopped(bool wasHost){
-        SceneManager.LoadSceneAsync("PlayScene");
+        SceneManager.LoadScene("PlayScene");
     }
 
     public override void OnDestroy(){
