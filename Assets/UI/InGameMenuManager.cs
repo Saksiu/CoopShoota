@@ -29,6 +29,9 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     //NetworkList<PlayerController>
 
     private NetworkList<FixedString64Bytes> connectedPlayerNames;
+
+    //only for use for the server, workaround around dumb fucking way unity handles disconnects
+    private Dictionary<ulong, string> connectedPlayerNamesDict=new();
     private MyNetworkDiscovery m_Discovery;
 
 
@@ -69,7 +72,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     private void onPlayerNamesListChanged(NetworkListEvent<FixedString64Bytes> changeEvent){
         print($"onPlayerNamesListChanged, event type: {changeEvent.Type} for {changeEvent.Value}");
         //if(!IsServer) return;
-        /*switch(changeEvent.Type){
+        switch(changeEvent.Type){
             case NetworkListEvent<FixedString64Bytes>.EventType.Add:
                 addToDisplayedPlayersList(changeEvent.Value.ToString());
                 break;
@@ -79,34 +82,28 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
             default: case NetworkListEvent<FixedString64Bytes>.EventType.Clear:
                 clearDisplayedPlayersList();
                 break;
-        }*/
+        }
         if(changeEvent.Type==NetworkListEvent<FixedString64Bytes>.EventType.Clear){
             clearDisplayedPlayersList();
             return;
         }
-        redrawPlayerList();
-
-
     }
 
     private void handlePlayerCountChanged(NetworkManager networkManager, ConnectionEventData eventData){
         print($"handlePlayerCountChanged, event type: {eventData.EventType}, local client id: {NetworkManager.Singleton.LocalClientId}");
-
         Assert.IsTrue(IsServer,"Non-Server entity tried to handle player joined event");
 
         if(eventData.EventType==ConnectionEvent.ClientConnected){
-            connectedPlayerNames.Add(NetworkManager.ConnectedClients[eventData.ClientId].PlayerObject.GetComponent<PlayerController>().playerName.Value);
-            //redrawPlayerListClientRpc();
+            connectedPlayerNamesDict.Add(eventData.ClientId, 
+            NetworkManager.ConnectedClients[eventData.ClientId].PlayerObject
+                .GetComponent<PlayerController>().playerName.Value.ToString());
+            connectedPlayerNames.Add(connectedPlayerNamesDict[eventData.ClientId]);
         }
         else if(eventData.EventType==ConnectionEvent.ClientDisconnected){
-            connectedPlayerNames.Remove(NetworkManager.ConnectedClients[eventData.ClientId].PlayerObject.GetComponent<PlayerController>().playerName.Value);
-            //redrawPlayerListClientRpc();
+
+            connectedPlayerNames.Remove(connectedPlayerNamesDict[eventData.ClientId]);
+            connectedPlayerNamesDict.Remove(eventData.ClientId);
         }
-        //connectedPlayerNames.Clear();
-        //foreach(var client in NetworkManager.ConnectedClients.Values)
-        //    connectedPlayerNames.Add(client.PlayerObject.GetComponent<PlayerController>().playerName.Value);
-        //redrawPlayerListClientRpc();
-        //updatePlayerListClientRpc(NetworkManager.ConnectedClients[playerID].PlayerObject.GetComponent<PlayerController>().playerName.Value);
     }
 
 
