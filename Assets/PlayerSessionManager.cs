@@ -21,9 +21,9 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         //NetworkManager.Singleton.OnServerStopped-=handleLocalServerStopping;
     }
 
-    public void Update(){
+    /*public void Update(){
         print($"Session State: IsListening: {NetworkManager.Singleton.IsListening} Is Shutting down: {NetworkManager.Singleton.ShutdownInProgress} IsServer: {NetworkManager.Singleton.IsServer}, IsClient: {NetworkManager.Singleton.IsClient}, IsHost: {NetworkManager.Singleton.IsHost}");
-    }
+    }*/
     public void beginShutDown(bool exitGame=false)
     {
         print("beginshutdown called for "+NetworkManager.Singleton.LocalClientId);
@@ -60,25 +60,4 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         }
         NetworkManager.Singleton.DisconnectClient(clientID);
     }
-
-    /*private void DisconnectAllClients(ulong hostClientID){
-        //print($"disconnect request made to server for {playerID}");
-        foreach (var clientID in NetworkManager.Singleton.ConnectedClientsIds)
-        {
-            if(clientID==hostClientID) continue;
-            NetworkManager.Singleton.DisconnectClient(clientID);  
-        }
-        //NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
-    }*/
-
-    /*private void Shutdown(bool exitGame)
-    {
-        print("Shutdown called "+NetworkManager.Singleton.LocalClientId);
-        NetworkManager.Singleton.Shutdown();
-        if(exitGame){Application.Quit();}
-        else{
-            NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
-        }
-            
-    }*/
 }
