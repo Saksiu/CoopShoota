@@ -96,7 +96,8 @@ public class PlayerSessionComponent : NetworkBehaviour
     {
         print("Shutdown called "+NetworkManager.LocalClientId);
         NetworkManager.Singleton.Shutdown();
-        NetworkManager.Singleton.GetComponent<UnityTransport>().Shutdown();
+        //NetworkManager.Singleton.NetworkConfig
+        //NetworkManager.Singleton.GetComponent<UnityTransport>().Shutdown();
         if(exitGame){Application.Quit();}
         else{
             NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
