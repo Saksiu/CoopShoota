@@ -41,8 +41,9 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
     }
 
     private void handleLocalServerStopping(bool wasHost){
+        print("Server Stopped, shutting down client was host?"+wasHost);
         if(wasHost) return;
-        print("Server Stopped, shutting down client");
+        
         NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
         SceneManager.LoadScene("PlayScene");
     }
