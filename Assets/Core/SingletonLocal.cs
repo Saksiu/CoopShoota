@@ -6,10 +6,13 @@ using UnityEngine;
 public class SingletonLocal<T> : MonoBehaviour where T : Component
 {
     public static T Instance { get; private set; }
+    [SerializeField] private bool DestroyOnLoad = true;
     public virtual void Awake() {
         if (Instance == null)
         {
             Instance = this as T;
+            if(!DestroyOnLoad)
+                DontDestroyOnLoad(gameObject);
         }
         else
         {

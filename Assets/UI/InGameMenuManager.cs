@@ -178,10 +178,10 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         //if(!IsOwner) return;
         //TODO: Warning dialog
         disableInGameMenu();
-        PlayerController.localPlayer.sessionComponent.beginShutDown(exitGame: false);
+        PlayerSessionManager.Instance.beginShutDown(exitGame: false);
     }
     public void handleExitGameButtonPressed(){
-        PlayerController.localPlayer.sessionComponent.beginShutDown(exitGame: true);
+        PlayerSessionManager.Instance.beginShutDown(exitGame: true);
     }
 
     public void disableInGameMenu()=>disableCanvasGroup(MAIN_inGameMenuCanvasGroup);

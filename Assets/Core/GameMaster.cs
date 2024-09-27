@@ -228,7 +228,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     //TODO: handle host/client disconnects here probably
     public void ExitGame(){
-        PlayerController.localPlayer.sessionComponent.beginShutDown(exitGame: true);
+        PlayerSessionManager.Instance.beginShutDown(exitGame: true);
         //Application.Quit();
     }
     public override void OnDestroy()
