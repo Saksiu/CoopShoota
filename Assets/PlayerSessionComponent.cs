@@ -42,8 +42,9 @@ public class PlayerSessionComponent : NetworkBehaviour
         
         // Call the async shutdown method and wait for it to complete
         var shutdownTask = ShutdownAsync();
+        print("waiting for async shutdown to complete");
         yield return new WaitUntil(() => shutdownTask.IsCompleted);
-
+        print("async shutdown completed");
         if (exitGame)
         {
             Application.Quit();
