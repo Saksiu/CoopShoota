@@ -91,6 +91,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public override void OnNetworkDespawn()
     {
         playerName.OnValueChanged-=setName;
+        print("on network despawn called on player"+NetworkManager.LocalClientId);
         if(!IsOwner)  return;
 
         InputManager.PlayerInput.Player.RemoveCallbacks(this);
