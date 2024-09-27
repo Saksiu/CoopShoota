@@ -13,12 +13,34 @@ public class GameMaster : SingletonNetwork<GameMaster>
 {
     [SerializeField] private int minPlayers = 1;
     
-    public List<PlayerController> _players = new();
+    //public List<PlayerController> _players = new();
 
-    public PlayerController getPlayer(ulong playerId)
+    /*public List<PlayerController> getConnectedPlayers(){
+        if(!IsServer){
+            Debug.LogWarning("getConnectedPlayers called on client");
+            return null;
+        }
+        List<PlayerController> players = new();
+        foreach(var player in NetworkManager.ConnectedClients.Values)
+            if(player.PlayerObject!=null)
+                players.Add(player.PlayerObject.GetComponent<PlayerController>());
+        return players;
+    }*/
+
+    public List<PlayerController> getConnectedPlayers(){
+        if(!IsServer){
+            Debug.LogWarning("getConnectedPlayers called on client");
+            return null;
+        }
+        return playersDict.Values.ToList();
+    }
+
+    private Dictionary<ulong,PlayerController> playersDict = new();
+
+    /*public PlayerController getPlayer(ulong playerId)
     {
         return _players.Find(player => player.OwnerClientId == playerId);
-    }
+    }*/
     //[SerializeField] private RoomController runRoomController;
     [SerializeField] private List<Transform> spawnPoints;
 
@@ -57,18 +79,21 @@ public class GameMaster : SingletonNetwork<GameMaster>
         print("onPlayerJoined "+playerId+" ");
 
         if(!IsServer) return;
-        print("total players joined: "+NetworkManager.ConnectedClientsIds.Count);
+        if(playersDict.ContainsKey(playerId)) return;
+
+        
         //print(NetworkManager.ConnectedClients[playerId].PlayerObject.name);
         
         var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
-        if(player==null||_players.Contains(player))
-            return;
+        if(player!=null)
+            playersDict.Add(playerId,player);
         
-        _players.Add(player);
+        //_players.Add(player);
         
-        
+        print("total players joined: "+NetworkManager.ConnectedClientsIds.Count);
+
         //OnPlayerSpawned?.Invoke(player);
-        setPlayerPositionClientRpc(playerId,spawnPoints[_players.Count-1].position);
+        setPlayerPositionClientRpc(playerId,spawnPoints[playersDict.Count-1].position);
 
 
         player.healthComponent.OnDeathAction += OnPlayerDeath;
@@ -89,17 +114,15 @@ public class GameMaster : SingletonNetwork<GameMaster>
         if(!IsServer) return;
         //onPlayerDespawned?.Invoke();
         
-        var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
-        if(player!=null&&_players.Contains(player))
-            _players.Remove(player);
+        playersDict.Remove(playerId);
 
-        player.healthComponent.OnDeathAction -= OnPlayerDeath;
+        //player.healthComponent.OnDeathAction -= OnPlayerDeath;
 
-        if(!player.IsSpawned) return;
+        //if(!player.IsSpawned) return;
 
-        NetworkManager.DisconnectClient(playerId);
-        player.NetworkObject.Despawn();
-        DestroyPlayerObjectClientRpc(playerId);
+        //NetworkManager.DisconnectClient(playerId);
+        //player.NetworkObject.Despawn();
+        //DestroyPlayerObjectClientRpc(playerId);
         
     }
 
@@ -115,7 +138,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         if(NetworkManager.LocalClientId!=playerId) return;
 
         Destroy(NetworkManager.LocalClient.PlayerObject);
-        Destroy(NetworkManager.gameObject);
+        //Destroy(NetworkManager.gameObject);
     }
 
     [ClientRpc]
@@ -139,7 +162,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     private void onAllPlayersJoined()
     {
-        print("2 or more players joined the game "+_players.ToArray());
+        //print("2 or more players joined the game "+_players.ToArray());
         //probably unlock all game systems outside of the lobby
     }
     public void OnRunStarted(){

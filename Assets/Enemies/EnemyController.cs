@@ -87,7 +87,7 @@ public class EnemyController : NetworkBehaviour
 
     private bool anyPlayerInRange()
     {
-        foreach (var player in GameMaster.Instance._players)
+        foreach (var player in GameMaster.Instance.getConnectedPlayers())
             if(Vector3.Distance(transform.position,player.transform.position)<playerDetectionRadius)
                 return true;
 
@@ -99,7 +99,7 @@ public class EnemyController : NetworkBehaviour
         float closestDistance = float.MaxValue;
         float nextPlayerDistance;
         
-        foreach (var player in GameMaster.Instance._players)
+        foreach (var player in GameMaster.Instance.getConnectedPlayers())
         {
             if(player==null) break;
             nextPlayerDistance = Vector3.Distance(player.transform.position, transform.position);
