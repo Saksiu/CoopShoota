@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -35,15 +36,34 @@ public class PlayerSessionComponent : NetworkBehaviour
         base.OnDestroy();
     }
 
-    private IEnumerator ClientShutdownCoroutine(bool exitGame){
-        print("Shutdown called for client"+NetworkManager.LocalClientId);
+    private IEnumerator ClientShutdownCoroutine(bool exitGame)
+    {
+        Debug.Log("Shutdown called for client " + NetworkManager.LocalClientId);
+        
+        // Call the async shutdown method and wait for it to complete
+        var shutdownTask = ShutdownAsync();
+        yield return new WaitUntil(() => shutdownTask.IsCompleted);
+
+        if (exitGame)
+        {
+            Application.Quit();
+        }
+        else
+        {
+            SceneManager.LoadSceneAsync("PlayScene");
+            // MainMenuManager.Instance.EnableMainMenu();
+        }
+    }
+
+    private async Task ShutdownAsync()
+    {
         NetworkManager.Singleton.Shutdown();
         NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
-        yield return new WaitUntil(()=>!NetworkManager.Singleton.ShutdownInProgress);
-        if(exitGame){Application.Quit();}
-        else{
-            SceneManager.LoadSceneAsync("PlayScene");
-           // MainMenuManager.Instance.enableMainMenu();
+
+        // Wait until the shutdown process is complete
+        while (NetworkManager.Singleton.ShutdownInProgress)
+        {
+            await Task.Yield(); // Yield control back to the main thread
         }
     }
     
