@@ -101,6 +101,11 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         }
         else if(eventData.EventType==ConnectionEvent.ClientDisconnected){
 
+            if(!connectedPlayerNamesDict.ContainsKey(eventData.ClientId)){
+                print("received disconnect event for client before connect event was fully processed... aborting");
+                return;
+            }
+
             connectedPlayerNames.Remove(connectedPlayerNamesDict[eventData.ClientId]);
             connectedPlayerNamesDict.Remove(eventData.ClientId);
         }

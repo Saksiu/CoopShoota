@@ -120,9 +120,11 @@ public class GameMaster : SingletonNetwork<GameMaster>
         //if(!player.IsSpawned) return;
 
         //NetworkManager.DisconnectClient(playerId);
-        playersDict[playerId].NetworkObject.Despawn();
-        //DestroyPlayerObjectClientRpc(playerId);
-        playersDict.Remove(playerId);
+        if(playersDict.ContainsKey(playerId)){
+            playersDict[playerId].NetworkObject.Despawn();
+            //DestroyPlayerObjectClientRpc(playerId);
+            playersDict.Remove(playerId);
+        }
         
     }
 
