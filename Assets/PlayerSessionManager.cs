@@ -10,14 +10,14 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
 {
 
     public void Start(){
-        //NetworkManager.Singleton.OnClientStopped+=handleStopping;
-        NetworkManager.Singleton.OnServerStopped+=handleLocalServerStopping;
+        NetworkManager.Singleton.OnClientStopped+=handleClientStopping;
+        //NetworkManager.Singleton.OnServerStopped+=handleLocalServerStopping;
     }
 
     public void OnDestroy(){
         if(NetworkManager.Singleton==null) return;
-        //NetworkManager.Singleton.OnClientStopped-=handleStopping;
-        NetworkManager.Singleton.OnServerStopped-=handleLocalServerStopping;
+        NetworkManager.Singleton.OnClientStopped-=handleClientStopping;
+        //NetworkManager.Singleton.OnServerStopped-=handleLocalServerStopping;
     }
 
     public void Update(){
@@ -40,7 +40,7 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
             
     }
 
-    private void handleLocalServerStopping(bool wasHost){
+    private void handleClientStopping(bool wasHost){
         print("Server Stopped, shutting down client was host?"+wasHost);
         if(wasHost) return;
         
