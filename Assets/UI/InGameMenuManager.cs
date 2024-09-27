@@ -195,7 +195,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
             PlayerSessionManager.Instance.beginShutDown(exitGame: false);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void DisconnectClientServerRpc(ulong clientID){
         NetworkManager.Singleton.DisconnectClient(clientID);
     }
