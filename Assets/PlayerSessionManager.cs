@@ -10,14 +10,14 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
 {
 
     public void Start(){
-        NetworkManager.Singleton.OnClientStopped+=handleStopping;
-        NetworkManager.Singleton.OnServerStopped+=handleStopping;
+        //NetworkManager.Singleton.OnClientStopped+=handleStopping;
+        //NetworkManager.Singleton.OnServerStopped+=handleStopping;
     }
 
     public void OnDestroy(){
         if(NetworkManager.Singleton==null) return;
-        NetworkManager.Singleton.OnClientStopped-=handleStopping;
-        NetworkManager.Singleton.OnServerStopped-=handleStopping;
+        //NetworkManager.Singleton.OnClientStopped-=handleStopping;
+        //NetworkManager.Singleton.OnServerStopped-=handleStopping;
     }
 
     public void Update(){
@@ -31,28 +31,37 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         //caller.
         //print("beginshutdown called for "+caller.playerName.Value);
 
-        if(NetworkManager.Singleton.IsHost)
-            DisconnectAllClients();
+        //if(NetworkManager.Singleton.IsHost)
+        //    DisconnectAllClients(NetworkManager.Singleton.LocalClientId);
 
-        Shutdown(exitGame);
+        //Shutdown(exitGame);
+        StartCoroutine(shutDownCoroutine(exitGame));
         
             
     }
 
     private void handleStopping(bool wasHost){
-        StartCoroutine(safeReloadGameCoroutine());
+        //StartCoroutine(shutDownCoroutine());
     }
 
-    private IEnumerator safeReloadGameCoroutine(){
+    private IEnumerator shutDownCoroutine(bool exitGame){
+        NetworkManager.Singleton.Shutdown();
         print("waiting for singleton to finish shutting down before reload");
         yield return new WaitUntil(()=>!NetworkManager.Singleton.ShutdownInProgress);
-        SceneManager.LoadScene("PlayScene");
+        if(exitGame){Application.Quit();}
+        else{
+            NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
+            SceneManager.LoadScene("PlayScene");
+           // MainMenuManager.Instance.enableMainMenu();
+        }
+        
     }
 
-    private void DisconnectAllClients(){
+    private void DisconnectAllClients(ulong hostClientID){
         //print($"disconnect request made to server for {playerID}");
         foreach (var clientID in NetworkManager.Singleton.ConnectedClientsIds)
-        {      
+        {
+            if(clientID==hostClientID) continue;
             NetworkManager.Singleton.DisconnectClient(clientID);  
         }
         //NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
