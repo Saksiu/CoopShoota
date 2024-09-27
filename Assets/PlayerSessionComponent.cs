@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -95,6 +96,7 @@ public class PlayerSessionComponent : NetworkBehaviour
     {
         print("Shutdown called "+NetworkManager.LocalClientId);
         NetworkManager.Singleton.Shutdown();
+        NetworkManager.Singleton.GetComponent<UnityTransport>().Shutdown();
         if(exitGame){Application.Quit();}
         else{
             NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
