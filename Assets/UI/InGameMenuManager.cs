@@ -183,10 +183,21 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
         //if(!IsOwner) return;
         //TODO: Warning dialog
         disableInGameMenu();
-        PlayerSessionManager.Instance.beginShutDown(exitGame: false);
+        if(IsClient&&!IsHost)
+            DisconnectClientServerRpc(NetworkManager.LocalClientId);
+        else
+            PlayerSessionManager.Instance.beginShutDown(exitGame: false);
     }
     public void handleExitGameButtonPressed(){
-        PlayerSessionManager.Instance.beginShutDown(exitGame: true);
+        if(IsClient&&!IsHost)
+            DisconnectClientServerRpc(NetworkManager.LocalClientId);
+        else
+            PlayerSessionManager.Instance.beginShutDown(exitGame: false);
+    }
+
+    [ServerRpc]
+    private void DisconnectClientServerRpc(ulong clientID){
+        NetworkManager.Singleton.DisconnectClient(clientID);
     }
 
     public void disableInGameMenu()=>disableCanvasGroup(MAIN_inGameMenuCanvasGroup);

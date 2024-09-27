@@ -26,15 +26,6 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
     public void beginShutDown(bool exitGame=false)
     {
         print("beginshutdown called for "+NetworkManager.Singleton.LocalClientId);
-        
-        
-        //caller.
-        //print("beginshutdown called for "+caller.playerName.Value);
-
-        //if(NetworkManager.Singleton.IsHost)
-        //    DisconnectAllClients(NetworkManager.Singleton.LocalClientId);
-
-        //Shutdown(exitGame);
         StartCoroutine(shutDownCoroutine(exitGame));
         
             
@@ -61,7 +52,15 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         
     }
 
-    private void DisconnectAllClients(ulong hostClientID){
+    public void DisconnectClient(ulong clientID){
+        if(!NetworkManager.Singleton.IsServer){
+            Debug.LogWarning($"DisconnectClient for {clientID} called on non-server {NetworkManager.Singleton.LocalClientId}, aborting");
+            return;
+        }
+        NetworkManager.Singleton.DisconnectClient(clientID);
+    }
+
+    /*private void DisconnectAllClients(ulong hostClientID){
         //print($"disconnect request made to server for {playerID}");
         foreach (var clientID in NetworkManager.Singleton.ConnectedClientsIds)
         {
@@ -69,19 +68,16 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
             NetworkManager.Singleton.DisconnectClient(clientID);  
         }
         //NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
-    }
+    }*/
 
-    private void Shutdown(bool exitGame)
+    /*private void Shutdown(bool exitGame)
     {
         print("Shutdown called "+NetworkManager.Singleton.LocalClientId);
         NetworkManager.Singleton.Shutdown();
-        //NetworkManager.Singleton.NetworkConfig
-        //NetworkManager.Singleton.GetComponent<UnityTransport>().Shutdown();
         if(exitGame){Application.Quit();}
         else{
             NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
-           // MainMenuManager.Instance.enableMainMenu();
         }
             
-    }
+    }*/
 }
