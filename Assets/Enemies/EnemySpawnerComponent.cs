@@ -11,13 +11,15 @@ public class EnemySpawnerComponent : NetworkBehaviour
     //[SerializeField] private GameObject enemyPrefab;
     private List<EnemyWaveData> Waves;
 
+    public Action OnAllEnemiesSpawned;
+
 
     //[Tooltip("Global interval between each individual enemy spawn")]
     //[SerializeField] private float spawnInterval;
     
     [SerializeField] private BoxCollider spawnArea;
     
-    private Coroutine enemySpawnCoroutineRef;
+     private Coroutine enemySpawnCoroutineRef;
 
 
 
@@ -30,6 +32,12 @@ public class EnemySpawnerComponent : NetworkBehaviour
         }
     }
 
+    public void injectWaveData(List<EnemyWaveData> injectedData)
+    {
+        StopSpawningEnemies();
+        Waves = injectedData;
+    }
+
     public void BeginSpawningEnemies()
     {
         print("beginspawningenemies called on "+NetworkBehaviourId);
@@ -39,7 +47,7 @@ public class EnemySpawnerComponent : NetworkBehaviour
         enemySpawnCoroutineRef = StartCoroutine(spawnEnemyCoroutine());
     }
 
-    private void StopSpawningEnemies(){
+    public void StopSpawningEnemies(){
         if(enemySpawnCoroutineRef!=null)
             StopCoroutine(enemySpawnCoroutineRef);
                 
@@ -87,6 +95,7 @@ public class EnemySpawnerComponent : NetworkBehaviour
         base.OnDestroy();
     }
 }
+
 [Serializable]
 public class EnemyWaveData
 {

@@ -1,21 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
-
+using UnityEngine.Assertions;
+/*
+*1. Open the gate for all players, disable trigger on the client side
+*2. When player enters the arena, inform the arenaManager
+*3. Once all players join, close the gate for all of them
+*4. Re-open the gate when the run ends
+**/
 public class EntranceGateComponent : NetworkBehaviour
 {
-
     [SerializeField] private Animator gateAnimator;
 
-    [SerializeField] private Collider coll;
+    [SerializeField] private Collider entranceTrigger;
 
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         if(IsServer){
-            ArenaManager.OnRunEndAction+=handleRunEnd;
+            //ArenaManager.OnRunEndAction+=handleRunEnd;
+            ArenaManager.Instance.runPhase.OnValueChanged+=handleRunPhaseChange;
+            //ArenaManager.OnRunStartAction+=handleRunStart;
+            gateAnimator.SetBool("isOpen",true);
+        }else{
+            entranceTrigger.enabled=false;
         }
         
     }
@@ -23,32 +34,47 @@ public class EntranceGateComponent : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         if(IsServer){
-            ArenaManager.OnRunEndAction-=handleRunEnd;
-        }
-        else{
-            coll.enabled=false;
+            //ArenaManager.OnRunEndAction-=handleRunEnd;
+            ArenaManager.Instance.runPhase.OnValueChanged-=handleRunPhaseChange;
+            //ArenaManager.OnRunStartAction-=handleRunStart;
         }
 
         base.OnNetworkDespawn();
     }
 
+    private void handleRunPhaseChange(int prev, int curr){
+        print("run phase changed from "+prev+" to "+curr);
+        if(!IsServer) return;
+        if(curr<0){
+            //reset
+        }
+        else if(curr==0){
+            handleRunStart();
+        }
+        else if(curr>99){
+            handleRunEnd(true);
+        }
+    }
+    private void handleRunStart(){
+        print("run started");
+        Assert.IsTrue(IsServer,"handleRunStart called on client");
+        entranceTrigger.enabled=false;
+        gateAnimator.SetBool("isOpen",false);
+    }
     private void handleRunEnd(bool win){
-        coll.enabled=true;
+        entranceTrigger.enabled=true;
         gateAnimator.SetBool("isOpen",true);
     }
 
-    private void OnTriggerEnter(Collider other){
-
+    public void OnPlayerTriggerEnter(){
         if(!IsServer) return;
-        if(other.gameObject.TryGetComponent(out PlayerController player)){
-            //setTriggerActiveClientRpc(false,new ClientRpcParams{Send = new ClientRpcSendParams{TargetClientIds = new[] {player.OwnerClientId}}});
-            coll.enabled=false;
-            ArenaManager.Instance.onPlayerEnteredArena();
-        }
+        entranceTrigger.enabled=false;
+        ArenaManager.Instance.onPlayerEnteredArena();
     }
 
     [ClientRpc]
     private void setTriggerActiveClientRpc(bool enabled, ClientRpcParams rpcParams=default){
-        coll.enabled=enabled;
+        entranceTrigger.enabled=enabled;
+        gateAnimator.SetBool("isOpen",enabled);
     }
 }

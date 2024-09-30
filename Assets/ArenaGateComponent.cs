@@ -11,23 +11,24 @@ public class ArenaGateComponent : NetworkBehaviour
 
 
     public override void OnNetworkSpawn(){
-        EnemyWavesManager.OnWaveStart+=handleWaveStart;
-        EnemyWavesManager.OnWaveEnd+=handleWaveEnd;
+        //EnemyWavesManager.OnWaveStart+=handleWaveStart;
+        //EnemyWavesManager.OnWaveEnd+=handleWaveEnd;
         base.OnNetworkSpawn();
     }
     public void OnNetworkDeSpawn(){
-        EnemyWavesManager.OnWaveStart-=handleWaveStart;
-        EnemyWavesManager.OnWaveEnd-=handleWaveEnd;
+        //EnemyWavesManager.OnWaveStart-=handleWaveStart;
+        //EnemyWavesManager.OnWaveEnd-=handleWaveEnd;
     }
 
 
-    private void handleWaveStart(){
+    /*private void handleWaveStart(){
+        OpenGate();
         enemySpawner.BeginSpawningEnemies();
     }
 
     private void handleWaveEnd(){
 
-    }
+    }*/
 
     public void OpenGate(){
         gateAnimator.SetBool("isOpen",true);

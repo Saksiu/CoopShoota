@@ -8,14 +8,18 @@ using UnityEngine;
 
 public class ArenaManager : SingletonNetwork<ArenaManager>
 {
-    public NetworkVariable<uint> runPhase = new NetworkVariable<uint>(0);
+    public NetworkVariable<int> runPhase = new NetworkVariable<int>(-1);
 
-    public static Action OnRunStartAction;
+    public static Action<int,int> runPhaseChangedAction;
+
+    public uint maxPhaseNum = 3;
+
+    //public static Action OnRunStartAction;
 
     /// <summary>
     /// called with a bool determining if players won the run or not
     /// </summary>
-    public static event Action<bool> OnRunEndAction;
+    //public static event Action<bool> OnRunEndAction;
 
     public List<Transform> spawnPoints;
 
@@ -27,8 +31,6 @@ public class ArenaManager : SingletonNetwork<ArenaManager>
         if(!IsServer) return;
 
         EnemyHealthComponent.OnEnemyDeathAction+=OnEnemyKilled;
-
-        runPhase.OnValueChanged.Invoke(0,0);
 
     }
     public override void OnNetworkDespawn(){
@@ -42,8 +44,11 @@ public class ArenaManager : SingletonNetwork<ArenaManager>
     public void onPlayerEnteredArena(){
         if(!IsServer) return;
         playersInArena++;
-        if(playersInArena==GameMaster.Instance.getConnectedPlayers().Count){
-            OnRunStartAction?.Invoke();
+        
+        print(playersInArena+" players in the arena");
+        if(playersInArena>=GameMaster.Instance.getConnectedPlayers().Count){
+            print("all players in the arena, setting runPhase to 0");
+            setRunPhase(0);
         }
     }
 
@@ -59,7 +64,17 @@ public class ArenaManager : SingletonNetwork<ArenaManager>
 
     [ServerRpc(RequireOwnership = false)]
     public void increaseRunPhaseNumServerRpc(){
-        runPhase.Value++;
+        if(runPhase.Value==maxPhaseNum){
+            setRunPhase(100);
+            return;
+        }
+        
+        setRunPhase(runPhase.Value+1);
+    }
+    private void setRunPhase(int newPhase){
+        int prev=runPhase.Value;
+        runPhase.Value=newPhase;
+        runPhaseChangedAction?.Invoke(prev,newPhase);
     }
 }
 

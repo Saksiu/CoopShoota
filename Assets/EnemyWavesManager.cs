@@ -1,43 +1,71 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class EnemyWavesManager : SingletonNetwork<EnemyWavesManager>
 {
     
-    public static event Action OnWaveStart;
-    public static event Action OnWaveEnd;
-
-    [SerializeField] private uint maxPhaseNum = 3;
+    //public static event Action OnWaveStart;
+    //public static event Action OnWaveEnd;
 
     [SerializeField] private List<GateSpawnData> GatesSpawnData;
 
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkDespawn();
-        ArenaManager.Instance.runPhase.OnValueChanged += handleRunPhaseChanged;
+        base.OnNetworkSpawn();
+        if(!IsServer) return;
+        ArenaManager.runPhaseChangedAction += handleRunPhaseChanged;
+        //ArenaManager.OnRunStartAction += handleRunStart;
     }
 
     public override void OnNetworkDespawn()
     {
-        ArenaManager.Instance.runPhase.OnValueChanged += handleRunPhaseChanged;
+        if(IsServer){
+            ArenaManager.runPhaseChangedAction -= handleRunPhaseChanged;
+        }
+
         base.OnNetworkDespawn();
     }
 
-    private void handleRunPhaseChanged(uint prev, uint curr)
+    /*private void handleRunStart(){
+        Assert.IsTrue(IsServer,"handleRunStart called on client");
+        
+    }*/
+
+    private void handleRunPhaseChanged(int prev, int curr)
     {
+        print("run phase changed from "+prev+" to "+curr);
         if(!IsServer)return;
 
-        if(curr>=maxPhaseNum){
-            GameMaster.Instance.endRun(true);
+        if(curr<0){
+            foreach(var gateData in GatesSpawnData){
+                gateData.gate.CloseGate();
+                gateData.gate.enemySpawner.StopSpawningEnemies();
+            }
+            foreach(var enemy in FindObjectsOfType<EnemyController>()){
+            enemy.GetComponent<NetworkObject>().Despawn(true);
+            }
+            return;
         }
-
-        if(curr==0){
-
+        //default: pass all gate data to the gate enemy spawners, and open the gates
+        foreach(var gateData in GatesSpawnData){
+            gateData.gate.enemySpawner.injectWaveData(gateData.phasesData[curr].wavesData);
+            gateData.gate.OpenGate();
+            /*foreach(var phaseData in gateData.phasesData){
+                if(phaseData.wavesData.Count>curr){
+                    gateData.gate.injectSpawnerData(phaseData.wavesData);
+                    gateData.gate.OpenGate();
+                    return;
+                }
+            }*/
         }
     }
+
 }
+
 
 [Serializable]
 public class GateSpawnData{

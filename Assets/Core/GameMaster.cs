@@ -28,8 +28,9 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
     public override void OnNetworkSpawn()
     {
-        ArenaManager.OnRunStartAction += OnRunStarted;
-        ArenaManager.OnRunEndAction += endRun;
+        //ArenaManager.OnRunStartAction += OnRunStarted;
+        //ArenaManager.OnRunEndAction += endRun;
+        ArenaManager.Instance.runPhase.OnValueChanged+=handleRunPhaseChange;
         
         if(!IsServer) return;
 
@@ -40,8 +41,9 @@ public class GameMaster : SingletonNetwork<GameMaster>
     
     public override void OnNetworkDespawn()
     {
-        ArenaManager.OnRunStartAction -= OnRunStarted;
-        ArenaManager.OnRunEndAction -= endRun;
+        //ArenaManager.OnRunStartAction -= OnRunStarted;
+        //ArenaManager.OnRunEndAction -= endRun;
+        ArenaManager.Instance.runPhase.OnValueChanged-=handleRunPhaseChange;
 
         if(!IsServer) return;
 
@@ -127,9 +129,15 @@ public class GameMaster : SingletonNetwork<GameMaster>
 
 
     
-    public void OnRunStarted(){
+    private void handleRunPhaseChange(int prev, int curr){
+        if(!IsServer) return;
+        if(curr<0){
+            //reset
+        }
+        else if(curr>99){
+            endRun(true);
+        }
     }
-
     /// <summary>
     /// 
     /// </summary>
