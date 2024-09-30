@@ -37,6 +37,7 @@ public class EnemyHealthComponent : NetworkBehaviour
 
     private void Update()
     {
+        if(PlayerController.localPlayer==null) return;
         enemyCanvas.transform.LookAt(PlayerController.localPlayer.transform);
     }
 

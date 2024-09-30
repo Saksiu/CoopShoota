@@ -26,6 +26,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public PlayerInteractor playerInteractor;
     
     public Rigidbody rb;
+    public CapsuleCollider coll;
 
     public NetworkVariable<NetworkObjectReference> currentGun=new();
     public GunController getGunReference()=>((NetworkObject)currentGun.Value).GetComponent<GunController>();
@@ -42,6 +43,8 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
     [SerializeField] private float groundDrag=5f;
     [SerializeField] private float airDrag=0.1f;
+
+    [SerializeField] private float stepHeight=0.6f;
 
     [Tooltip("Don't add mid air force if player is moving faster than this")]
     private bool MovementEnabled = true;
@@ -137,16 +140,20 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     private void FixedUpdate()
     {
         if(!IsOwner) return;
+        if(!MovementEnabled) return;
 
         Vector2 moveDirInput=InputManager.PlayerInput.Player.Move.ReadValue<Vector2>();
         Vector3 movementDirection = transform.TransformDirection(moveDirInput.x,0,moveDirInput.y);
-        
-        if(!MovementEnabled) return;
 
         if(isGrounded()){
             rb.drag = groundDrag;
             //rb.velocity = new Vector3(movementDirection.x, rb.velocity.y, movementDirection.z);
             rb.AddForce(movementDirection*walkSpeed,ForceMode.VelocityChange);
+            Vector3 stepMoveOffset=getStepMovePos(movementDirection);
+            //print("got step height "+stepMoveOffset);
+            if(stepMoveOffset.magnitude>0){
+                rb.MovePosition(stepMoveOffset);
+            }
         }
         else{
             rb.drag = airDrag;
@@ -155,6 +162,35 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
 
         //rb.velocity = ;
 
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="moveDir"></param>
+    /// <returns>the next step edge position, or Vector3.zero if no steps were found</returns>
+    private Vector3 getStepMovePos(Vector3 moveDir){
+        //moveDir.Normalize();
+
+        Vector3 basePos=new Vector3(
+            coll.bounds.center.x,
+            coll.bounds.center.y-((coll.bounds.center.y-coll.bounds.min.y)*0.95f),
+            //coll.bounds.center.y,
+            coll.bounds.center.z);
+
+        float checkDistance=coll.bounds.extents.x;
+        RaycastHit[] hits=Physics.RaycastAll(basePos, moveDir.normalized*checkDistance, checkDistance);
+
+        //Physics.Raycast(basePos, new Vector3(moveDir.x,0,moveDir.y), out RaycastHit hit, checkDistance);
+        Debug.DrawRay(basePos, moveDir.normalized*checkDistance, Color.blue, 0.1f);
+
+        foreach(var h in hits){
+           // print("hit "+h.collider.gameObject.name+" "+h.collider.gameObject.layer);
+            if(h.collider.gameObject.layer==LayerMask.NameToLayer("Ground")){
+                return new Vector3(h.point.x, h.point.y+(stepHeight*2.0f), h.point.z);
+            }
+        }
+        return Vector3.zero;
     }
 
     #region input
@@ -299,6 +335,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
         //grounded check
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * checkGroundDistance);
+
     }
 
 }

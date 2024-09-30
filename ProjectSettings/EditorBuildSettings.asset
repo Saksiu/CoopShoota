@@ -11,5 +11,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PlayScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 0
+    path: Assets/Scenes/Prot_Level1.unity
+    guid: 62cd8f82b46b9b34ab7063c1b29d1d38
+  - enabled: 1
+    path: Assets/Scenes/Prot_Arena1.unity
+    guid: fc5ed88cf4fa3434a8df8529259c8d61
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 8e18411c183ac3f4a827093773986cd9, type: 2}

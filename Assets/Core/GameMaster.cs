@@ -12,43 +12,42 @@ using UnityEngine.SceneManagement;
 public class GameMaster : SingletonNetwork<GameMaster>
 {
     [SerializeField] private int minPlayers = 1;
-    
-    //public List<PlayerController> _players = new();
-
-    /*public List<PlayerController> getConnectedPlayers(){
-        if(!IsServer){
-            Debug.LogWarning("getConnectedPlayers called on client");
-            return null;
-        }
-        List<PlayerController> players = new();
-        foreach(var player in NetworkManager.ConnectedClients.Values)
-            if(player.PlayerObject!=null)
-                players.Add(player.PlayerObject.GetComponent<PlayerController>());
-        return players;
-    }*/
 
     public List<PlayerController> getConnectedPlayers(){
-        if(!IsServer){
-            Debug.LogWarning("getConnectedPlayers called on client");
-            return null;
-        }
+        Assert.IsTrue(IsServer,"getConnectedPlayers called on client");
+        
         return playersDict.Values.ToList();
     }
 
     private Dictionary<ulong,PlayerController> playersDict = new();
 
-    /*public PlayerController getPlayer(ulong playerId)
-    {
-        return _players.Find(player => player.OwnerClientId == playerId);
-    }*/
-    //[SerializeField] private RoomController runRoomController;
     [SerializeField] private List<Transform> spawnPoints;
 
+    private Dictionary<ulong,Transform> assignedSpawnPoints = new();
 
-    //public Action<PlayerController> OnPlayerSpawned;
 
-    //public static Action onPlayerSpawned;
-    //public static Action onPlayerDespawned;
+    public override void OnNetworkSpawn()
+    {
+        ArenaManager.OnRunStartAction += OnRunStarted;
+        ArenaManager.OnRunEndAction += endRun;
+        
+        if(!IsServer) return;
+
+        NetworkManager.OnClientConnectedCallback += onPlayerJoined;
+        NetworkManager.OnClientDisconnectCallback += onPlayerLeft;
+    }
+
+    
+    public override void OnNetworkDespawn()
+    {
+        ArenaManager.OnRunStartAction -= OnRunStarted;
+        ArenaManager.OnRunEndAction -= endRun;
+
+        if(!IsServer) return;
+
+        NetworkManager.OnClientConnectedCallback -= onPlayerJoined;
+        NetworkManager.OnClientDisconnectCallback -= onPlayerLeft;
+    }
 
     public void printServerFoundMessage(IPEndPoint endPoint, DiscoveryResponseData data)
     {
@@ -56,23 +55,6 @@ public class GameMaster : SingletonNetwork<GameMaster>
     }
 
     public float respawnTime = 3f;
-
-    //private NetworkManager initialNetworkManager;
-    public override void Awake()
-    {
-        //we REALLY probably don't wanna do this
-        /*if(initialNetworkManager==null)
-            initialNetworkManager = NetworkManager.Singleton;
-        FindObjectsOfType<NetworkManager>().ToList().ForEach(nm => {
-            if(nm!=initialNetworkManager){
-                print("found duplicate network manager "+nm.gameObject.name+" destroying it");
-                Destroy(nm.gameObject);
-            }
-        });
-        initialNetworkManager.SetSingleton();*/
-        base.Awake();
-        //Cursor.lockState = CursorLockMode.Locked;
-    }
 
     public void onPlayerJoined(ulong playerId)
     {
@@ -87,19 +69,20 @@ public class GameMaster : SingletonNetwork<GameMaster>
         var player = NetworkManager.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerController>();
         if(player!=null)
             playersDict.Add(playerId,player);
-        
+
+        assignedSpawnPoints.Add(playerId,spawnPoints[playersDict.Count-1]);
         //_players.Add(player);
         
         print("total players joined: "+NetworkManager.ConnectedClientsIds.Count);
 
         //OnPlayerSpawned?.Invoke(player);
-        setPlayerPositionClientRpc(playerId,spawnPoints[playersDict.Count-1].position);
+        setPlayerPositionClientRpc(playerId,assignedSpawnPoints[playerId].position);
 
 
         player.healthComponent.OnDeathAction += OnPlayerDeath;
         
-        if (NetworkManager.ConnectedClientsIds.Count >= minPlayers)
-            onAllPlayersJoined();
+        //if (NetworkManager.ConnectedClientsIds.Count >= minPlayers)
+        //    onAllPlayersJoined();
         //onPlayerSpawned?.Invoke();
     }
 
@@ -124,23 +107,9 @@ public class GameMaster : SingletonNetwork<GameMaster>
             playersDict[playerId].NetworkObject.Despawn();
             //DestroyPlayerObjectClientRpc(playerId);
             playersDict.Remove(playerId);
+            assignedSpawnPoints.Remove(playerId);
         }
         
-    }
-
-    private Vector3 getRandomLobbySpawnPos(){
-        return spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)].position;
-    }
-    private Vector3 getRandomRunSpawnPos(){
-        return RoomController.Instance.spawnPoints[UnityEngine.Random.Range(0, RoomController.Instance.spawnPoints.Count)].position;
-    }
-
-    [ClientRpc]
-    private void DestroyPlayerObjectClientRpc(ulong playerId){
-        if(NetworkManager.LocalClientId!=playerId) return;
-
-        Destroy(NetworkManager.LocalClient.PlayerObject);
-        //Destroy(NetworkManager.gameObject);
     }
 
     [ClientRpc]
@@ -157,45 +126,35 @@ public class GameMaster : SingletonNetwork<GameMaster>
     }
 
 
-    [ClientRpc]
-    private void resetAllPlayersPositionsToLobbyClientRpc(){
-        setPlayerPositionClientRpc(NetworkManager.LocalClientId,getRandomLobbySpawnPos());
-    }
-
-    private void onAllPlayersJoined()
-    {
-        //print("2 or more players joined the game "+_players.ToArray());
-        //probably unlock all game systems outside of the lobby
-    }
+    
     public void OnRunStarted(){
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="win"></param>
     public void endRun(bool win){
-        resetAllPlayersPositionsToLobbyClientRpc();
+        resetAllPlayersServerRpc();
         displayPromptForAllPlayersClientRpc(win?"You win!":"You lose!",3f);
     }
+
+    [ServerRpc]
+    private void resetAllPlayersServerRpc(){
+        foreach(var player in playersDict.Values){
+            player.healthComponent.resetHPServerRpc();
+            setPlayerPositionClientRpc(player.OwnerClientId,getPlayerSpawnPosition(player.OwnerClientId));
+        }
+    }
+
+    private Vector3 getPlayerSpawnPosition(ulong playerId)=>assignedSpawnPoints[playerId].position;
 
     [ClientRpc]
     public void displayPromptForAllPlayersClientRpc(string message,float duration){
         HUDManager.Instance.showPromptFor(message,duration);
     }
 
-    public override void OnNetworkSpawn()
-    {
-        RoomController.Instance.OnRunStartAction += OnRunStarted;
-        RoomController.Instance.OnRunEndAction += endRun;
-        
-        if(!IsServer) return;
-
-        NetworkManager.OnClientConnectedCallback += onPlayerJoined;
-        NetworkManager.OnClientDisconnectCallback += onPlayerLeft;
-
-        /*if (!IsServer)
-        {
-            
-        }*/
-        //_currentRoomController = FindObjectsOfType<RoomController>();
-    }
+    
 
     public void OnPlayerDeath(PlayerController deadPlayer)
     {
@@ -212,21 +171,9 @@ public class GameMaster : SingletonNetwork<GameMaster>
         
         yield return new WaitForSeconds(respawnTime);
         player.healthComponent.resetHPServerRpc();
-        setPlayerPositionClientRpc(player.OwnerClientId,getRandomRunSpawnPos());
+        setPlayerPositionClientRpc(player.OwnerClientId,getPlayerSpawnPosition(player.OwnerClientId));
     }
 
-    public override void OnNetworkDespawn()
-    {
-        RoomController.Instance.OnRunStartAction -= OnRunStarted;
-        RoomController.Instance.OnRunEndAction -= endRun;
-
-        if(!IsServer) return;
-
-        NetworkManager.OnClientConnectedCallback -= onPlayerJoined;
-        NetworkManager.OnClientDisconnectCallback -= onPlayerLeft;
-
-        
-    }
 
     //TODO: handle host/client disconnects here probably
     public void ExitGame(){

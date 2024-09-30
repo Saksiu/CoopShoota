@@ -35,7 +35,7 @@ public class InGameMenuManager : SingletonNetwork<InGameMenuManager>
     private MyNetworkDiscovery m_Discovery;
 
 
-    public override void Awake(){
+    public void Start(){
         base.Awake();
         m_Discovery=NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>();
         connectedPlayerNames=new NetworkList<FixedString64Bytes>(
