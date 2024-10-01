@@ -176,7 +176,8 @@ public class GunController : NetworkBehaviour
             print("requested shot with no ammo left, aborting");
             return;
         }
-        GunsManager.Instance.setAmmoServerRpc(senderClientId,gunName,AmmoLeft-1);
+
+        GunsManager.Instance.addAmmoServerRpc(senderClientId,gunName,-1);
         FireBullet(dir,initPos);
         FireBulletClientRpc(dir,initPos);
     }
@@ -184,6 +185,9 @@ public class GunController : NetworkBehaviour
     [ClientRpc]
     private void FireBulletClientRpc(Vector3 dir,Vector3 initPos)
     {
+        if(AmmoLeft<=0){
+            return;
+        }
         FireBullet(dir,initPos);
     }
 

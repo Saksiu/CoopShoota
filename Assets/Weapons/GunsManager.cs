@@ -43,34 +43,42 @@ public class GunsManager : SingletonNetwork<GunsManager>
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void setAmmoServerRpc(ulong clientID, string gunName, uint ammo){
+    [ServerRpc]
+    private void setAmmoServerRpc(ulong clientID, string gunName, uint ammo){
         print("setting ammo "+ammo+" to "+gunName+" for player P"+clientID);
         //if(playerAmmoDict[clientID][gunName]==ammo) return;
-        if(playerAmmoDict[clientID][gunName]<1&&ammo<0){
-            Debug.LogError("attempting to set uint ammo to negative value!!!\n aborting");
-            return;
-        }
+        
         playerAmmoDict[clientID][gunName]=ammo;
-        setAmmoClientRpc(ammo,new ClientRpcParams{
+        setAmmoClientRpc(gunName,ammo,new ClientRpcParams{
             Send=new ClientRpcSendParams{
                 TargetClientIds=new ulong[]{clientID}}});
     }
 
     [ClientRpc]
-    private void setAmmoClientRpc(uint newAmmo, ClientRpcParams receiveParams = default){
+    private void setAmmoClientRpc(string gunName,uint newAmmo, ClientRpcParams receiveParams = default){
         print("setting ammo client rpc "+newAmmo+" on client "+NetworkManager.LocalClientId);
-        PlayerController.localPlayer.getGunReference().AmmoLeft=newAmmo;
+        if(PlayerController.localPlayer.getGunReference().gunName==gunName)
+            PlayerController.localPlayer.getGunReference().AmmoLeft=newAmmo;
     }
 
 
-    [ServerRpc]
-    public void addAmmoServerRpc(ulong clientID, string gunName, uint ammo){
-        print("adding ammo "+ammo+" to "+gunName+" for player P"+NetworkManager.LocalClientId);
-        if(!hasAmmoForKey(clientID,gunName)) playerAmmoDict[clientID].Add(gunName,ammo);
-        else setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName)+ammo);
+    [ServerRpc(RequireOwnership = false)]
+    public void addAmmoServerRpc(ulong clientID, string gunName, int change){
+        print("adding ammo "+change+" to "+gunName+" for player P"+NetworkManager.LocalClientId);
+        
+        if(!hasAmmoForKey(clientID,gunName)&&change>=0) {playerAmmoDict[clientID].Add(gunName,(uint)change);}
+        else {
+            if(playerAmmoDict[clientID][gunName]+change<0){
+                Debug.LogError($"attempting to change {gunName} weapon ammo for client {clientID} resulting in negative number!!!\n aborting");
+                return;
+                }
+            }
+            setAmmoServerRpc(clientID,gunName,(uint)((int)getAmmoLeft(clientID,gunName)+change));
         //getGunReference().AmmoLeft=playerAmmoDict[clientID][gunName];
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void addAmmoServerRpc(ulong clientID, string gunName, uint change)=>addAmmoServerRpc(clientID,gunName,(int)change);    
 
 
     [ServerRpc(RequireOwnership = false)]
