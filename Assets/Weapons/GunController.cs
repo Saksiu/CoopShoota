@@ -20,7 +20,7 @@ public class GunController : NetworkBehaviour
 
 
     private uint Internal_Ammoleft=0;
-    private uint AmmoLeft{
+    public uint AmmoLeft{
         get=>Internal_Ammoleft;
         set{
             Internal_Ammoleft=value;
@@ -83,12 +83,14 @@ public class GunController : NetworkBehaviour
         
         //transform.Rotate(0, 90, 0);
     }
-
     private void onAmmoLeftValueChanged(uint newAmmo)
     {
         if (!IsOwner) return;
-        //print("ammo left changed from " + prev + " to " + curr+" on "+NetworkManager.LocalClientId+" is he the fuckin owner?"+IsOwner);
+        print("ammo left changed to " + newAmmo+ " on "+NetworkManager.LocalClientId+" is owner?"+IsOwner);
         HUDManager.Instance.updateAmmoLeft(newAmmo);
+    }
+    public void resetAmmoCount(){
+        AmmoLeft=initialAmmo;
     }
 
 
@@ -113,6 +115,13 @@ public class GunController : NetworkBehaviour
             cameraShakeEffect.GenerateImpulse();
         }
     }
+
+    [ClientRpc]
+    public void onAmmoChangedClientRpc(uint newAmmo){
+        //print("onammochangedClientRpc called "+NetworkManager.LocalClientId);
+        if(!isControlledByPlayer) return;
+        AmmoLeft=newAmmo;
+    }
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
         if(parentNetworkObject==null) return;
@@ -121,12 +130,9 @@ public class GunController : NetworkBehaviour
             gunAnchor=player.playerCamera.transform.GetChild(2);
             gunNozzle=player.CamNozzle;
 
-            //print("gun on parent changed: owner? "+IsOwner+" id: "+NetworkManager.LocalClientId);
+            print("gun on parent changed: owner? "+IsOwner+" id: "+NetworkManager.LocalClientId);
             if(IsOwner){
-                if(!player.hasAmmoForKey(gunName))
-                    player.setAmmoForKey(gunName,initialAmmo);
-                    
-                AmmoLeft=player.getAmmoLeft(gunName);
+                GunsManager.Instance.OnGunEquippedServerRpc(NetworkManager.LocalClientId,gunName,initialAmmo);
             }
                 
                 
@@ -167,7 +173,7 @@ public class GunController : NetworkBehaviour
     [ServerRpc]
     private void RequestFireServerRpc(Vector3 dir,Vector3 initPos)
     {
-        
+        GunsManager.Instance.setAmmoServerRpc(NetworkManager.LocalClientId,gunName,AmmoLeft-1);
         FireBullet(dir,initPos);
         FireBulletClientRpc(dir,initPos);
     }
@@ -175,8 +181,7 @@ public class GunController : NetworkBehaviour
     [ClientRpc]
     private void FireBulletClientRpc(Vector3 dir,Vector3 initPos)
     {
-        if(IsOwner) AmmoLeft--;
-        else FireBullet(dir,initPos);
+        FireBullet(dir,initPos);
     }
 
     private void FireBullet(Vector3 dir,Vector3 initPos)

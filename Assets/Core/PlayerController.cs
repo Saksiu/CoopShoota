@@ -55,22 +55,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     /// <summary>
     /// Dictionary of player ammo, with gun names as keys
     /// </summary>
-    private Dictionary<string,uint> playerAmmo = new();
-    public bool hasAmmoForKey(string gunName)=>playerAmmo.ContainsKey(gunName);
-    public uint getAmmoLeft(string gunName)=>playerAmmo[gunName];
-    public void setAmmoForKey(string gunName, uint ammo)=>playerAmmo[gunName]=ammo;
-    private void addAmmo(string gunName, uint ammo){
-        if(!hasAmmoForKey(gunName)) playerAmmo.Add(gunName,ammo);
-        else playerAmmo[gunName]+=ammo;   
-    }
-
-    public void addAmmoToCurrentGun(uint ammo){
-        if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
-            print("No gun held to add ammo to, how?");
-            return;
-        }
-        addAmmo(getGunReference().gunName,ammo);
-    }
+    
 
 
     //private float verticalAngle=0.0f;

@@ -20,6 +20,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     }
 
     private Dictionary<ulong,PlayerController> playersDict = new();
+    public PlayerController getPlayer(ulong playerID)=>playersDict[playerID];
 
     [SerializeField] private List<Transform> spawnPoints;
 
@@ -180,6 +181,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         yield return new WaitForSeconds(respawnTime);
         ArenaManager.Instance.OnPlayerKilledServerRpc(player.OwnerClientId);
         player.healthComponent.resetHPServerRpc();
+        player.getGunReference()?.resetAmmoCount();
         setPlayerPositionClientRpc(player.OwnerClientId,getPlayerSpawnPosition(player.OwnerClientId));
     }
 

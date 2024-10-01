@@ -29,6 +29,8 @@ public class DashingComponent : MonoBehaviour
     }
 
     private IEnumerator dashCoroutine(Vector3 moveDir){
+        Vector3 initVelocity=PlayerController.localPlayer.rb.velocity;
+        initVelocity.y=0;
         PlayerController.localPlayer.onDashFromComponent(dashDuration);
 
         PlayerController.localPlayer.rb.useGravity = false;
@@ -39,7 +41,7 @@ public class DashingComponent : MonoBehaviour
         //rumbleCameraEffect.GenerateImpulse();
         yield return new WaitForSeconds(dashDuration);
         PlayerController.localPlayer.rb.useGravity = true;
-        PlayerController.localPlayer.rb.velocity = Vector3.zero;
+        PlayerController.localPlayer.rb.velocity = 0.8f * initVelocity.magnitude * moveDir.normalized;
         
     }
 
