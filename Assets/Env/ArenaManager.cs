@@ -5,12 +5,13 @@ using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class ArenaManager : SingletonNetwork<ArenaManager>
 {
-    public NetworkVariable<int> runPhase = new NetworkVariable<int>(-1);
+    private int runPhase = -1;
 
-    public static Action<int,int> runPhaseChangedAction;
+    public static Action<int,int> runPhaseChanged;
 
     public uint maxPhaseNum = 3;
 
@@ -63,18 +64,28 @@ public class ArenaManager : SingletonNetwork<ArenaManager>
     }
 
     [ServerRpc(RequireOwnership = false)]
+    public void OnPlayerKilledServerRpc(ulong playerID){
+        print("received OnPlayerKilledServerRpc in arena manager");
+        playersInArena--;
+        if(playersInArena<=0){
+            print("all players dead, resetting run phase");
+            setRunPhase(-1);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
     public void increaseRunPhaseNumServerRpc(){
-        if(runPhase.Value==maxPhaseNum){
+        if(runPhase==maxPhaseNum){
             setRunPhase(100);
             return;
         }
         
-        setRunPhase(runPhase.Value+1);
+        setRunPhase(runPhase+1);
     }
     private void setRunPhase(int newPhase){
-        int prev=runPhase.Value;
-        runPhase.Value=newPhase;
-        runPhaseChangedAction?.Invoke(prev,newPhase);
+        int prev=runPhase;
+        runPhase=newPhase;
+        runPhaseChanged?.Invoke(prev,newPhase);
     }
 }
 

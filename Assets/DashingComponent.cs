@@ -18,19 +18,29 @@ public class DashingComponent : MonoBehaviour
     
     private bool canDash = true;
     
-    public void Dash()
+    public void Dash(Vector3 moveDir)
     {
         if(!canDash) return;
-        
-        Vector3 direction = PlayerController.localPlayer.playerCamera.transform.forward;
-        
-        PlayerController.localPlayer.onDashFromComponent(dashDuration);
-        
-        PlayerController.localPlayer.rb.velocity = Vector3.zero;
-        PlayerController.localPlayer.rb.AddForce(direction.normalized*dashForce,ForceMode.Impulse);
-        rumbleCameraEffect.GenerateImpulse();
-        
         StartCoroutine(dashCooldownCoroutine());
+        StartCoroutine(dashCoroutine(moveDir));
+        //Vector3 direction = PlayerController.localPlayer.playerCamera.transform.forward;
+        
+        
+    }
+
+    private IEnumerator dashCoroutine(Vector3 moveDir){
+        PlayerController.localPlayer.onDashFromComponent(dashDuration);
+
+        PlayerController.localPlayer.rb.useGravity = false;
+        PlayerController.localPlayer.rb.velocity = Vector3.zero;
+        PlayerController.localPlayer.rb.drag=PlayerController.localPlayer.getGroundDrag();
+
+        PlayerController.localPlayer.rb.AddForce(moveDir.normalized*dashForce,ForceMode.Impulse);
+        //rumbleCameraEffect.GenerateImpulse();
+        yield return new WaitForSeconds(dashDuration);
+        PlayerController.localPlayer.rb.useGravity = true;
+        PlayerController.localPlayer.rb.velocity = Vector3.zero;
+        
     }
 
     private IEnumerator dashCooldownCoroutine()

@@ -920,9 +920,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7291ad74b45f5d84f8aa4f3fd228d7d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dashForce: 2000
+  dashForce: 8000
   dashCooldown: 2
-  dashDuration: 0.5
+  dashDuration: 0.2
   rumbleCameraEffect: {fileID: 5700577814458290137}
 --- !u!114 &2606058140669270406
 MonoBehaviour:

@@ -187,6 +187,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyGate_West
       objectReference: {fileID: 0}
+    - target: {fileID: 2279833190241816115, guid: 1af0e3ef6d68f4046ab91fa8cd783f4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3865936067271005221, guid: 1af0e3ef6d68f4046ab91fa8cd783f4a, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -5242,6 +5246,7 @@ Transform:
   - {fileID: 1709759}
   - {fileID: 1024245103}
   - {fileID: 1826355560}
+  - {fileID: 1887057379}
   m_Father: {fileID: 7771504027993549648}
   m_LocalEulerAnglesHint: {x: 0, y: 22.5, z: 0}
 --- !u!64 &481368813
@@ -12690,6 +12695,10 @@ PrefabInstance:
     - target: {fileID: 2279833190241816115, guid: 1af0e3ef6d68f4046ab91fa8cd783f4a, type: 3}
       propertyPath: m_Name
       value: EnemyGate_East
+      objectReference: {fileID: 0}
+    - target: {fileID: 2279833190241816115, guid: 1af0e3ef6d68f4046ab91fa8cd783f4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3865936067271005221, guid: 1af0e3ef6d68f4046ab91fa8cd783f4a, type: 3}
       propertyPath: m_Mesh
@@ -20738,6 +20747,69 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2565397459774660781, guid: b10fa565ae0175042a99988e76765857, type: 3}
   m_PrefabInstance: {fileID: 1875352762}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1887057378
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1887057379}
+  - component: {fileID: 1887057380}
+  m_Layer: 0
+  m_Name: NavMesh Surface
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1887057379
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1887057378}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.19509031, z: -0, w: 0.98078537}
+  m_LocalPosition: {x: 0, y: -61, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 481368812}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1887057380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1887057378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_CollectObjects: 1
+  m_Size: {x: 203.91522, y: 17.434116, z: 243.42639}
+  m_Center: {x: 9.998932, y: 5.717058, z: 0.05444336}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 42878fb30a17e434d910ad9ab4658cfd, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &1983719213
 GameObject:
   m_ObjectHideFlags: 0
@@ -22818,6 +22890,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyGate_North
       objectReference: {fileID: 0}
+    - target: {fileID: 2279833190241816115, guid: 1af0e3ef6d68f4046ab91fa8cd783f4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3865936067271005221, guid: 1af0e3ef6d68f4046ab91fa8cd783f4a, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -22916,8 +22992,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a7a312b2c95f3045ae27edb892893e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runPhase:
-    m_InternalValue: 0
   maxPhaseNum: 3
   spawnPoints:
   - {fileID: 5427491314733849582}
@@ -22940,24 +23014,126 @@ MonoBehaviour:
   - gate: {fileID: 1201926602}
     phasesData:
     - wavesData:
-      - enemyPrefab: {fileID: 0}
-        enemyCount: 0
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
         waveInitDelay: 0
-        spawnInterval: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
     - wavesData:
-      - enemyPrefab: {fileID: 0}
-        enemyCount: 0
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
         waveInitDelay: 0
-        spawnInterval: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
     - wavesData:
-      - enemyPrefab: {fileID: 0}
-        enemyCount: 0
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
         waveInitDelay: 0
-        spawnInterval: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
   - gate: {fileID: 1709760}
-    phasesData: []
+    phasesData:
+    - wavesData:
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
+        waveInitDelay: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
+    - wavesData:
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
+        waveInitDelay: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
+    - wavesData:
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
+        waveInitDelay: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
   - gate: {fileID: 1024245104}
-    phasesData: []
+    phasesData:
+    - wavesData:
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
+        waveInitDelay: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
+    - wavesData:
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
+        waveInitDelay: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
+    - wavesData:
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 5
+        waveInitDelay: 2
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 10
+        waveInitDelay: 0
+        spawnInterval: 1
+      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+        enemyCount: 15
+        waveInitDelay: 0
+        spawnInterval: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

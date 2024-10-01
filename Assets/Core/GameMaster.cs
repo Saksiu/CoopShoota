@@ -30,7 +30,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     {
         //ArenaManager.OnRunStartAction += OnRunStarted;
         //ArenaManager.OnRunEndAction += endRun;
-        ArenaManager.Instance.runPhase.OnValueChanged+=handleRunPhaseChange;
+        ArenaManager.runPhaseChanged+=handleRunPhaseChange;
         
         if(!IsServer) return;
 
@@ -43,7 +43,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
     {
         //ArenaManager.OnRunStartAction -= OnRunStarted;
         //ArenaManager.OnRunEndAction -= endRun;
-        ArenaManager.Instance.runPhase.OnValueChanged-=handleRunPhaseChange;
+        ArenaManager.runPhaseChanged-=handleRunPhaseChange;
 
         if(!IsServer) return;
 
@@ -178,6 +178,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         Assert.IsTrue(IsServer);
         
         yield return new WaitForSeconds(respawnTime);
+        ArenaManager.Instance.OnPlayerKilledServerRpc(player.OwnerClientId);
         player.healthComponent.resetHPServerRpc();
         setPlayerPositionClientRpc(player.OwnerClientId,getPlayerSpawnPosition(player.OwnerClientId));
     }

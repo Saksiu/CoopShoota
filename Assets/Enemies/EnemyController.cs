@@ -35,7 +35,7 @@ public class EnemyController : NetworkBehaviour
         StateMachineState chase = new StateMachineState("chase", onStartChase, onUpdateChase, null);
         
         idle.AddTransition(anyPlayerInRange, chase);
-        chase.AddTransition(()=>!anyPlayerInRange(), idle);
+        //chase.AddTransition(()=>!anyPlayerInRange(), idle);
         stateMachine.CurrentState = idle;
 
 
@@ -73,7 +73,7 @@ public class EnemyController : NetworkBehaviour
             if(target==null) return;
         }
 
-        if(Vector3.Distance(transform.position,target.position)>playerDetectionRadius) return;
+        //if(Vector3.Distance(transform.position,target.position)>playerDetectionRadius) return;
 
         agent.SetDestination(target.position);
         agent.CalculatePath(target.position,agent.path);
@@ -87,11 +87,12 @@ public class EnemyController : NetworkBehaviour
 
     private bool anyPlayerInRange()
     {
-        foreach (var player in GameMaster.Instance.getConnectedPlayers())
+        return true;
+        /*foreach (var player in GameMaster.Instance.getConnectedPlayers())
             if(Vector3.Distance(transform.position,player.transform.position)<playerDetectionRadius)
                 return true;
 
-        return false;
+        return false;*/
     }
 
     private Transform getClosestPlayer(){

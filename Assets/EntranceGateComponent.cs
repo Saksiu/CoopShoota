@@ -22,7 +22,7 @@ public class EntranceGateComponent : NetworkBehaviour
         base.OnNetworkSpawn();
         if(IsServer){
             //ArenaManager.OnRunEndAction+=handleRunEnd;
-            ArenaManager.Instance.runPhase.OnValueChanged+=handleRunPhaseChange;
+            ArenaManager.runPhaseChanged+=handleRunPhaseChange;
             //ArenaManager.OnRunStartAction+=handleRunStart;
             gateAnimator.SetBool("isOpen",true);
         }else{
@@ -35,7 +35,7 @@ public class EntranceGateComponent : NetworkBehaviour
     {
         if(IsServer){
             //ArenaManager.OnRunEndAction-=handleRunEnd;
-            ArenaManager.Instance.runPhase.OnValueChanged-=handleRunPhaseChange;
+            ArenaManager.runPhaseChanged-=handleRunPhaseChange;
             //ArenaManager.OnRunStartAction-=handleRunStart;
         }
 

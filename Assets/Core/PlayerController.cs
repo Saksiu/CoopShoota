@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Numerics;
+using System.Reflection.Emit;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -42,18 +44,42 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     [SerializeField] private float walkSpeed=5;
 
     [SerializeField] private float groundDrag=5f;
+    public float getGroundDrag()=>groundDrag;
     [SerializeField] private float airDrag=0.1f;
 
     [SerializeField] private float stepHeight=0.6f;
 
     [Tooltip("Don't add mid air force if player is moving faster than this")]
     private bool MovementEnabled = true;
+
+    /// <summary>
+    /// Dictionary of player ammo, with gun names as keys
+    /// </summary>
+    private Dictionary<string,uint> playerAmmo = new();
+    public bool hasAmmoForKey(string gunName)=>playerAmmo.ContainsKey(gunName);
+    public uint getAmmoLeft(string gunName)=>playerAmmo[gunName];
+    public void setAmmoForKey(string gunName, uint ammo)=>playerAmmo[gunName]=ammo;
+    private void addAmmo(string gunName, uint ammo){
+        if(!hasAmmoForKey(gunName)) playerAmmo.Add(gunName,ammo);
+        else playerAmmo[gunName]+=ammo;   
+    }
+
+    public void addAmmoToCurrentGun(uint ammo){
+        if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
+            print("No gun held to add ammo to, how?");
+            return;
+        }
+        addAmmo(getGunReference().gunName,ammo);
+    }
+
+
     //private float verticalAngle=0.0f;
 
     //public PlayerSessionManager sessionComponent;
     /*private void Awake(){
         sessionComponent=GetComponent<PlayerSessionManager>();
     }*/
+
 
     public override void OnNetworkSpawn()
     {
@@ -217,18 +243,23 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     {
         if(!context.performed) return;
 
+        /*
+
         if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
             print("No gun to reload");
             return;
         }
 
         getGunReference().Reload();
+        */
     }
 
     public void OnDash(InputAction.CallbackContext context)
     {
         if(context.performed){
-            dashComponent.Dash();
+            Vector2 moveDirInput=InputManager.PlayerInput.Player.Move.ReadValue<Vector2>();
+            Vector3 movementDirection = transform.TransformDirection(moveDirInput.x,0,moveDirInput.y);
+            dashComponent.Dash(movementDirection);
         }
             
     }
@@ -269,6 +300,7 @@ public class PlayerController : NetworkBehaviour, PlayerInputGenerated.IPlayerAc
     public void disableMovement(){
         MovementEnabled = false;
         rb.velocity = Vector3.zero;
+        rb.useGravity = true;
     }
 
     public void switchToUIInput(){

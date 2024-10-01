@@ -282,7 +282,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 440748357
+  GlobalObjectIdHash: 120845917
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -306,8 +307,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 2871185545854695455, guid: f4450526348d3b747b575214045db2da, type: 3}
   ShootCooldown: 1
   bulletDistribution: 1
-  magazineSize: 8
-  reloadTime: 2
+  initialAmmo: 50
   bulletsPerShot: 8
   bulletSpread: 0.4
   gunAnimator: {fileID: 8653825201948435179}
@@ -401,6 +401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1

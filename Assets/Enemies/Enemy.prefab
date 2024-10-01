@@ -369,6 +369,7 @@ GameObject:
   - component: {fileID: 2083251567363397400}
   - component: {fileID: 8112945742361106837}
   - component: {fileID: 5177182114525428754}
+  - component: {fileID: -9100101598847341114}
   - component: {fileID: -6078274312333572976}
   - component: {fileID: 4241031030747323380}
   - component: {fileID: 3495308290650850120}
@@ -411,7 +412,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1738502558
+  GlobalObjectIdHash: 2209256934
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -455,6 +456,19 @@ MonoBehaviour:
     m_InternalValue: 0
   enemyCanvas: {fileID: 4108331389411058882}
   healthBar: {fileID: 7764881540480764128}
+--- !u!114 &-9100101598847341114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694717039117533379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc9a8287f81946d46aa56b236a12bd8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickableToSpawn: {fileID: 426912453091155317, guid: d336405c4c7076b40a7aa00856cb3103, type: 3}
 --- !u!114 &-6078274312333572976
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -17,14 +17,14 @@ public class EnemyWavesManager : SingletonNetwork<EnemyWavesManager>
     {
         base.OnNetworkSpawn();
         if(!IsServer) return;
-        ArenaManager.runPhaseChangedAction += handleRunPhaseChanged;
+        ArenaManager.runPhaseChanged += handleRunPhaseChanged;
         //ArenaManager.OnRunStartAction += handleRunStart;
     }
 
     public override void OnNetworkDespawn()
     {
         if(IsServer){
-            ArenaManager.runPhaseChangedAction -= handleRunPhaseChanged;
+            ArenaManager.runPhaseChanged -= handleRunPhaseChanged;
         }
 
         base.OnNetworkDespawn();
@@ -54,6 +54,7 @@ public class EnemyWavesManager : SingletonNetwork<EnemyWavesManager>
         foreach(var gateData in GatesSpawnData){
             gateData.gate.enemySpawner.injectWaveData(gateData.phasesData[curr].wavesData);
             gateData.gate.OpenGate();
+            gateData.gate.enemySpawner.BeginSpawningEnemies();
             /*foreach(var phaseData in gateData.phasesData){
                 if(phaseData.wavesData.Count>curr){
                     gateData.gate.injectSpawnerData(phaseData.wavesData);

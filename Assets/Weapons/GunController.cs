@@ -15,8 +15,8 @@ public class GunController : NetworkBehaviour
     [SerializeField] private float ShootCooldown;
     [SerializeField] private BulletDistribution bulletDistribution;
 
-    [SerializeField] private uint magazineSize = 30;
-    [SerializeField] private float reloadTime = 2.0f;
+    //[SerializeField] private uint magazineSize = 30;
+    //[SerializeField] private float reloadTime = 2.0f;
 
 
     private uint Internal_Ammoleft=0;
@@ -27,6 +27,8 @@ public class GunController : NetworkBehaviour
             onAmmoLeftValueChanged(value);
         }
     }
+
+    public uint initialAmmo=100;
 
     [SerializeField] private uint bulletsPerShot = 1;
 
@@ -114,14 +116,19 @@ public class GunController : NetworkBehaviour
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
         if(parentNetworkObject==null) return;
-        if(parentNetworkObject.GetComponent<PlayerController>()!=null){
+        if(parentNetworkObject.TryGetComponent(out PlayerController player)){
             isControlledByPlayer=true;
-            gunAnchor=parentNetworkObject.GetComponent<PlayerController>().playerCamera.transform.GetChild(2);;
-            gunNozzle=parentNetworkObject.GetComponent<PlayerController>().CamNozzle;
+            gunAnchor=player.playerCamera.transform.GetChild(2);
+            gunNozzle=player.CamNozzle;
 
             //print("gun on parent changed: owner? "+IsOwner+" id: "+NetworkManager.LocalClientId);
-            if(IsOwner)
-                AmmoLeft=magazineSize;
+            if(IsOwner){
+                if(!player.hasAmmoForKey(gunName))
+                    player.setAmmoForKey(gunName,initialAmmo);
+                    
+                AmmoLeft=player.getAmmoLeft(gunName);
+            }
+                
                 
         }else if(parentNetworkObject.GetComponent<GunsManager>()!=null){
             isControlledByPlayer=false;
@@ -197,7 +204,7 @@ public class GunController : NetworkBehaviour
         gunAnimator.SetTrigger(ShootTrigger);
         shootEffect.Play();
     }
-    private Coroutine reloadCoroutineHandle;
+    /*private Coroutine reloadCoroutineHandle;
 
     private bool isReloading=false;
 
@@ -224,7 +231,7 @@ public class GunController : NetworkBehaviour
         AmmoLeft = magazineSize;
         canShoot = true;
         isReloading=false;
-    }
+    }*/
     
 }
 
