@@ -109,7 +109,7 @@ public class GunController : NetworkBehaviour
             Vector3 gunNozzlePos = gunNozzle.position;
             Vector3 nozzleDir=gunNozzle.up;
 
-            RequestFireServerRpc(gunNozzle.up,gunNozzlePos);
+            RequestFireServerRpc(NetworkManager.LocalClientId, gunNozzle.up,gunNozzlePos);
             FireBullet(gunNozzle.up, gunNozzlePos);
             gunAnimator.SetTrigger(ShootTrigger);
             cameraShakeEffect.GenerateImpulse();
@@ -157,7 +157,7 @@ public class GunController : NetworkBehaviour
                 //dir = getDirTowardsMouse();
                 gunNozzlePos = gunNozzle.position;
                 
-                RequestFireServerRpc(gunNozzle.up,gunNozzlePos);
+                RequestFireServerRpc(NetworkManager.LocalClientId,gunNozzle.up,gunNozzlePos);
                 FireBullet(gunNozzle.up, gunNozzlePos);
                 yield return new WaitForSeconds(ShootCooldown);
                 canShoot = true;
@@ -170,9 +170,9 @@ public class GunController : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void RequestFireServerRpc(Vector3 dir,Vector3 initPos)
+    private void RequestFireServerRpc(ulong senderClientId, Vector3 dir,Vector3 initPos)
     {
-        GunsManager.Instance.setAmmoServerRpc(NetworkManager.LocalClientId,gunName,AmmoLeft-1);
+        GunsManager.Instance.setAmmoServerRpc(senderClientId,gunName,AmmoLeft-1);
         FireBullet(dir,initPos);
         FireBulletClientRpc(dir,initPos);
     }

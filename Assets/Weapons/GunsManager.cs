@@ -36,14 +36,14 @@ public class GunsManager : SingletonNetwork<GunsManager>
         print("on gun equipped server rpc for player P"+clientID+" with gun "+gunName);
         if(!playerAmmoDict.ContainsKey(clientID)) playerAmmoDict.Add(clientID,new Dictionary<string, uint>());
         if(!playerAmmoDict[clientID].ContainsKey(gunName)){
-            playerAmmoDict[clientID].Add(gunName,0);
+            playerAmmoDict[clientID].Add(gunName,initAmmo);
             setAmmoServerRpc(clientID,gunName,initAmmo);
         }else{
             setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName));
         }
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void setAmmoServerRpc(ulong clientID, string gunName, uint ammo){
         print("setting ammo "+ammo+" to "+gunName+" for player P"+clientID);
         //if(playerAmmoDict[clientID][gunName]==ammo) return;
