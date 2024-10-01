@@ -57,8 +57,12 @@ public class GunsManager : SingletonNetwork<GunsManager>
     [ClientRpc]
     private void setAmmoClientRpc(string gunName,uint newAmmo, ClientRpcParams receiveParams = default){
         print("setting ammo client rpc "+newAmmo+" on client "+NetworkManager.LocalClientId);
-        if(PlayerController.localPlayer.getGunReference().gunName==gunName)
+        if(PlayerController.localPlayer.getGunReference().gunName==gunName){
+            print("requested gun name matches current gun name, setting ammo");
             PlayerController.localPlayer.getGunReference().AmmoLeft=newAmmo;
+        }else{
+            print("requested gun name does not match current gun name, aborting");
+        }
     }
 
 
