@@ -28,61 +28,62 @@ public class GunsManager : SingletonNetwork<GunsManager>
     //public NetworkList<NetworkObjectReference> unusedGuns = new NetworkList<NetworkObjectReference>();
     public static Dictionary<ulong, Dictionary<string,uint>> playerAmmoDict = new Dictionary<ulong, Dictionary<string,uint>>();
 
-    public bool hasAmmoForKey(ulong playerID, string gunName)=>playerAmmoDict[playerID].ContainsKey(gunName);
-    public uint getAmmoLeft(ulong playerID, string gunName)=>playerAmmoDict[playerID][gunName];
+    public bool hasAmmoForKey(ulong clientID, string gunName)=>playerAmmoDict[clientID].ContainsKey(gunName);
+    public uint getAmmoLeft(ulong clientID, string gunName)=>playerAmmoDict[clientID][gunName];
     
     [ServerRpc(RequireOwnership = false)]
-    public void OnGunEquippedServerRpc(ulong playerID, string gunName, uint initAmmo){
-        print("on gun equipped server rpc for player P"+playerID+" with gun "+gunName);
-        if(!playerAmmoDict.ContainsKey(playerID)) playerAmmoDict.Add(playerID,new Dictionary<string, uint>());
-        if(!playerAmmoDict[playerID].ContainsKey(gunName)){
-            playerAmmoDict[playerID].Add(gunName,0);
-            setAmmoServerRpc(playerID,gunName,initAmmo);
+    public void OnGunEquippedServerRpc(ulong clientID, string gunName, uint initAmmo){
+        print("on gun equipped server rpc for player P"+clientID+" with gun "+gunName);
+        if(!playerAmmoDict.ContainsKey(clientID)) playerAmmoDict.Add(clientID,new Dictionary<string, uint>());
+        if(!playerAmmoDict[clientID].ContainsKey(gunName)){
+            playerAmmoDict[clientID].Add(gunName,0);
+            setAmmoServerRpc(clientID,gunName,initAmmo);
         }else{
-            setAmmoServerRpc(playerID,gunName,getAmmoLeft(playerID,gunName));
+            setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName));
         }
     }
 
     [ServerRpc]
-    public void setAmmoServerRpc(ulong playerID, string gunName, uint ammo){
-        print("setting ammo "+ammo+" to "+gunName+" for player P"+playerID);
-        //if(playerAmmoDict[playerID][gunName]==ammo) return;
+    public void setAmmoServerRpc(ulong clientID, string gunName, uint ammo){
+        print("setting ammo "+ammo+" to "+gunName+" for player P"+clientID);
+        //if(playerAmmoDict[clientID][gunName]==ammo) return;
 
-        playerAmmoDict[playerID][gunName]=ammo;
+        playerAmmoDict[clientID][gunName]=ammo;
         setAmmoClientRpc(ammo,new ClientRpcParams{
             Send=new ClientRpcSendParams{
-                TargetClientIds=new List<ulong>{playerID}}});
+                TargetClientIds=new ulong[]{clientID}}});
     }
 
     [ClientRpc]
-    private void setAmmoClientRpc(uint newAmmo, ClientRpcParams receiveParams){
+    private void setAmmoClientRpc(uint newAmmo, ClientRpcParams receiveParams = default){
+        print("setting ammo client rpc "+newAmmo+" on client "+NetworkManager.LocalClientId);
         PlayerController.localPlayer.getGunReference().onAmmoChangedClientRpc(newAmmo);
     }
 
 
     [ServerRpc]
-    public void addAmmoServerRpc(ulong playerID, string gunName, uint ammo){
+    public void addAmmoServerRpc(ulong clientID, string gunName, uint ammo){
         print("adding ammo "+ammo+" to "+gunName+" for player P"+NetworkManager.LocalClientId);
-        if(!hasAmmoForKey(playerID,gunName)) playerAmmoDict[playerID].Add(gunName,ammo);
-        else setAmmoServerRpc(playerID,gunName,getAmmoLeft(playerID,gunName)+ammo);
-        //getGunReference().AmmoLeft=playerAmmoDict[playerID][gunName];
+        if(!hasAmmoForKey(clientID,gunName)) playerAmmoDict[clientID].Add(gunName,ammo);
+        else setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName)+ammo);
+        //getGunReference().AmmoLeft=playerAmmoDict[clientID][gunName];
     }
 
 
     [ServerRpc(RequireOwnership = false)]
-    public void addAmmoToCurrentlyHeldGunServerRpc(ulong playerID, uint ammo){
+    public void addAmmoToCurrentlyHeldGunServerRpc(ulong clientID, uint ammo){
         /*if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
             print("No gun held to add ammo to, how?");
             return;
         }*/
-        addAmmoServerRpc(playerID,PlayerController.localPlayer.getGunReference().gunName,ammo);
+        addAmmoServerRpc(clientID,PlayerController.localPlayer.getGunReference().gunName,ammo);
     }
 
     private List<GunController> unusedGuns=new List<GunController>();
 
-    private void handlePlayerDisconnected(ulong playerID){
-        if(playerAmmoDict.ContainsKey(playerID))
-            playerAmmoDict.Remove(playerID);
+    private void handlePlayerDisconnected(ulong clientID){
+        if(playerAmmoDict.ContainsKey(clientID))
+            playerAmmoDict.Remove(clientID);
     }
 
     public override void OnNetworkSpawn()
