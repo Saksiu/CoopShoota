@@ -41,6 +41,8 @@ public class GunsManager : SingletonNetwork<GunsManager>
         }else{
             setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName));
         }
+        print("OnGunEquippedServerRpc ended data:");
+        printAllAmmoInfo();
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -52,6 +54,8 @@ public class GunsManager : SingletonNetwork<GunsManager>
         setAmmoClientRpc(gunName,ammo,new ClientRpcParams{
             Send=new ClientRpcSendParams{
                 TargetClientIds=new ulong[]{clientID}}});
+        print("setAmmoServerRpc ended data:");
+        printAllAmmoInfo();
     }
 
     [ClientRpc]
@@ -63,6 +67,9 @@ public class GunsManager : SingletonNetwork<GunsManager>
         }else{
             print("requested gun name does not match current gun name, aborting");
         }
+
+        print("setAmmoClientRpc ended data:");
+        printAllAmmoInfo();
     }
 
 
@@ -178,6 +185,18 @@ public class GunsManager : SingletonNetwork<GunsManager>
             if(gun.gunName == gunName)
                 return gun;
         return null; //failed to find gun of that name
+    }
+
+    public void printAllAmmoInfo(){
+        print($"GUNSMANAGER AMMO DATA FOR {NetworkManager.LocalClientId}:");
+        string data="";
+        foreach(var player in playerAmmoDict){
+            data+=($"\nPlayer P{player.Key} has:");
+            foreach(var gun in player.Value){
+                data+=($"\n\t{gun.Value} ammo for {gun.Key}");
+            }
+        }
+        print(data);
     }
 
 }
