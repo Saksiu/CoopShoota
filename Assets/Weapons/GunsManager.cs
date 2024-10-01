@@ -43,7 +43,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
         }
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void setAmmoServerRpc(ulong clientID, string gunName, uint ammo){
         print("setting ammo "+ammo+" to "+gunName+" for player P"+clientID);
         //if(playerAmmoDict[clientID][gunName]==ammo) return;
