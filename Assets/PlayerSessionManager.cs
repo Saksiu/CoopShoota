@@ -36,7 +36,7 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         print("Shutting down client was host?"+wasHost);
         if(wasHost) return;
         NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
-        SceneManager.LoadScene("PlayScene");
+        SceneManager.LoadScene("Prot_Arena1");
 
     }
 
@@ -47,7 +47,7 @@ public class PlayerSessionManager : SingletonLocal<PlayerSessionManager>
         if(exitGame){Application.Quit();}
         else{
             NetworkManager.Singleton.GetComponent<MyNetworkDiscovery>().StopDiscovery();
-            SceneManager.LoadScene("PlayScene");
+            SceneManager.LoadScene("Prot_Arena1");
            // MainMenuManager.Instance.enableMainMenu();
         }
         

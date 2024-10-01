@@ -57,7 +57,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
     [ClientRpc]
     private void setAmmoClientRpc(uint newAmmo, ClientRpcParams receiveParams = default){
         print("setting ammo client rpc "+newAmmo+" on client "+NetworkManager.LocalClientId);
-        PlayerController.localPlayer.getGunReference().onAmmoChangedClientRpc(newAmmo);
+        PlayerController.localPlayer.getGunReference().AmmoLeft=newAmmo;
     }
 
 

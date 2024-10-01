@@ -116,8 +116,7 @@ public class GunController : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void onAmmoChangedClientRpc(uint newAmmo){
+    public void onAmmoChanged(uint newAmmo){
         print("onammochangedClientRpc called "+NetworkManager.LocalClientId+" is controlled by player? "+isControlledByPlayer);
         if(!isControlledByPlayer) return;
         AmmoLeft=newAmmo;
