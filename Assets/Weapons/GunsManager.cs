@@ -145,11 +145,17 @@ public class GunsManager : SingletonNetwork<GunsManager>
         
         player.currentGun.Value = availableGun.NetworkObject;
 
-        availableGun.NetworkObject.TrySetParent((NetworkObject)playerRef);
-        Assert.IsNotNull(player.currentGun, "Player current gun is null");
-        //remove from unused guns
-        unusedGuns.Remove(availableGun);
+        ReparentGunNetworkObject(playerRef, availableGun);
+        
     }
+
+    private IEnumerator ReparentGunNetworkObject(NetworkObjectReference playerRef, GunController toReparent){
+        yield return new WaitForFixedUpdate();
+        toReparent.NetworkObject.TrySetParent((NetworkObject)playerRef);
+        Assert.IsNotNull(((NetworkObject)playerRef).GetComponent<PlayerController>().currentGun, "Player current gun is null");
+        //remove from unused guns
+        unusedGuns.Remove(toReparent);
+        }
 
     public GunController getWeaponToReparent(string gunName){
         foreach(GunController gun in unusedGuns)
