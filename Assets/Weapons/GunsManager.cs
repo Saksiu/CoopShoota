@@ -47,7 +47,10 @@ public class GunsManager : SingletonNetwork<GunsManager>
     public void setAmmoServerRpc(ulong clientID, string gunName, uint ammo){
         print("setting ammo "+ammo+" to "+gunName+" for player P"+clientID);
         //if(playerAmmoDict[clientID][gunName]==ammo) return;
-
+        if(playerAmmoDict[clientID][gunName]<1&&ammo<0){
+            Debug.LogError("attempting to set uint ammo to negative value!!!\n aborting");
+            return;
+        }
         playerAmmoDict[clientID][gunName]=ammo;
         setAmmoClientRpc(ammo,new ClientRpcParams{
             Send=new ClientRpcSendParams{
