@@ -172,6 +172,10 @@ public class GunController : NetworkBehaviour
     [ServerRpc]
     private void RequestFireServerRpc(ulong senderClientId, Vector3 dir,Vector3 initPos)
     {
+        if(AmmoLeft<=0){
+            print("requested shot with no ammo left, aborting");
+            return;
+        }
         GunsManager.Instance.setAmmoServerRpc(senderClientId,gunName,AmmoLeft-1);
         FireBullet(dir,initPos);
         FireBulletClientRpc(dir,initPos);
