@@ -145,7 +145,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
         
         player.currentGun.Value = availableGun.NetworkObject;
 
-        ReparentGunNetworkObject(playerRef, availableGun);
+        StartCoroutine(ReparentGunNetworkObject(playerRef, availableGun));
         
     }
 
