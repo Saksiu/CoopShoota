@@ -12660,7 +12660,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd7d15bd0463ccf44a7ef155d2ef411c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requireOwner: 1
+  requireOwner: 0
   onPlayerTriggerEnter:
     m_PersistentCalls:
       m_Calls:

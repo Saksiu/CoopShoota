@@ -69,6 +69,7 @@ public class EntranceGateComponent : NetworkBehaviour
     }
 
     public void OnPlayerTriggerEnter(){
+        print($"player triggered entrance gate on client {NetworkManager.LocalClientId}, isServer: {IsServer}, isOwner: {IsOwner}, isClient: {IsClient}");
         if(IsClient){
             onPlayerEnteredTriggerServerRpc(NetworkManager.LocalClientId);
         }
