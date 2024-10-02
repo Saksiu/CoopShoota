@@ -134,11 +134,11 @@ public class GunController : NetworkBehaviour
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
         if(parentNetworkObject==null){ //if the player is disconnected
-            if(IsOwner){
+            /*if(IsOwner){
                 print($"new parent object is null, returning gun {gunName} to pool");
                 GunsManager.Instance.returnGunToPoolServerRpc(NetworkObject);
                 
-            }
+            }*/
             return;
         }
         if(parentNetworkObject.TryGetComponent(out PlayerController player)){
