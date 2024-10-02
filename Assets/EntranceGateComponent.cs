@@ -26,8 +26,9 @@ public class EntranceGateComponent : NetworkBehaviour
             ArenaManager.runPhaseChanged+=handleRunPhaseChange;
             //ArenaManager.OnRunStartAction+=handleRunStart;
             gateAnimator.SetBool("isOpen",true);
-        }else{
             entranceTrigger.enabled=false;
+        }else{
+            //entranceTrigger.enabled=false;
         }
         
     }
