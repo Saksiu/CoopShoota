@@ -247,7 +247,6 @@ GameObject:
   - component: {fileID: 8653825201948435179}
   - component: {fileID: 3701633434445315458}
   - component: {fileID: -4118819629224002688}
-  - component: {fileID: 653212052253978617}
   m_Layer: 0
   m_Name: PumpActionShotgun
   m_TagString: Untagged
@@ -421,27 +420,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &653212052253978617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6928456815955258123}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TransitionStateInfoList:
-  - IsCrossFadeExit: 0
-    Layer: 0
-    OriginatingState: 2081823275
-    DestinationState: 614505075
-    TransitionDuration: 0.25
-    TriggerNameHash: 431054515
-    TransitionIndex: 0
-  m_Animator: {fileID: 8653825201948435179}
 --- !u!1 &7019610022902993947
 GameObject:
   m_ObjectHideFlags: 0

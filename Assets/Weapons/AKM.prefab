@@ -97,7 +97,6 @@ GameObject:
   - component: {fileID: 3868219581759318554}
   - component: {fileID: 8935728154770883774}
   - component: {fileID: 5499025808127348785}
-  - component: {fileID: 2203235609142255188}
   m_Layer: 0
   m_Name: AKM
   m_TagString: Untagged
@@ -133,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2538229645
+  GlobalObjectIdHash: 3852909561
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -271,27 +270,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &2203235609142255188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4875518283939212026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TransitionStateInfoList:
-  - IsCrossFadeExit: 0
-    Layer: 0
-    OriginatingState: 2081823275
-    DestinationState: 1883569342
-    TransitionDuration: 0
-    TriggerNameHash: 431054515
-    TransitionIndex: 0
-  m_Animator: {fileID: 3868219581759318554}
 --- !u!1 &6357662367540948793
 GameObject:
   m_ObjectHideFlags: 0
