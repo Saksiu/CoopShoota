@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Cinemachine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,18 +63,19 @@ public class GunController : NetworkBehaviour
     private static readonly int ShootTrigger= Animator.StringToHash("ShootTrigger");
 
 
-    /*public override void OnNetworkSpawn()
+    public override void OnNetworkSpawn()
     {
-        
-        AmmoLeft.OnValueChanged += onAmmoLeftValueChanged;
         base.OnNetworkSpawn();
+
     }
 
     public override void OnNetworkDespawn()
     {
-        AmmoLeft.OnValueChanged -= onAmmoLeftValueChanged;
+        
         base.OnNetworkDespawn();
-    }*/
+    }
+
+    //private void handlePlayerDisconnected
 
     private void Update()
     {
@@ -113,6 +117,7 @@ public class GunController : NetworkBehaviour
             if(AmmoLeft<=0){
                 return;
             }
+            GetComponent<NetworkAnimator>().SetTrigger(ShootTrigger);
             FireBullet(gunNozzle.up, gunNozzlePos);
             gunAnimator.SetTrigger(ShootTrigger);
             cameraShakeEffect.GenerateImpulse();
@@ -127,7 +132,12 @@ public class GunController : NetworkBehaviour
 
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
-        if(parentNetworkObject==null) return;
+        if(parentNetworkObject==null){ //if the player is disconnected
+            print($"new parent object is null, returning gun {gunName} to pool");
+            GunsManager.Instance.returnGunToPoolServerRpc(NetworkObject);
+
+            return;
+        }
         if(parentNetworkObject.TryGetComponent(out PlayerController player)){
             isControlledByPlayer=true;
             gunAnchor=player.playerCamera.transform.GetChild(2);
@@ -164,7 +174,8 @@ public class GunController : NetworkBehaviour
                 RequestFireServerRpc(NetworkManager.LocalClientId,gunNozzle.up,gunNozzlePos);
                 if(AmmoLeft<=0){
                     yield return null;
-                }   
+                }
+                GetComponent<NetworkAnimator>().SetTrigger(ShootTrigger);
                 FireBullet(gunNozzle.up, gunNozzlePos);
                 yield return new WaitForSeconds(ShootCooldown);
                 canShoot = true;
@@ -186,11 +197,17 @@ public class GunController : NetworkBehaviour
 
         GunsManager.Instance.addAmmoServerRpc(senderClientId,gunName,-1);
         FireBullet(dir,initPos);
-        FireBulletClientRpc(dir,initPos);
+        List<ulong> targetClientIds=new(NetworkManager.ConnectedClientsIds);
+        targetClientIds.Remove(senderClientId);
+        FireBulletClientRpc(dir,initPos,new ClientRpcParams{
+            Send=new ClientRpcSendParams{
+                TargetClientIds=targetClientIds
+            }
+        });
     }
 
     [ClientRpc]
-    private void FireBulletClientRpc(Vector3 dir,Vector3 initPos)
+    private void FireBulletClientRpc(Vector3 dir,Vector3 initPos, ClientRpcParams clientRpcParams = default)
     {
         //IMPORTANT: WE DON'T VERIFY IF THE CLIENT HAS AMMO LEFT, AS THIS IS JUST FOR ALL OTHER PLAYERS TO SEE THE SHOT
         FireBullet(dir,initPos);
@@ -217,8 +234,7 @@ public class GunController : NetworkBehaviour
                     Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir,visualNozzle.position);
                     break;
             }
-        
-        gunAnimator.SetTrigger(ShootTrigger);
+        //gunAnimator.SetTrigger(ShootTrigger);
         shootEffect.Play();
     }
     /*private Coroutine reloadCoroutineHandle;

@@ -149,8 +149,15 @@ public class GunsManager : SingletonNetwork<GunsManager>
         addAmmoServerRpc(clientID,PlayerController.localPlayer.getGunReference().gunName,ammo);
     }
 
-
-
+    [ServerRpc(RequireOwnership = false)]
+    public void returnGunToPoolServerRpc(NetworkObjectReference toReturn){
+        GunController gun = ((NetworkObject)toReturn).GetComponent<GunController>();
+        if(gun.OwnerClientId!=NetworkManager.ServerClientId)
+            gun.NetworkObject.ChangeOwnership(NetworkManager.ServerClientId);
+        gun.NetworkObject.TrySetParent(NetworkObject);
+        gun.transform.position = transform.position+new Vector3(0,0,GUN_HOLDING_AREA_DISTANCE*unusedGuns.Count);
+        unusedGuns.Add(gun);
+    }
 
     [ServerRpc(RequireOwnership = false)]
     public void ChangeHeldWeaponServerRpc(NetworkObjectReference playerRef, FixedString32Bytes gunName){
