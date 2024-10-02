@@ -192,9 +192,7 @@ public class GunController : NetworkBehaviour
     [ClientRpc]
     private void FireBulletClientRpc(Vector3 dir,Vector3 initPos)
     {
-        if(AmmoLeft<=0){
-            return;
-        }
+        //IMPORTANT: WE DON'T VERIFY IF THE CLIENT HAS AMMO LEFT, AS THIS IS JUST FOR ALL OTHER PLAYERS TO SEE THE SHOT
         FireBullet(dir,initPos);
     }
 
