@@ -81,7 +81,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
     public void OnGunEquippedServerRpc(ulong clientID, string gunName){
 
         setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName));
-        print("OnGunEquippedServerRpc ended data:");
+        print($"OnGunEquippedServerRpc for client {clientID} ended data:");
         printAllAmmoInfo();
     }
 
@@ -104,7 +104,11 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
     [ClientRpc]
     private void setAmmoClientRpc(string gunName,int newAmmo, ClientRpcParams receiveParams = default){
-        
+        if(PlayerController.localPlayer.getGunReference()==null){
+            print("local player is null, shifting to coroutine");
+            StartCoroutine(setAmmoClientRpcCoroutine(gunName,newAmmo));
+            return;
+        }
         if(PlayerController.localPlayer.getGunReference().gunName==gunName){
             print("requested gun name matches current gun name, setting ammo");
             PlayerController.localPlayer.getGunReference().AmmoLeft=newAmmo;
@@ -113,6 +117,11 @@ public class GunsManager : SingletonNetwork<GunsManager>
         }
 
         print("setAmmoClientRpc ended data:");
+    }
+
+    private IEnumerator setAmmoClientRpcCoroutine(string gunName, int newAmmo){
+        yield return new WaitUntil(()=>PlayerController.localPlayer.getGunReference()!=null);
+        setAmmoClientRpc(gunName,newAmmo);
     }
 
 
