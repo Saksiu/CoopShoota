@@ -57,13 +57,14 @@ public class GunsManager : SingletonNetwork<GunsManager>
             NetworkManager.OnClientConnectedCallback-=handlePlayerConnected;
             NetworkManager.OnClientDisconnectCallback -= handlePlayerDisconnected;   
         }
+        playerAmmoDict.Clear();
         base.OnNetworkDespawn();
     }
 
     private void handlePlayerConnected(ulong clientID){
         if(!playerAmmoDict.ContainsKey(clientID)){
             playerAmmoDict.Add(clientID,new Dictionary<string, int>());
-            foreach(GunController gun in unusedGuns)
+            foreach(GunController gun in gunPrefabs)
                 playerAmmoDict[clientID].Add(gun.gunName,gun.initialAmmo);
         }
     }
