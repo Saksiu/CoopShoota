@@ -26,11 +26,11 @@ public class EntranceGateComponent : NetworkBehaviour
             ArenaManager.runPhaseChanged+=handleRunPhaseChange;
             //ArenaManager.OnRunStartAction+=handleRunStart;
             gateAnimator.SetBool("isOpen",true);
-            entranceTrigger.enabled=false;
-        }else{
             //entranceTrigger.enabled=false;
+        }else{
+            entranceTrigger.enabled=false;
         }
-        
+        //entranceTrigger.
     }
 
     public override void OnNetworkDespawn()
@@ -69,11 +69,21 @@ public class EntranceGateComponent : NetworkBehaviour
         playersInArena.Clear();
     }
 
+    private void OnTriggerEnter(Collider other){
+        if(!IsServer) return;
+        if(other.TryGetComponent(out PlayerController player)){
+            if(!playersInArena.Contains(player.OwnerClientId)){
+                ArenaManager.Instance.onPlayerEnteredArena();
+                playersInArena.Add(player.OwnerClientId);
+            }
+        }
+    }
+
     public void OnPlayerTriggerEnter(){
-        print($"player triggered entrance gate on client {NetworkManager.LocalClientId}, isServer: {IsServer}, isOwner: {IsOwner}, isClient: {IsClient}");
+        /*print($"player triggered entrance gate on client {NetworkManager.LocalClientId}, isServer: {IsServer}, isOwner: {IsOwner}, isClient: {IsClient}");
         if(IsClient){
             onPlayerEnteredTriggerServerRpc(NetworkManager.LocalClientId);
-        }
+        }*/
         //entranceTrigger.enabled=false;
         
     }
