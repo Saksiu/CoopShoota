@@ -110,6 +110,9 @@ public class GunController : NetworkBehaviour
             Vector3 nozzleDir=gunNozzle.up;
 
             RequestFireServerRpc(NetworkManager.LocalClientId, gunNozzle.up,gunNozzlePos);
+            if(AmmoLeft<=0){
+                return;
+            }
             FireBullet(gunNozzle.up, gunNozzlePos);
             gunAnimator.SetTrigger(ShootTrigger);
             cameraShakeEffect.GenerateImpulse();
@@ -121,7 +124,7 @@ public class GunController : NetworkBehaviour
         if(!isControlledByPlayer) return;
         AmmoLeft=newAmmo;
     }*/
-   
+
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
         if(parentNetworkObject==null) return;
@@ -159,6 +162,9 @@ public class GunController : NetworkBehaviour
                 gunNozzlePos = gunNozzle.position;
                 
                 RequestFireServerRpc(NetworkManager.LocalClientId,gunNozzle.up,gunNozzlePos);
+                if(AmmoLeft<=0){
+                    yield return null;
+                }   
                 FireBullet(gunNozzle.up, gunNozzlePos);
                 yield return new WaitForSeconds(ShootCooldown);
                 canShoot = true;
@@ -173,7 +179,7 @@ public class GunController : NetworkBehaviour
     [ServerRpc]
     private void RequestFireServerRpc(ulong senderClientId, Vector3 dir,Vector3 initPos)
     {
-        if(AmmoLeft<=0){
+        if(GunsManager.Instance.getAmmoLeft(senderClientId,gunName)<=0){
             print("requested shot with no ammo left, aborting");
             return;
         }
