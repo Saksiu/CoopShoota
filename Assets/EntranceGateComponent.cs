@@ -67,9 +67,14 @@ public class EntranceGateComponent : NetworkBehaviour
     }
 
     public void OnPlayerTriggerEnter(){
-        if(!IsServer) return;
-        entranceTrigger.enabled=false;
-        ArenaManager.Instance.onPlayerEnteredArena();
+        if(IsServer){
+            ArenaManager.Instance.onPlayerEnteredArena();
+        }
+        else if (IsClient){
+            entranceTrigger.enabled=false;
+        }
+        //entranceTrigger.enabled=false;
+        
     }
 
     [ClientRpc]
