@@ -88,7 +88,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
     [ServerRpc(RequireOwnership = false)]
     public void resetAllAmmoServerRpc(ulong clientID){
         foreach(var gun in playerAmmoDict[clientID].Keys)
-            setAmmoServerRpc(clientID,gun,unusedGuns.Find(g=>g.gunName==gun).initialAmmo);
+            setAmmoServerRpc(clientID,gun,gunPrefabs.Find(g=>g.gunName==gun).initialAmmo);
     }
 
     [ServerRpc(RequireOwnership = false)]
