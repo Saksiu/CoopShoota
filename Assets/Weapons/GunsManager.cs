@@ -104,7 +104,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
     [ClientRpc]
     private void setAmmoClientRpc(string gunName,int newAmmo, ClientRpcParams receiveParams = default){
-        if(PlayerController.localPlayer.getGunReference()==null){
+        if(PlayerController.localPlayer.getGunReference()==null||PlayerController.localPlayer.getGunReference().gunName!=gunName){
             print("local player is null, shifting to coroutine");
             StartCoroutine(setAmmoClientRpcCoroutine(gunName,newAmmo));
             return;
