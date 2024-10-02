@@ -181,7 +181,7 @@ public class GameMaster : SingletonNetwork<GameMaster>
         yield return new WaitForSeconds(respawnTime);
         ArenaManager.Instance.OnPlayerKilledServerRpc(player.OwnerClientId);
         player.healthComponent.resetHPServerRpc();
-        player.getGunReference()?.resetAmmoCount();
+        GunsManager.Instance.resetAllAmmoServerRpc(player.OwnerClientId);
         setPlayerPositionClientRpc(player.OwnerClientId,getPlayerSpawnPosition(player.OwnerClientId));
     }
 

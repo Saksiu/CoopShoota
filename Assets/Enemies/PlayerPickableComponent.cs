@@ -6,7 +6,7 @@ using UnityEngine.PlayerLoop;
 
 public class PlayerPickableComponent : NetworkBehaviour
 {
-    [SerializeField] private uint AmmoGiven=10;
+    [SerializeField] private int AmmoGiven=10;
 
     [SerializeField] private float rotationSpeed=1f;
     private void FixedUpdate(){

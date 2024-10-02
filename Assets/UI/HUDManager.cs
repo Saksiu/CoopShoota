@@ -42,7 +42,7 @@ public class HUDManager : SingletonLocal<HUDManager>, PlayerInputGenerated.IUIAc
         reloadRadialAnimator.SetTrigger("Reload");
         
     }
-    public void updateAmmoLeft(uint newAmmo)
+    public void updateAmmoLeft(int newAmmo)
     {
         ammoText.text = "Ammo: " + newAmmo;
     }

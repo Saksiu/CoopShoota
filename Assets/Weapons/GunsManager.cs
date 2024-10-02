@@ -7,7 +7,6 @@ using UnityEngine.Assertions;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using Unity.Collections;
-using UnityEditor.PackageManager;
 
 
 /**
@@ -26,87 +25,9 @@ public class GunsManager : SingletonNetwork<GunsManager>
     [SerializeField] private List<GunController> gunPrefabs;
 
     //public NetworkList<NetworkObjectReference> unusedGuns = new NetworkList<NetworkObjectReference>();
-    public static Dictionary<ulong, Dictionary<string,uint>> playerAmmoDict = new Dictionary<ulong, Dictionary<string,uint>>();
-
-    public bool hasAmmoForKey(ulong clientID, string gunName)=>playerAmmoDict[clientID].ContainsKey(gunName);
-    public uint getAmmoLeft(ulong clientID, string gunName)=>playerAmmoDict[clientID][gunName];
-    
-    [ServerRpc(RequireOwnership = false)]
-    public void OnGunEquippedServerRpc(ulong clientID, string gunName, uint initAmmo){
-        print("on gun equipped server rpc for player P"+clientID+" with gun "+gunName);
-        if(!playerAmmoDict.ContainsKey(clientID)) playerAmmoDict.Add(clientID,new Dictionary<string, uint>());
-        if(!playerAmmoDict[clientID].ContainsKey(gunName)){
-            playerAmmoDict[clientID].Add(gunName,initAmmo);
-            setAmmoServerRpc(clientID,gunName,initAmmo);
-        }else{
-            setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName));
-        }
-        print("OnGunEquippedServerRpc ended data:");
-        printAllAmmoInfo();
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void setAmmoServerRpc(ulong clientID, string gunName, uint ammo){
-        print("setting ammo "+ammo+" to "+gunName+" for player P"+clientID);
-        //if(playerAmmoDict[clientID][gunName]==ammo) return;
-        
-        playerAmmoDict[clientID][gunName]=ammo;
-        setAmmoClientRpc(gunName,ammo,new ClientRpcParams{
-            Send=new ClientRpcSendParams{
-                TargetClientIds=new ulong[]{clientID}}});
-        print("setAmmoServerRpc ended data:");
-        printAllAmmoInfo();
-    }
-
-    [ClientRpc]
-    private void setAmmoClientRpc(string gunName,uint newAmmo, ClientRpcParams receiveParams = default){
-        print("setting ammo client rpc "+newAmmo+" on client "+NetworkManager.LocalClientId);
-        if(PlayerController.localPlayer.getGunReference().gunName==gunName){
-            print("requested gun name matches current gun name, setting ammo");
-            PlayerController.localPlayer.getGunReference().AmmoLeft=newAmmo;
-        }else{
-            print("requested gun name does not match current gun name, aborting");
-        }
-
-        print("setAmmoClientRpc ended data:");
-        printAllAmmoInfo();
-    }
-
-
-    [ServerRpc(RequireOwnership = false)]
-    public void addAmmoServerRpc(ulong clientID, string gunName, int change){
-        print("adding ammo "+change+" to "+gunName+" for player P"+NetworkManager.LocalClientId);
-        
-        if(!hasAmmoForKey(clientID,gunName)&&change>=0) {playerAmmoDict[clientID].Add(gunName,(uint)change);}
-        else {
-            if(playerAmmoDict[clientID][gunName]+change<0){
-                Debug.LogError($"attempting to change {gunName} weapon ammo for client {clientID} resulting in negative number!!!\n aborting");
-                return;
-                }
-            }
-            setAmmoServerRpc(clientID,gunName,(uint)((int)getAmmoLeft(clientID,gunName)+change));
-        //getGunReference().AmmoLeft=playerAmmoDict[clientID][gunName];
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    public void addAmmoServerRpc(ulong clientID, string gunName, uint change)=>addAmmoServerRpc(clientID,gunName,(int)change);    
-
-
-    [ServerRpc(RequireOwnership = false)]
-    public void addAmmoToCurrentlyHeldGunServerRpc(ulong clientID, uint ammo){
-        /*if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
-            print("No gun held to add ammo to, how?");
-            return;
-        }*/
-        addAmmoServerRpc(clientID,PlayerController.localPlayer.getGunReference().gunName,ammo);
-    }
-
+    private static Dictionary<ulong, Dictionary<string,int>> playerAmmoDict = new Dictionary<ulong, Dictionary<string,int>>();
     private List<GunController> unusedGuns=new List<GunController>();
 
-    private void handlePlayerDisconnected(ulong clientID){
-        if(playerAmmoDict.ContainsKey(clientID))
-            playerAmmoDict.Remove(clientID);
-    }
 
     public override void OnNetworkSpawn()
     {
@@ -121,7 +42,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
                 gunInstance.GetComponent<NetworkObject>().Spawn();
                 unusedGuns.Add(gunInstance);
                 gunInstance.NetworkObject.TrySetParent(NetworkObject);
-
+                NetworkManager.OnClientConnectedCallback+=handlePlayerConnected;
                 NetworkManager.OnClientDisconnectCallback += handlePlayerDisconnected;
             }
             Assert.IsTrue(unusedGuns.Count > 0, "No guns found instantiated under gunsmanager SERVER");
@@ -132,10 +53,94 @@ public class GunsManager : SingletonNetwork<GunsManager>
     public override void OnNetworkDespawn()
     {
         if(IsServer){
+            
+            NetworkManager.OnClientConnectedCallback-=handlePlayerConnected;
             NetworkManager.OnClientDisconnectCallback -= handlePlayerDisconnected;   
         }
         base.OnNetworkDespawn();
     }
+
+    private void handlePlayerConnected(ulong clientID){
+        if(!playerAmmoDict.ContainsKey(clientID)){
+            playerAmmoDict.Add(clientID,new Dictionary<string, int>());
+            foreach(GunController gun in unusedGuns)
+                playerAmmoDict[clientID].Add(gun.gunName,gun.initialAmmo);
+        }
+    }
+
+    private void handlePlayerDisconnected(ulong clientID){
+        if(playerAmmoDict.ContainsKey(clientID))
+            playerAmmoDict.Remove(clientID);
+    }
+
+    public bool hasAmmoForKey(ulong clientID, string gunName)=>playerAmmoDict[clientID].ContainsKey(gunName);
+    public int getAmmoLeft(ulong clientID, string gunName)=>playerAmmoDict[clientID][gunName];
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void OnGunEquippedServerRpc(ulong clientID, string gunName){
+
+        setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName));
+        print("OnGunEquippedServerRpc ended data:");
+        printAllAmmoInfo();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void resetAllAmmoServerRpc(ulong clientID){
+        foreach(var gun in playerAmmoDict[clientID].Keys)
+            setAmmoServerRpc(clientID,gun,unusedGuns.Find(g=>g.gunName==gun).initialAmmo);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void setAmmoServerRpc(ulong clientID, string gunName, int ammo){
+        
+        playerAmmoDict[clientID][gunName]=ammo;
+        setAmmoClientRpc(gunName,ammo,new ClientRpcParams{
+            Send=new ClientRpcSendParams{
+                TargetClientIds=new ulong[]{clientID}}});
+        print("setAmmoServerRpc ended data:");
+        printAllAmmoInfo();
+    }
+
+    [ClientRpc]
+    private void setAmmoClientRpc(string gunName,int newAmmo, ClientRpcParams receiveParams = default){
+        
+        if(PlayerController.localPlayer.getGunReference().gunName==gunName){
+            print("requested gun name matches current gun name, setting ammo");
+            PlayerController.localPlayer.getGunReference().AmmoLeft=newAmmo;
+        }else{
+            print("requested gun name does not match current gun name, aborting");
+        }
+
+        print("setAmmoClientRpc ended data:");
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void addAmmoServerRpc(ulong clientID, string gunName, int change){
+        print("adding ammo "+change+" to "+gunName+" for player P"+NetworkManager.LocalClientId);
+        
+        if(playerAmmoDict[clientID][gunName]+change<0){
+            Debug.LogError($"attempting to change {gunName} weapon ammo for client {clientID} resulting in negative number!!!\n aborting");
+            return;
+        }
+        
+        setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName)+change);
+        
+        //getGunReference().AmmoLeft=playerAmmoDict[clientID][gunName];
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void addAmmoToCurrentlyHeldGunServerRpc(ulong clientID, int ammo){
+        /*if(currentGun==null||getGunNetworkObject()==null||getGunReference()==null){
+            print("No gun held to add ammo to, how?");
+            return;
+        }*/
+        addAmmoServerRpc(clientID,PlayerController.localPlayer.getGunReference().gunName,ammo);
+    }
+
+
+
 
     [ServerRpc(RequireOwnership = false)]
     public void ChangeHeldWeaponServerRpc(NetworkObjectReference playerRef, FixedString32Bytes gunName){
@@ -188,8 +193,8 @@ public class GunsManager : SingletonNetwork<GunsManager>
     }
 
     public void printAllAmmoInfo(){
-        print($"GUNSMANAGER AMMO DATA FOR {NetworkManager.LocalClientId}:");
-        string data="";
+
+        string data=$"GUNSMANAGER AMMO DATA:";
         foreach(var player in playerAmmoDict){
             data+=($"\nPlayer P{player.Key} has:");
             foreach(var gun in player.Value){

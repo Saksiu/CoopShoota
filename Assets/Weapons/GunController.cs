@@ -19,8 +19,8 @@ public class GunController : NetworkBehaviour
     //[SerializeField] private float reloadTime = 2.0f;
 
 
-    private uint Internal_Ammoleft=0;
-    public uint AmmoLeft{
+    private int Internal_Ammoleft=0;
+    public int AmmoLeft{
         get=>Internal_Ammoleft;
         set{
             Internal_Ammoleft=value;
@@ -28,7 +28,7 @@ public class GunController : NetworkBehaviour
         }
     }
 
-    public uint initialAmmo=100;
+    public int initialAmmo=100;
 
     [SerializeField] private uint bulletsPerShot = 1;
 
@@ -83,14 +83,14 @@ public class GunController : NetworkBehaviour
         
         //transform.Rotate(0, 90, 0);
     }
-    private void onAmmoLeftValueChanged(uint newAmmo)
+    private void onAmmoLeftValueChanged(int newAmmo)
     {
         if (!IsOwner) return;
-        print("ammo left changed to " + newAmmo+ " on "+NetworkManager.LocalClientId+" is owner?"+IsOwner);
+        print($"ammo left changed to {newAmmo} on {NetworkManager.LocalClientId} is owner? {IsOwner}");
         HUDManager.Instance.updateAmmoLeft(newAmmo);
     }
     public void resetAmmoCount(){
-        AmmoLeft=initialAmmo;
+        GunsManager.Instance.setAmmoServerRpc(NetworkManager.LocalClientId,gunName,initialAmmo);
     }
 
 
@@ -116,7 +116,7 @@ public class GunController : NetworkBehaviour
         }
     }
 
-    public void onAmmoChanged(uint newAmmo){
+    public void onAmmoChanged(int newAmmo){
         print("onammochangedClientRpc called "+NetworkManager.LocalClientId+" is controlled by player? "+isControlledByPlayer);
         if(!isControlledByPlayer) return;
         AmmoLeft=newAmmo;
@@ -131,7 +131,7 @@ public class GunController : NetworkBehaviour
 
             print("gun on parent changed: owner? "+IsOwner+" id: "+NetworkManager.LocalClientId);
             if(IsOwner){
-                GunsManager.Instance.OnGunEquippedServerRpc(NetworkManager.LocalClientId,gunName,initialAmmo);
+                GunsManager.Instance.OnGunEquippedServerRpc(NetworkManager.LocalClientId,gunName);
             }
                 
                 
