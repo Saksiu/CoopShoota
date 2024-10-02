@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Cinemachine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -132,10 +133,12 @@ public class GunController : NetworkBehaviour
 
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
-        if(IsOwner&&parentNetworkObject==null){ //if the player is disconnected
-            print($"new parent object is null, returning gun {gunName} to pool");
-            GunsManager.Instance.returnGunToPoolServerRpc(NetworkObject);
-
+        if(parentNetworkObject==null){ //if the player is disconnected
+            if(IsOwner){
+                print($"new parent object is null, returning gun {gunName} to pool");
+                GunsManager.Instance.returnGunToPoolServerRpc(NetworkObject);
+                
+            }
             return;
         }
         if(parentNetworkObject.TryGetComponent(out PlayerController player)){
