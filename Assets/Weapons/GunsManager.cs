@@ -121,6 +121,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
     private IEnumerator setAmmoClientRpcCoroutine(string gunName, int newAmmo){
         yield return new WaitUntil(()=>PlayerController.localPlayer.getGunReference()!=null);
+        yield return new WaitUntil(()=>PlayerController.localPlayer.getGunReference().gunName==gunName);
         setAmmoClientRpc(gunName,newAmmo);
     }
 
