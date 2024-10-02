@@ -117,7 +117,7 @@ public class GunController : NetworkBehaviour
             if(AmmoLeft<=0){
                 return;
             }
-            GetComponent<NetworkAnimator>().SetTrigger(ShootTrigger);
+            //GetComponent<NetworkAnimator>().SetTrigger(ShootTrigger);
             FireBullet(gunNozzle.up, gunNozzlePos);
             gunAnimator.SetTrigger(ShootTrigger);
             cameraShakeEffect.GenerateImpulse();
@@ -175,7 +175,7 @@ public class GunController : NetworkBehaviour
                 if(AmmoLeft<=0){
                     yield return null;
                 }
-                GetComponent<NetworkAnimator>().SetTrigger(ShootTrigger);
+                //GetComponent<NetworkAnimator>().SetTrigger(ShootTrigger);
                 FireBullet(gunNozzle.up, gunNozzlePos);
                 yield return new WaitForSeconds(ShootCooldown);
                 canShoot = true;
@@ -234,7 +234,7 @@ public class GunController : NetworkBehaviour
                     Instantiate(bulletPrefab, initPos, gunNozzle.rotation).GetComponent<BulletController>().Launch(dir,visualNozzle.position);
                     break;
             }
-        //gunAnimator.SetTrigger(ShootTrigger);
+        gunAnimator.SetTrigger(ShootTrigger);
         shootEffect.Play();
     }
     /*private Coroutine reloadCoroutineHandle;
