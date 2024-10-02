@@ -16,6 +16,7 @@ public class EntranceGateComponent : NetworkBehaviour
 
     [SerializeField] private Collider entranceTrigger;
 
+    private List<ulong> playersInArena=new();
 
     public override void OnNetworkSpawn()
     {
@@ -64,17 +65,22 @@ public class EntranceGateComponent : NetworkBehaviour
     private void handleRunEnd(bool win){
         entranceTrigger.enabled=true;
         gateAnimator.SetBool("isOpen",true);
+        playersInArena.Clear();
     }
 
     public void OnPlayerTriggerEnter(){
-        if(IsServer){
-            ArenaManager.Instance.onPlayerEnteredArena();
-        }
-        else if (IsClient){
-            entranceTrigger.enabled=false;
+        if(IsClient){
+            onPlayerEnteredTriggerServerRpc(NetworkManager.LocalClientId);
         }
         //entranceTrigger.enabled=false;
         
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void onPlayerEnteredTriggerServerRpc(ulong enteringClientID){
+        if(!playersInArena.Contains(enteringClientID)){
+            ArenaManager.Instance.onPlayerEnteredArena();
+            playersInArena.Add(enteringClientID);
+        }
     }
 
     [ClientRpc]
