@@ -48,7 +48,8 @@ public class EntranceGateComponent : NetworkBehaviour
         print("run phase changed from "+prev+" to "+curr);
         if(!IsServer) return;
         if(curr<0){
-            //handleRunEnd(true);
+            entranceTrigger.enabled=true;
+            gateAnimator.SetBool("isOpen",true);
         }
         else if(curr==0){
             handleRunStart();
