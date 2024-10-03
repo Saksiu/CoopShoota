@@ -54,6 +54,7 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
         playerIDText.text="ID: "+PlayerPrefs.GetString("PlayerID");
         string savedPlayerName=PlayerPrefs.GetString("PlayerName");
         playerNameInputField.text=string.IsNullOrEmpty(savedPlayerName)?"":savedPlayerName;
+        serverNameInputField.text=string.IsNullOrEmpty(savedPlayerName)?"":savedPlayerName+"'s Server";
         m_Discovery.OnServerFound.AddListener(handleServerFound);
 
         enableMainMenu();
@@ -186,7 +187,17 @@ public class MainMenuManager : SingletonLocal<MainMenuManager>
 
     private string GetServerName(){
         string serverNameRaw=serverNameInputField.text;
+        if(serverNameRaw.Length==0){
+            //try and generate server name based on player name if exists
+            try{
+                string playerName=GetPlayerName();
+                if(playerName.Length>0){
+                    return playerName+"'s Server";
+                }
+                    
+            }catch(Exception e){throw new ArgumentException("Can't determine automatic server name due to:\n"+e);}
 
+        }
         if(serverNameRaw.Length>0)
             if(serverNameRaw.Length<=32)
                 return serverNameRaw;

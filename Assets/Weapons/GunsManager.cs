@@ -81,14 +81,16 @@ public class GunsManager : SingletonNetwork<GunsManager>
     public void OnGunEquippedServerRpc(ulong clientID, string gunName){
 
         setAmmoServerRpc(clientID,gunName,getAmmoLeft(clientID,gunName));
-        print($"OnGunEquippedServerRpc for client {clientID} ended data:");
-        printAllAmmoInfo();
+        //print($"OnGunEquippedServerRpc for client {clientID} ended data:");
+        //printAllAmmoInfo();
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void resetAllAmmoServerRpc(ulong clientID){
-        foreach(var gun in playerAmmoDict[clientID].Keys)
-            setAmmoServerRpc(clientID,gun,gunPrefabs.Find(g=>g.gunName==gun).initialAmmo);
+
+        foreach(var gun in playerAmmoDict[clientID].Keys.ToList())
+            setAmmoServerRpc(clientID,gun,gunPrefabs.Find(gunPrefab=>gunPrefab.gunName==gun).initialAmmo);
+            
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -98,27 +100,13 @@ public class GunsManager : SingletonNetwork<GunsManager>
         setAmmoClientRpc(gunName,ammo,new ClientRpcParams{
             Send=new ClientRpcSendParams{
                 TargetClientIds=new ulong[]{clientID}}});
-        print("setAmmoServerRpc ended data:");
-        printAllAmmoInfo();
+        //print("setAmmoServerRpc ended data:");
+        //printAllAmmoInfo();
     }
 
     [ClientRpc]
     private void setAmmoClientRpc(string gunName,int newAmmo, ClientRpcParams receiveParams = default){
-        
         StartCoroutine(setAmmoClientRpcCoroutine(gunName,newAmmo));
-        /*if(PlayerController.localPlayer.getGunReference()==null||PlayerController.localPlayer.getGunReference().gunName!=gunName){
-            print("local player is null or gun name does not match yet, shifting to coroutine");
-            
-            return;
-        }
-        if(PlayerController.localPlayer.getGunReference().gunName==gunName){
-            print("requested gun name matches current gun name, setting ammo");
-            
-        }else{
-            print("requested gun name does not match current gun name, aborting");
-        }
-
-        print("setAmmoClientRpc ended data:");*/
     }
 
     private IEnumerator setAmmoClientRpcCoroutine(string gunName, int newAmmo){
@@ -131,7 +119,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
 
     [ServerRpc(RequireOwnership = false)]
     public void addAmmoServerRpc(ulong clientID, string gunName, int change){
-        print("adding ammo "+change+" to "+gunName+" for player P"+NetworkManager.LocalClientId);
+        //print("adding ammo "+change+" to "+gunName+" for player P"+NetworkManager.LocalClientId);
         
         if(playerAmmoDict[clientID][gunName]+change<0){
             Debug.LogError($"attempting to change {gunName} weapon ammo for client {clientID} resulting in negative number!!!\n aborting");
@@ -185,7 +173,7 @@ public class GunsManager : SingletonNetwork<GunsManager>
             player.currentGun.Value=default;
         }
 
-        print($"setting {player.playerName.Value} player current gun");
+        //print($"setting {player.playerName.Value} player current gun");
 
         if(availableGun.NetworkObject.OwnerClientId!=player.OwnerClientId)
             availableGun.NetworkObject.ChangeOwnership(player.OwnerClientId);

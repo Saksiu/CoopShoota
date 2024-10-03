@@ -65,7 +65,7 @@ public class ArenaManager : SingletonNetwork<ArenaManager>
 
     [ServerRpc(RequireOwnership = false)]
     public void OnPlayerKilledServerRpc(ulong playerID){
-        print("received OnPlayerKilledServerRpc in arena manager");
+        print($"received OnPlayerKilledServerRpc in arena manager for player {playerID}");
         playersInArena--;
         if(playersInArena<=0){
             print("all players dead, resetting run phase");

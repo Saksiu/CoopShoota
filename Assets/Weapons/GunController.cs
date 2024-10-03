@@ -91,7 +91,7 @@ public class GunController : NetworkBehaviour
     private void onAmmoLeftValueChanged(int newAmmo)
     {
         if (!IsOwner) return;
-        print($"ammo left changed to {newAmmo} on {NetworkManager.LocalClientId} is owner? {IsOwner}");
+        //print($"ammo left changed to {newAmmo} on {NetworkManager.LocalClientId} is owner? {IsOwner}");
         HUDManager.Instance.updateAmmoLeft(newAmmo);
     }
     public void resetAmmoCount(){
@@ -146,7 +146,7 @@ public class GunController : NetworkBehaviour
             gunAnchor=player.playerCamera.transform.GetChild(2);
             gunNozzle=player.CamNozzle;
 
-            print("gun on parent changed: owner? "+IsOwner+" id: "+NetworkManager.LocalClientId);
+            //print("gun on parent changed: owner? "+IsOwner+" id: "+NetworkManager.LocalClientId);
             if(IsOwner){
                 GunsManager.Instance.OnGunEquippedServerRpc(NetworkManager.LocalClientId,gunName);
             }
@@ -240,34 +240,6 @@ public class GunController : NetworkBehaviour
         gunAnimator.SetTrigger(ShootTrigger);
         shootEffect.Play();
     }
-    /*private Coroutine reloadCoroutineHandle;
-
-    private bool isReloading=false;
-
-    public void Reload()
-    {
-        //print("reload called on "+NetworkManager.LocalClientId);
-        if(AmmoLeft==magazineSize){
-            reloadCoroutineHandle=null;
-            return;
-        }
-        if(isReloading) return;
-
-        if(reloadCoroutineHandle!=null)
-            StopCoroutine(reloadCoroutineHandle);
-        reloadCoroutineHandle=StartCoroutine(ReloadCoroutine());
-    }
-
-    private IEnumerator ReloadCoroutine()
-    {
-        isReloading=true;
-        canShoot = false;
-        HUDManager.Instance.ShowReload(reloadTime);
-        yield return new WaitForSeconds(reloadTime);
-        AmmoLeft = magazineSize;
-        canShoot = true;
-        isReloading=false;
-    }*/
     
 }
 

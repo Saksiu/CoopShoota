@@ -9,6 +9,34 @@ public class PlayerPickableComponent : NetworkBehaviour
     [SerializeField] private int AmmoGiven=10;
 
     [SerializeField] private float rotationSpeed=1f;
+
+
+    public override void OnNetworkSpawn()
+    {
+        if(IsServer){
+            ArenaManager.runPhaseChanged+=handleRunPhaseChange;
+        }
+        base.OnNetworkSpawn();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if(IsServer){
+            ArenaManager.runPhaseChanged-=handleRunPhaseChange;
+        }
+
+
+        base.OnNetworkDespawn();
+    }
+
+    private void handleRunPhaseChange(int prev, int curr){
+        
+        if(curr<0){
+            NetworkObject.Despawn(true);
+        }
+    }
+
+
     private void FixedUpdate(){
         transform.Rotate(Vector3.up,rotationSpeed);
     }

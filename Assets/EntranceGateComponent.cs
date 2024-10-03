@@ -48,7 +48,7 @@ public class EntranceGateComponent : NetworkBehaviour
         print("run phase changed from "+prev+" to "+curr);
         if(!IsServer) return;
         if(curr<0){
-            //reset
+            //handleRunEnd(true);
         }
         else if(curr==0){
             handleRunStart();
@@ -87,7 +87,7 @@ public class EntranceGateComponent : NetworkBehaviour
         //entranceTrigger.enabled=false;
         
     }
-    [ServerRpc(RequireOwnership = false)]
+    /*[ServerRpc(RequireOwnership = false)]
     private void onPlayerEnteredTriggerServerRpc(ulong enteringClientID){
         if(!playersInArena.Contains(enteringClientID)){
             ArenaManager.Instance.onPlayerEnteredArena();
@@ -99,5 +99,5 @@ public class EntranceGateComponent : NetworkBehaviour
     private void setTriggerActiveClientRpc(bool enabled, ClientRpcParams rpcParams=default){
         entranceTrigger.enabled=enabled;
         gateAnimator.SetBool("isOpen",enabled);
-    }
+    }*/
 }
