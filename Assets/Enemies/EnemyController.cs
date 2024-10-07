@@ -12,19 +12,24 @@ public class EnemyController : NetworkBehaviour
     [SerializeField] private float speed;
 
     [SerializeField] private Rigidbody rb;
-    [SerializeField] private Collider col;
+    [SerializeField] private Collider HitscanCollider;
+    [SerializeField] private LayerMask hitscanLayer;
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private Animator animator;
+
+    private AnimationEventPropagator animationEventPropagator;
     
     [SerializeField] private EnemyHealthComponent healthComponent;
     //[SerializeField] private HealthBarController healthBar;
 
-    [SerializeField] private float rotationCorrectionSpeed=1f;
+    //[SerializeField] private float rotationCorrectionSpeed=1f;
+    [SerializeField] private float playerAttackDistance=1f;
     private Transform target;
     //public override void OnNetworkSpawn() { }
 
     private List<Collider> previouslyCollided=new();
     private StateMachine stateMachine;
+    private bool attackAnimActive=false;
 
     public override void OnNetworkSpawn()
     {
@@ -35,23 +40,84 @@ public class EnemyController : NetworkBehaviour
         
         StateMachineState idle = new StateMachineState("idle", onStartIdle, null, null);
         StateMachineState chase = new StateMachineState("chase", onStartChase, onUpdateChase, null);
+        StateMachineState attack=new StateMachineState("attack",onStartAttack,null,onEndAttack);
         
         idle.AddTransition(anyPlayerInRange, chase);
-        //chase.AddTransition(()=>!anyPlayerInRange(), idle);
+        chase.AddTransition(()=>(!anyPlayerInRange())&&(!attackAnimActive), idle);
+        chase.AddTransition(isTargetWithinAttackRange, attack);
+        attack.AddTransition(()=>(!isTargetWithinAttackRange())&&(!attackAnimActive), chase);
         stateMachine.CurrentState = idle;
 
 
         EnemyHealthComponent.OnEnemyDeathAction += onDeath;
 
+        animationEventPropagator = GetComponentInChildren<AnimationEventPropagator>();
+        animationEventPropagator.AnimationEventAction += onAnimationEventCallbackReceived;
         
+    }
+
+    private void onAnimationEventCallbackReceived(string eventName){
+        //print("animation event received: "+eventName);
+        switch (eventName)
+        {
+            case "AttackStart":
+                onAttackStartAnimEvent();
+                break;
+            case "AttackHit":
+                onAttackHitAnimEvent();
+                break;
+            case "AttackAnimEnd":
+                if(IsServer){
+                    print("attack anim end event");
+                    attackAnimActive=false;
+                }
+                    
+                break;
+        }
     }
     public override void OnNetworkDespawn()
     {
         if(IsServer){
             EnemyHealthComponent.OnEnemyDeathAction -= onDeath;
+
+            if(animationEventPropagator!=null)
+                animationEventPropagator.AnimationEventAction -= onAnimationEventCallbackReceived;
         }
 
         base.OnNetworkDespawn();
+    }
+    
+    private void onStartAttack(){
+        agent.isStopped=true;
+        animator.SetBool("Attack",true);
+    }
+
+    public void onAttackStartAnimEvent(){
+        if(!IsServer) return;
+        print("attack start anim event");
+        attackAnimActive=true;
+        //rotate to face player
+        rb.rotation = Quaternion.LookRotation(target.position - transform.position);
+    }
+    private static Collider[] collisionBuffer=new Collider[20];
+    public void onAttackHitAnimEvent(){
+        if(!IsServer) return;
+
+        Physics.OverlapBoxNonAlloc(
+            HitscanCollider.bounds.center, HitscanCollider.bounds.size, collisionBuffer, 
+            HitscanCollider.transform.root.rotation,hitscanLayer);
+        for(int i=0;i<collisionBuffer.Length;i++){
+            if(collisionBuffer[i]==null) break;
+            if(collisionBuffer[i].TryGetComponent(out PlayerController player)){
+                player.healthComponent.DeductHPServerRpc(1);
+            }
+            collisionBuffer[i]=null;
+        }
+        //do a boxcast using a collider, deal damage to all players in it
+    }
+    private void onEndAttack(){
+        agent.isStopped=false;
+        animator.SetBool("Attack",false);
     }
 
     private void onStartIdle()
@@ -63,6 +129,7 @@ public class EnemyController : NetworkBehaviour
     private void onStartChase()
     {
         animator.SetBool("Run",true);
+        agent.isStopped=false;
     }
 
 
@@ -76,20 +143,16 @@ public class EnemyController : NetworkBehaviour
             if(target==null) return;
         }
 
-        //if(Vector3.Distance(transform.position,target.position)>playerDetectionRadius) return;
-
         agent.SetDestination(target.position);
-        //agent.CalculatePath(target.position,agent.path);
-
 
         //Quaternion targetRotation = Quaternion.LookRotation(target.position - transform.position);
         //rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationCorrectionSpeed);
 
-        
-        //! DEPRECATED: old direct-move code
-        //Vector3 direction= (target.position - transform.position).normalized*speed;
-        //rb.velocity = new Vector3(direction.x,rb.velocity.y,direction.z);
-        //transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+    }
+
+    private bool isTargetWithinAttackRange(){
+        //print("isTargetWithinAttackRange called, distance is "+Vector3.Distance(transform.position,target.position));
+        return Vector3.Distance(transform.position,target.position)<playerAttackDistance;
     }
 
     private bool anyPlayerInRange()
@@ -101,7 +164,6 @@ public class EnemyController : NetworkBehaviour
 
         return false;*/
     }
-
     private Transform getClosestPlayer(){
         Transform closestPlayer = target;
         float closestDistance = float.MaxValue;
@@ -109,7 +171,7 @@ public class EnemyController : NetworkBehaviour
         
         foreach (var player in GameMaster.Instance.getConnectedPlayers())
         {
-            if(player==null) break;
+            if(player==null) continue;
             nextPlayerDistance = Vector3.Distance(player.transform.position, transform.position);
             if (nextPlayerDistance < closestDistance)
             {
@@ -144,7 +206,7 @@ public class EnemyController : NetworkBehaviour
             return;
             //StartCoroutine(enforcePosandVelocityAfterCollision());
         }else if(other.gameObject.TryGetComponent(out PlayerController player)){
-            player.healthComponent.DeductHPServerRpc(1);
+            //player.healthComponent.DeductHPServerRpc(1);
         }
         //print("collided enemy"+gameObject.layer+" with "+other.gameObject.layer+" ???: "+(other.gameObject.layer==enemyLayer));
         
@@ -154,15 +216,6 @@ public class EnemyController : NetworkBehaviour
         /*if(NetworkObject.IsSpawned)
             NetworkObject.Despawn();*/
     }
-
-    //this is probably very dumb, I should probably just make bullets colliders triggers
-    /*private IEnumerator enforcePosandVelocityAfterCollision()
-    {
-        Vector3 tempPos = transform.position;
-        yield return new WaitForFixedUpdate();
-        transform.position = tempPos;
-        rb.velocity = Vector3.zero;
-    }*/
 
     private void OnTriggerEnter(Collider other)
     {
@@ -190,4 +243,14 @@ public class EnemyController : NetworkBehaviour
         NetworkObject.Despawn();
     }
     private int actualValueOfLayerMask(LayerMask layerMask)=> (int)Mathf.Log(layerMask.value, 2);
+
+    private void OnDrawGizmos(){
+        if(HitscanCollider!=null){
+            Gizmos.color=Color.red;
+            //print(HitscanCollider.);
+            //partially lies because it doesn't account for rotation
+            //Gizmos.DrawWireCube(HitscanCollider.bounds.center, HitscanCollider.bounds.size);
+           // Gizmos.DrawCube(HitscanCollider.transform.position, HitscanCollider.bounds.size);
+        }
+    }
 }

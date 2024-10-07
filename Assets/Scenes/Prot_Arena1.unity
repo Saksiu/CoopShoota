@@ -18958,7 +18958,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.033333335
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 42878fb30a17e434d910ad9ab4658cfd, type: 2}
   m_BuildHeightMesh: 0
@@ -21202,14 +21202,6 @@ MonoBehaviour:
         enemyCount: 5
         waveInitDelay: 2
         spawnInterval: 1
-      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
   - gate: {fileID: 1709760}
     phasesData:
     - wavesData:
@@ -21217,28 +21209,12 @@ MonoBehaviour:
         enemyCount: 5
         waveInitDelay: 2
         spawnInterval: 1
-      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
   - gate: {fileID: 1024245104}
     phasesData:
     - wavesData:
       - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 5
         waveInitDelay: 2
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
         spawnInterval: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
