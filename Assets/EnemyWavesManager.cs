@@ -50,6 +50,10 @@ public class EnemyWavesManager : SingletonNetwork<EnemyWavesManager>
             }
             return;
         }
+        if(curr>=GatesSpawnData[0].phasesData.Count){
+            //run ended
+            return;
+        }
         //default: pass all gate data to the gate enemy spawners, and open the gates
         foreach(var gateData in GatesSpawnData){
             gateData.gate.enemySpawner.injectWaveData(gateData.phasesData[curr].wavesData);

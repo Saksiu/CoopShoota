@@ -21199,21 +21199,21 @@ MonoBehaviour:
     phasesData:
     - wavesData:
       - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 5
+        enemyCount: 1
         waveInitDelay: 2
         spawnInterval: 1
   - gate: {fileID: 1709760}
     phasesData:
     - wavesData:
       - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 5
+        enemyCount: 1
         waveInitDelay: 2
         spawnInterval: 1
   - gate: {fileID: 1024245104}
     phasesData:
     - wavesData:
       - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
-        enemyCount: 5
+        enemyCount: 1
         waveInitDelay: 2
         spawnInterval: 1
 --- !u!1660057539 &9223372036854775807

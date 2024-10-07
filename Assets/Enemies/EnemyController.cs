@@ -9,7 +9,7 @@ using UnityEngine.AI;
 
 public class EnemyController : NetworkBehaviour
 {
-    [SerializeField] private float speed;
+    //[SerializeField] private float speed;
 
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Collider HitscanCollider;
@@ -53,6 +53,7 @@ public class EnemyController : NetworkBehaviour
 
         animationEventPropagator = GetComponentInChildren<AnimationEventPropagator>();
         animationEventPropagator.AnimationEventAction += onAnimationEventCallbackReceived;
+        //rb.isKinematic = true;
         
     }
 
@@ -68,7 +69,6 @@ public class EnemyController : NetworkBehaviour
                 break;
             case "AttackAnimEnd":
                 if(IsServer){
-                    print("attack anim end event");
                     attackAnimActive=false;
                 }
                     
@@ -89,15 +89,25 @@ public class EnemyController : NetworkBehaviour
     
     private void onStartAttack(){
         agent.isStopped=true;
+        agent.updateRotation=false;
         animator.SetBool("Attack",true);
     }
 
     public void onAttackStartAnimEvent(){
         if(!IsServer) return;
-        print("attack start anim event");
         attackAnimActive=true;
+        //agent.updateRotation=false;
         //rotate to face player
-        rb.rotation = Quaternion.LookRotation(target.position - transform.position);
+        //animator.applyRootMotion=false;
+        float targetRotation = Quaternion.LookRotation(target.position - transform.position).eulerAngles.y;
+        //print($"on attack start anim callback, rotating to face player {target.position - transform.position}");
+        //transform.rotation = Quaternion.Euler(transform.rotation.x,targetRotation,transform.rotation.z);
+        //float prevRotation = rb.rotation.eulerAngles.y;
+        rb.rotation = Quaternion.Euler(rb.rotation.x,targetRotation,rb.rotation.z);
+        //print("prev rotation: "+prevRotation+" new rotation: "+rb.rotation.eulerAngles.y);
+        //rb.MoveRotation(Quaternion.LookRotation(target.position - transform.position));
+        
+        //animator.applyRootMotion=true;
     }
     private static Collider[] collisionBuffer=new Collider[20];
     public void onAttackHitAnimEvent(){
@@ -117,6 +127,8 @@ public class EnemyController : NetworkBehaviour
     }
     private void onEndAttack(){
         agent.isStopped=false;
+        
+        agent.updateRotation=true;
         animator.SetBool("Attack",false);
     }
 
@@ -143,10 +155,14 @@ public class EnemyController : NetworkBehaviour
             if(target==null) return;
         }
 
-        agent.SetDestination(target.position);
+        //print($"agent steering target: {agent.steeringTarget} current position: {transform.position} difference: {agent.steeringTarget-transform.position}");
+        //agent.nextPosition
+        //rb.rotation=Quaternion.LookRotation((agent.steeringTarget-transform.position).normalized);
 
         //Quaternion targetRotation = Quaternion.LookRotation(target.position - transform.position);
         //rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationCorrectionSpeed);
+        agent.SetDestination(target.position);
+        //rb.isKinematic = true;
 
     }
 

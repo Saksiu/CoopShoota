@@ -70,7 +70,6 @@ GameObject:
   - component: {fileID: 6711248188622562501}
   - component: {fileID: 3433098346963594858}
   - component: {fileID: 4828337323218050041}
-  - component: {fileID: 3192561954281698721}
   - component: {fileID: 1569487259764198236}
   m_Layer: 8
   m_Name: Crusader_Enemy
@@ -109,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 388678404
+  GlobalObjectIdHash: 2561634363
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -130,7 +129,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44cd55e01ada9ef41a35cdfeed4a4dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 12
   rb: {fileID: 4828337323218050041}
   HitscanCollider: {fileID: 7756849894750045057}
   hitscanLayer:
@@ -139,7 +137,7 @@ MonoBehaviour:
   agent: {fileID: 1569487259764198236}
   animator: {fileID: 547911748489719069}
   healthComponent: {fileID: 3443126582322058408}
-  playerAttackDistance: 6
+  playerAttackDistance: 5
 --- !u!114 &3443126582322058408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,18 +226,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &3192561954281698721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1572734453095507446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!195 &1569487259764198236
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1443,11 +1429,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -4312865704182799169, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
   m_PrefabInstance: {fileID: 6264515314776445068}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1424085082361001000 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4986428901626602660, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
-  m_PrefabInstance: {fileID: 6264515314776445068}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1596637468450406086 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -4550779475407786422, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
@@ -1541,11 +1522,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.01510359, y: 0.051496975, z: 0.013897579}
   m_Center: {x: 0.0006176179, y: 0.020748314, z: 0.0019488324}
---- !u!4 &2839729964530139896 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -1037877233866993036, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
-  m_PrefabInstance: {fileID: 6264515314776445068}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3106791859729250542 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9074064682360383586, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
@@ -1559,11 +1535,6 @@ Transform:
 --- !u!4 &3857249550671673239 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7167394674841184027, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
-  m_PrefabInstance: {fileID: 6264515314776445068}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &3931969680156879282 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6944883689891690814, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
   m_PrefabInstance: {fileID: 6264515314776445068}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &4252434671124569977 stripped
@@ -1605,11 +1576,6 @@ Transform:
 --- !u!4 &4471365493958626840 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7565339585172561556, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
-  m_PrefabInstance: {fileID: 6264515314776445068}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &4642940564492770554 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1630037691844873334, guid: 31ec6e80d85c25c49a028818bd93aec8, type: 3}
   m_PrefabInstance: {fileID: 6264515314776445068}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &5458395523017019220 stripped
@@ -1733,11 +1699,11 @@ MonoBehaviour:
   - {fileID: 2433629558155966308}
   - {fileID: 2326594084145556287}
   - {fileID: 1357158001123177523}
-  - {fileID: 1424085082361001000}
-  - {fileID: 2839729964530139896}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 4471365493958626840}
-  - {fileID: 4642940564492770554}
-  - {fileID: 3931969680156879282}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 409496369641624631}
   - {fileID: 6650540303801139280}
   - {fileID: 6837202723333892942}
