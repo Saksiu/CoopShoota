@@ -14,14 +14,16 @@ public class EnemyController : NetworkBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Collider col;
     [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private Animator animator;
     
     [SerializeField] private EnemyHealthComponent healthComponent;
     //[SerializeField] private HealthBarController healthBar;
 
-    [SerializeField] private float playerDetectionRadius=10f;
+    [SerializeField] private float rotationCorrectionSpeed=1f;
     private Transform target;
     //public override void OnNetworkSpawn() { }
 
+    private List<Collider> previouslyCollided=new();
     private StateMachine stateMachine;
 
     public override void OnNetworkSpawn()
@@ -54,12 +56,13 @@ public class EnemyController : NetworkBehaviour
 
     private void onStartIdle()
     {
+        animator.SetBool("Run",false);
         //print("onStartIdle");
     }
     
     private void onStartChase()
     {
-        //print("onStartChase");
+        animator.SetBool("Run",true);
     }
 
 
@@ -76,7 +79,11 @@ public class EnemyController : NetworkBehaviour
         //if(Vector3.Distance(transform.position,target.position)>playerDetectionRadius) return;
 
         agent.SetDestination(target.position);
-        agent.CalculatePath(target.position,agent.path);
+        //agent.CalculatePath(target.position,agent.path);
+
+
+        //Quaternion targetRotation = Quaternion.LookRotation(target.position - transform.position);
+        //rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationCorrectionSpeed);
 
         
         //! DEPRECATED: old direct-move code
@@ -134,13 +141,13 @@ public class EnemyController : NetworkBehaviour
             //print("enemy hit by bullet "+NetworkManager.LocalClientId);
             if(IsSpawned)
                 healthComponent.DeductHPServerRpc(1);
-            StartCoroutine(enforcePosandVelocityAfterCollision());
+            return;
+            //StartCoroutine(enforcePosandVelocityAfterCollision());
+        }else if(other.gameObject.TryGetComponent(out PlayerController player)){
+            player.healthComponent.DeductHPServerRpc(1);
         }
         //print("collided enemy"+gameObject.layer+" with "+other.gameObject.layer+" ???: "+(other.gameObject.layer==enemyLayer));
         
-        //col.enabled = false;
-
-        other.gameObject.GetComponent<PlayerController>()?.healthComponent.DeductHPServerRpc(1);
 
         //healthComponent.HP.Value--;
         //if(!IsServer) return;
@@ -149,13 +156,13 @@ public class EnemyController : NetworkBehaviour
     }
 
     //this is probably very dumb, I should probably just make bullets colliders triggers
-    private IEnumerator enforcePosandVelocityAfterCollision()
+    /*private IEnumerator enforcePosandVelocityAfterCollision()
     {
         Vector3 tempPos = transform.position;
         yield return new WaitForFixedUpdate();
         transform.position = tempPos;
         rb.velocity = Vector3.zero;
-    }
+    }*/
 
     private void OnTriggerEnter(Collider other)
     {
@@ -167,8 +174,12 @@ public class EnemyController : NetworkBehaviour
         {
             //deduct hp
             //print("enemy hit by bullet "+NetworkManager.LocalClientId);
-            if(IsSpawned)
+
+            if(IsSpawned&&!previouslyCollided.Contains(other)){
                 healthComponent.DeductHPServerRpc(1);
+                previouslyCollided.Add(other);
+            }
+                
         }
     }
 

@@ -48,7 +48,7 @@ public class PlayerHealthComponent : NetworkBehaviour
         HP.Value -= amount;
         if(HP.Value<=0){
             OnDeathAction.Invoke(GetComponent<PlayerController>());
-            OnDeathClientRpc();
+            //OnDeathClientRpc();
         }
             
     }

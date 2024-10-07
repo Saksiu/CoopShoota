@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1043011958}
-  m_IndirectSpecularColor: {r: 0.08045645, g: 0.13085444, b: 0.24502647, a: 1}
+  m_IndirectSpecularColor: {r: 0.08118828, g: 0.13146979, b: 0.2454972, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -21198,123 +21198,45 @@ MonoBehaviour:
   - gate: {fileID: 1201926602}
     phasesData:
     - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 5
         waveInitDelay: 2
         spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 10
         waveInitDelay: 0
         spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
-    - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 5
-        waveInitDelay: 2
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
-    - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 5
-        waveInitDelay: 2
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 15
         waveInitDelay: 0
         spawnInterval: 1
   - gate: {fileID: 1709760}
     phasesData:
     - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 5
         waveInitDelay: 2
         spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 10
         waveInitDelay: 0
         spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
-    - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 5
-        waveInitDelay: 2
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
-    - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 5
-        waveInitDelay: 2
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 15
         waveInitDelay: 0
         spawnInterval: 1
   - gate: {fileID: 1024245104}
     phasesData:
     - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 5
         waveInitDelay: 2
         spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 10
         waveInitDelay: 0
         spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
-    - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 5
-        waveInitDelay: 2
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 15
-        waveInitDelay: 0
-        spawnInterval: 1
-    - wavesData:
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 5
-        waveInitDelay: 2
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
-        enemyCount: 10
-        waveInitDelay: 0
-        spawnInterval: 1
-      - enemyPrefab: {fileID: 7694717039117533379, guid: 6d16b77cc93900246add015c06073e4f, type: 3}
+      - enemyPrefab: {fileID: 1572734453095507446, guid: 3e669fa667fd94a408821e2ce77e2ac2, type: 3}
         enemyCount: 15
         waveInitDelay: 0
         spawnInterval: 1
