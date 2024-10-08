@@ -69,7 +69,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.6145676
+      - time: 0.5483338
         functionName: CallAnimationEvent
         data: AttackHit
         objectReferenceParameter: {instanceID: 0}
